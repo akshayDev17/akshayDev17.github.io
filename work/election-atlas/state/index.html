@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>State — Election Atlas of India</title>
+<meta name="description" content="One state under two grids: its legislative assembly seats and its Lok Sabha seats, with each constituency's own result on hover.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EEF1F8; --paper-2:#E3E9F4; --ink:#0F1220; --muted:#525A6B;
+  --rule:#D3D9E6; --rule-2:#BCC4D6;
+  --serif:"Newsreader",ui-serif,Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px;
+  --r2:6px;
+  --col:86rem;
+  --pad:max(clamp(1.25rem,4vw,4.5rem),calc((100vw - var(--col)) / 2));
+  --ease:cubic-bezier(.2,0,0,1);
+  --map-h:clamp(16rem,78vh,46rem);
+  --aspect:1;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+html,body{height:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--serif);font-optical-sizing:auto;font-size:1.0625rem;line-height:1.65;
+  font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;min-height:100dvh;
+}
+p{margin:0}
+.lbl{
+  font-family:var(--mono);font-size:.625rem;line-height:1.4;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--muted);
+}
+main{flex:1 1 auto;display:flex;flex-direction:column;padding:0 var(--pad)}
+.hair{height:1px;background:var(--rule);border:0;margin:0}
+
+/* ── masthead ─────────────────────────────────────────────────────────── */
+.masthead{flex:0 0 auto;padding-top:clamp(1rem,2.4vw,2rem)}
+.mh-left{display:flex;align-items:baseline;gap:var(--s5);flex-wrap:wrap;margin:0}
+.mh-top .lbl{margin:0}
+.back{
+  font-family:var(--mono);font-size:.625rem;line-height:1.4;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--muted);text-decoration:none;
+  transition:color .18s var(--ease);
+}
+.back:hover{color:var(--ink)}
+.back:focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:2px}
+
+h1{margin:0;font-weight:400}
+
+/* ── the two grids, split by a rule down the middle ───────────────────── */
+.panels{
+  flex:0 0 auto;display:grid;gap:0 clamp(1.25rem,2.5vw,2.5rem);
+  grid-template-columns:1fr;padding-bottom:clamp(1rem,2vw,1.5rem);
+}
+.split{display:none}
+.panel{min-width:0;display:flex;flex-direction:column;gap:var(--s2);padding-top:var(--s5)}
+.panel-head{display:flex;flex-direction:column;gap:var(--s2)}
+.tier{
+  font-family:var(--mono);font-size:.625rem;line-height:1.4;letter-spacing:.15em;
+  text-transform:uppercase;margin:0;
+}
+.tier .name{color:var(--ink)}
+.tier .sep{color:var(--rule-2);padding:0 .6em}
+#cap-ac,#cap-pc{color:var(--muted)}
+.years{display:flex;align-items:baseline;gap:2px}
+.year{
+  appearance:none;background:none;border:0;cursor:pointer;
+  font-family:var(--mono);font-size:.75rem;letter-spacing:.06em;color:var(--muted);
+  padding:3px 8px 5px;border-bottom:2px solid transparent;
+  transition:color .18s var(--ease),border-color .18s var(--ease);
+}
+.year:hover{color:var(--ink)}
+.year[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.year:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:2px}
+.year[disabled]{opacity:.4;cursor:default}
+
+.panel figure{margin:0;display:flex;align-items:center;justify-content:center}
+.panel svg{
+  display:block;overflow:visible;height:auto;
+  width:min(100%, calc(var(--map-h) * var(--aspect)));
+  aspect-ratio:var(--aspect);
+}
+.pc,.ac{fill:var(--c);stroke:none;cursor:pointer}
+#map-pc .pc{stroke:var(--paper);stroke-width:.75;stroke-linejoin:round}
+#map-ac .ac{stroke:var(--paper);stroke-width:.5;stroke-linejoin:round}
+.panels.ready .ac,.panels.ready .pc{transition:fill .22s var(--ease)}
+.panel .edge{fill:none;stroke:var(--ink);stroke-width:1.1;stroke-linejoin:round;pointer-events:none}
+.pc:focus-visible,.ac:focus-visible{outline:none}
+.marked{stroke:var(--ink);stroke-width:2.4;stroke-opacity:1}
+.panels.ready .marked{transition:stroke-width .16s var(--ease)}
+.scrim,.lift{pointer-events:none}
+.panels.ready .scrim,.panels.ready .lift{transition:opacity .24s var(--ease)}
+.scrim{fill:var(--paper);opacity:0}
+.lift{fill:var(--ink);opacity:0}
+.panel.has-focus .scrim{opacity:.62}
+.panel.has-focus .lift{opacity:.24}
+.panel.has-focus .edge{stroke-opacity:.3}
+
+/* ── the hover card: one constituency's own result ────────────────────── */
+#card{
+  position:fixed;z-index:9;
+  /* the table can push the card wider than its own max-width, so cap both ends
+     against the viewport rather than trusting min/max alone */
+  min-width:min(22rem, calc(100vw - 16px));
+  max-width:min(27rem, calc(100vw - 16px));
+  background:#fff;border:1px solid var(--rule-2);border-radius:var(--r2);
+  box-shadow:0 6px 26px rgba(15,18,32,.14);
+  padding:14px 16px 12px;opacity:0;pointer-events:none;
+  transition:opacity .14s var(--ease);
+}
+#card.on{opacity:1}
+#card .sub{font-family:var(--mono);font-size:.5625rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 2px}
+#card h3{margin:0;font-size:1.0625rem;font-weight:400;line-height:1.2;letter-spacing:-.01em}
+/* the winner's portrait sits top-right, level with the eyebrow */
+#card .top{display:flex;align-items:flex-start;gap:13px}
+#card .who{flex:1 1 auto;min-width:0}
+#card .face{
+  flex:0 0 auto;width:68px;height:85px;border-radius:var(--r2);overflow:hidden;
+  border:1px solid var(--rule-2);background:var(--paper);
+}
+#card .face img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+#card .meta{font-family:var(--mono);font-size:.6875rem;color:var(--muted);
+  margin:5px 0 10px;line-height:1.45}
+#card .meta span{display:block}
+#card table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.6875rem}
+#card th{
+  font-weight:400;font-size:.5625rem;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--muted);text-align:right;padding:0 0 5px;border-bottom:1px solid var(--rule-2);
+}
+#card td{padding:4px 0;text-align:right;border-top:1px solid var(--rule)}
+#card tr:first-child td{border-top:0}
+#card th:nth-child(1),#card td:nth-child(1),
+#card th:nth-child(2),#card td:nth-child(2){text-align:left}
+#card th+th,#card td+td{padding-left:12px}
+#card .cell{display:flex;align-items:center;gap:6px}
+#card td.name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:11rem}
+#card .sw{width:9px;height:9px;border-radius:2px;flex:0 0 auto;background:var(--c);
+  box-shadow:inset 0 0 0 1px rgba(15,18,32,.2)}
+#card .more{color:var(--muted)}
+
+/* ── tables ───────────────────────────────────────────────────────────── */
+.table{flex:0 0 auto}
+.table-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s4)}
+.reset{
+  appearance:none;background:none;border:0;cursor:pointer;padding:2px 4px;
+  font-family:var(--mono);font-size:.5625rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);display:inline-flex;align-items:center;gap:5px;
+  transition:color .18s var(--ease);
+}
+.reset:hover{color:var(--ink)}
+.reset:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:2px}
+.reset[hidden]{display:none}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.6875rem}
+th{
+  font-weight:400;font-size:.5625rem;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--muted);text-align:right;padding:0;border-bottom:1px solid var(--rule-2);
+}
+th button{
+  appearance:none;background:none;border:0;cursor:pointer;width:100%;text-align:right;
+  font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit;
+  padding:0 0 5px;transition:color .18s var(--ease);
+}
+th button:hover{color:var(--ink)}
+th button:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:2px}
+th[aria-sort] button{color:var(--ink)}
+th:first-child button{text-align:left;cursor:default}
+td{padding:4px 0;text-align:right;border-top:1px solid var(--rule)}
+tr:first-child td{border-top:0}
+th:first-child,td:first-child{text-align:left}
+th+th,td+td{padding-left:16px}
+td .cell{display:flex;align-items:center;gap:7px}
+.sw{width:9px;height:9px;border-radius:2px;flex:0 0 auto;background:var(--c);
+  box-shadow:inset 0 0 0 1px rgba(15,18,32,.2)}
+.more{color:var(--muted)}
+
+.void{
+  min-height:12rem;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--rule);border-radius:var(--r2);padding:var(--s5);
+}
+.void p{max-width:40ch;text-align:center;font-family:var(--mono);font-size:.6875rem;
+  line-height:1.7;color:var(--muted)}
+
+@media (min-width:60rem){
+  .panels{grid-template-columns:1fr 1px 1fr}
+  /* Apple-ish: barely there, and it dissolves before it reaches either end
+     rather than stopping dead against the content. */
+  .split{
+    display:block;align-self:stretch;margin-top:var(--s5);
+    background:linear-gradient(to bottom,
+      transparent 0, var(--rule) 9%, var(--rule) 91%, transparent 100%);
+  }
+  .panel{padding-top:var(--s5)}
+}
+@media (prefers-reduced-motion:reduce){
+  .ac,.pc,.scrim,.lift,.year,.back,.edge,.marked,th button,#card{transition:none}
+}
+</style>
+</head>
+<body>
+<main>
+  <header class="masthead">
+    <div class="mh-left">
+      <a class="back" href="../">← India</a>
+      <h1 class="lbl" id="eyebrow">Election Atlas of India</h1>
+    </div>
+    <hr class="hair" style="margin-top:var(--s4)">
+  </header>
+
+  <div class="panels" id="panels">
+    <section class="panel" id="panel-ac">
+      <div class="panel-head">
+        <div class="years" id="years-ac" role="group" aria-label="Assembly election year"></div>
+        <p class="tier"><span class="name">State Legislative Assembly</span><span class="sep">·</span><span id="cap-ac">—</span></p>
+      </div>
+      <figure><svg id="map-ac" role="group" aria-label="Legislative assembly constituencies of this state."></svg></figure>
+      <div class="table">
+        <div class="table-head">
+          <p class="lbl">Seats won</p>
+          <button class="reset" id="reset-ac" type="button" hidden>
+            <svg width="10" height="10" viewBox="0 0 12 12" aria-hidden="true" fill="none"
+                 stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+              <path d="M2 6a4 4 0 1 0 1.2-2.8"/><path d="M2 1.6V4h2.4"/>
+            </svg>default order</button>
+        </div>
+        <div id="table-ac"></div>
+      </div>
+    </section>
+
+    <div class="split" aria-hidden="true"></div>
+
+    <section class="panel" id="panel-pc">
+      <div class="panel-head">
+        <div class="years" id="years-pc" role="group" aria-label="Lok Sabha election year"></div>
+        <p class="tier"><span class="name">Lok Sabha</span><span class="sep">·</span><span id="cap-pc">—</span></p>
+      </div>
+      <figure><svg id="map-pc" role="group" aria-label="Lok Sabha constituencies of this state."></svg></figure>
+      <div class="table">
+        <div class="table-head">
+          <p class="lbl">Seats won</p>
+          <button class="reset" id="reset-pc" type="button" hidden>
+            <svg width="10" height="10" viewBox="0 0 12 12" aria-hidden="true" fill="none"
+                 stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+              <path d="M2 6a4 4 0 1 0 1.2-2.8"/><path d="M2 1.6V4h2.4"/>
+            </svg>default order</button>
+        </div>
+        <div id="table-pc"></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div id="card" role="status" aria-live="polite"></div>
+
+<script type="module">
+const NS = 'http://www.w3.org/2000/svg';
+const $ = s => document.querySelector(s);
+const nf = n => Math.round(n).toLocaleString('en-IN');
+const pc1 = n => (n * 100).toFixed(1) + '%';
+
+let geo, topojson;
+try {
+  [geo, topojson] = await Promise.all([
+    import('../vendor/d3-geo.js'),
+    import('../vendor/topojson-client.js'),
+  ]);
+} catch (err) { $('#eyebrow').textContent = 'Election Atlas of India'; throw err; }
+
+const qs = new URLSearchParams(location.search);
+let stateCode = (qs.get('s') || '').toUpperCase();
+
+const [manifest, regionsDoc, partiesDoc, statesTopo, coverage] = await Promise.all([
+  fetch('../data/manifest.json').then(r => r.json()),
+  fetch('../data/regions.json').then(r => r.json()),
+  fetch('../data/parties.json').then(r => r.json()),
+  fetch('../data/geo/india-states.json').then(r => r.json()),
+  fetch('../data/geo/ac/coverage.json').then(r => r.json()).catch(() => ({ checked: {} })),
+]);
+
+const regionByCode = new Map(regionsDoc.regions.map(r => [r.code, r]));
+const regionBySource = new Map();
+for (const r of regionsDoc.regions) for (const s of r.sourceNames) regionBySource.set(s, r.code);
+const partyByCode = new Map(partiesDoc.parties.map(p => [p.code, p]));
+const fallback = partiesDoc.fallback;
+const colour = c => (partyByCode.get(c) || fallback).colour;
+
+if (!regionByCode.has(stateCode)) stateCode = 'IN-UP';
+const region = regionByCode.get(stateCode);
+const hasAC = !!coverage.checked[stateCode];
+
+/* the page is about one state, and says so */
+document.title = `Election Atlas of ${region.name}`;
+$('#eyebrow').textContent = `Election Atlas of ${region.name}`;
+
+/* Each map carries its own timeline. Assembly elections run on a different cycle
+   from Lok Sabha ones, so the two controls are independent by construction: a
+   year chosen on the left never touches the right. */
+const LS_YEARS = manifest.elections.ls.years;
+const LA_YEARS = manifest.elections.ac.years.length ? manifest.elections.ac.years : LS_YEARS;
+
+const pcTopo = await fetch('../data/geo/ls/' + stateCode + '.json').then(r => r.json());
+const pcs = topojson.feature(pcTopo, pcTopo.objects.pcs);
+let acs = null;
+if (hasAC) {
+  const t = await fetch('../data/geo/ac/' + stateCode + '.json').then(r => r.json());
+  acs = topojson.feature(t, t.objects.acs);
+}
+const stateFeature = topojson.feature(statesTopo, statesTopo.objects.states).features
+  .find(f => regionBySource.get(f.properties.state_ut_name) === stateCode);
+
+const probe = geo.geoMercator().fitSize([1000, 1000], stateFeature);
+const pb = geo.geoPath(probe).bounds(stateFeature);
+const ASPECT = (pb[1][0] - pb[0][0]) / Math.max(1e-6, pb[1][1] - pb[0][1]);
+$('#panels').style.setProperty('--aspect', ASPECT);
+
+const svgAC = $('#map-ac'), svgPC = $('#map-pc');
+let W = 0, H = 0, pathGen = null;
+const acPaths = new Map(), pcPaths = new Map();
+const acName = new Map(), pcName = new Map();
+const P = {};
+
+function buildPanel(svg, cls) {
+  svg.textContent = '';
+  const uid = 'm' + Math.random().toString(36).slice(2, 8);
+  const defs = document.createElementNS(NS, 'defs');
+  defs.innerHTML =
+    `<mask id="${uid}" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}">
+       <rect x="0" y="0" width="${W}" height="${H}" fill="#fff"/>
+       <path class="hole" fill="#000"/>
+     </mask>
+     <filter id="f${uid}" x="-30%" y="-30%" width="160%" height="160%">
+       <feGaussianBlur stdDeviation="${Math.max(3.5, W / 145).toFixed(2)}"/>
+     </filter>`;
+  svg.appendChild(defs);
+  const g = document.createElementNS(NS, 'g');
+  g.setAttribute('class', cls);
+  svg.appendChild(g);
+  const scrim = document.createElementNS(NS, 'rect');
+  scrim.setAttribute('class', 'scrim');
+  scrim.setAttribute('x', 0); scrim.setAttribute('y', 0);
+  scrim.setAttribute('width', W); scrim.setAttribute('height', H);
+  scrim.setAttribute('mask', `url(#${uid})`);
+  svg.appendChild(scrim);
+  const lift = document.createElementNS(NS, 'path');
+  lift.setAttribute('class', 'lift');
+  lift.setAttribute('mask', `url(#${uid})`);
+  lift.setAttribute('filter', `url(#f${uid})`);
+  lift.setAttribute('transform', `translate(0,${Math.max(4, W / 105).toFixed(1)})`);
+  svg.appendChild(lift);
+  const edge = document.createElementNS(NS, 'path');
+  edge.setAttribute('class', 'edge');
+  edge.setAttribute('d', pathGen(stateFeature));
+  svg.appendChild(edge);
+  return { g, scrim, lift, hole: defs.querySelector('.hole') };
+}
+
+function buildGrids() {
+  acPaths.clear(); pcPaths.clear(); acName.clear(); pcName.clear();
+  P.ac = buildPanel(svgAC, 'acs');
+  P.pc = buildPanel(svgPC, 'pcs');
+  if (acs) {
+    for (const f of acs.features) {
+      const key = String(f.properties.no);
+      const p = document.createElementNS(NS, 'path');
+      p.setAttribute('d', pathGen(f));
+      p.setAttribute('class', 'ac');
+      p.dataset.key = key;
+      p.setAttribute('tabindex', '0');
+      p.setAttribute('role', 'button');
+      p.setAttribute('aria-label', `${f.properties.ac}, assembly constituency`);
+      P.ac.g.appendChild(p);
+      acPaths.set(key, p);
+      acName.set(key, f.properties.ac);
+    }
+  }
+  for (const f of pcs.features) {
+    const key = String(f.properties.ls_seat_code);
+    const p = document.createElementNS(NS, 'path');
+    p.setAttribute('d', pathGen(f));
+    p.setAttribute('class', 'pc');
+    p.dataset.key = key;
+    p.setAttribute('tabindex', '0');
+    p.setAttribute('role', 'button');
+    p.setAttribute('aria-label', `${f.properties.ls_seat_name}, Lok Sabha constituency`);
+    P.pc.g.appendChild(p);
+    pcPaths.set(key, p);
+    pcName.set(key, f.properties.ls_seat_name);
+  }
+}
+
+function layout(force) {
+  const b = svgAC.getBoundingClientRect();
+  const w = Math.max(160, Math.round(b.width));
+  const h = Math.max(120, Math.round(b.height));
+  if (!force && w === W && h === H && pathGen) return false;
+  W = w; H = h;
+  for (const s of [svgAC, svgPC]) s.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  pathGen = geo.geoPath(geo.geoMercator().fitExtent([[2, 2], [W - 2, H - 2]], stateFeature));
+  buildGrids();
+  repaintAll();
+  return true;
+}
+
+/* ── results ──────────────────────────────────────────────────────────── */
+function aggregateFrom(cs) {
+  const m = new Map(); let total = 0;
+  for (const c of Object.values(cs)) {
+    const w = m.get(c.p) || { seats: 0, votes: 0 };
+    w.seats++; w.votes += c.v; total += c.v;
+    m.set(c.p, w);
+    for (const [code, v] of Object.entries(c.o || {})) {
+      const o = m.get(code) || { seats: 0, votes: 0 };
+      o.votes += v; total += v; m.set(code, o);
+    }
+  }
+  return { m, total };
+}
+
+const MAX_ROWS = 8;
+const sortState = { ac: { key: 'seats', dir: -1 }, pc: { key: 'seats', dir: -1 } };
+const DEFAULT_SORT = { key: 'seats', dir: -1 };
+
+function sortedRows(agg, which) {
+  const rows = [...agg.m.entries()].map(([code, v]) => ({ code, ...v }))
+    .filter(r => r.seats > 0 || r.votes > 0);
+  const s = sortState[which];
+  const share = r => (agg.total ? r.votes / agg.total : 0);
+  return rows.sort((a, b) => {
+    const va = s.key === 'share' ? share(a) : a[s.key];
+    const vb = s.key === 'share' ? share(b) : b[s.key];
+    return s.dir * (va - vb) || b.seats - a.seats;
+  });
+}
+
+function renderTable(el, agg, which, resetBtn) {
+  if (!agg || !agg.m.size) { el.innerHTML = ''; if (resetBtn) resetBtn.hidden = true; return; }
+  const rows = sortedRows(agg, which);
+  const total = agg.total, rest = rows.slice(MAX_ROWS);
+  const restV = rest.reduce((n, r) => n + r.votes, 0);
+  const s = sortState[which];
+  const isDefault = s.key === DEFAULT_SORT.key && s.dir === DEFAULT_SORT.dir;
+  if (resetBtn) resetBtn.hidden = isDefault;
+  const arrow = k => s.key === k ? (s.dir === -1 ? ' ↓' : ' ↑') : '';
+  const th = (k, label) =>
+    `<th aria-sort="${s.key === k ? (s.dir === -1 ? 'descending' : 'ascending') : 'none'}">` +
+    `<button type="button" data-sort="${k}">${label}${arrow(k)}</button></th>`;
+  el.innerHTML =
+    `<table><thead><tr><th>Party</th>${th('seats', 'Seats won')}${th('votes', 'Votes')}${th('share', 'Share')}</tr></thead><tbody>` +
+    rows.slice(0, MAX_ROWS).map(r =>
+      `<tr><td><span class="cell"><i class="sw" style="--c:${colour(r.code)}"></i>${r.code}</span></td>` +
+      `<td>${r.seats}</td><td>${nf(r.votes)}</td><td>${pc1(total ? r.votes / total : 0)}</td></tr>`).join('') +
+    (rest.length ? `<tr class="more"><td><span class="cell">+${rest.length} more</span></td>` +
+      `<td>${rest.reduce((n, r) => n + r.seats, 0)}</td><td>${nf(restV)}</td>` +
+      `<td>${pc1(total ? restV / total : 0)}</td></tr>` : '') +
+    `</tbody></table>`;
+  for (const b of el.querySelectorAll('th button[data-sort]')) {
+    b.addEventListener('click', () => {
+      const k = b.dataset.sort;
+      const st = sortState[which];
+      if (st.key === k) st.dir = -st.dir; else { st.key = k; st.dir = -1; }
+      renderTable(el, agg, which, resetBtn);
+    });
+  }
+}
+
+/* ── per-constituency detail ──────────────────────────────────────────── */
+const detail = { ac: new Map(), pc: new Map() };
+
+async function loadPCDetail(year) {
+  const doc = await fetch(`../data/results/ls/detail/${year}.json`).then(r => r.json()).catch(() => null);
+  detail.pc = new Map(doc ? Object.entries(doc.constituencies) : []);
+}
+async function loadACDetail(year) {
+  if (!hasAC) return;
+  const doc = await fetch(`../data/results/ac/${stateCode}/${year}-detail.json`).then(r => r.json()).catch(() => null);
+  detail.ac = new Map(doc ? Object.entries(doc.constituencies) : []);
+}
+
+/* ── the card ─────────────────────────────────────────────────────────── */
+const card = $('#card');
+const cardRows = { ac: new Map(), pc: new Map() };
+
+function showCard(which, key, x, y) {
+  const cands = (which === 'ac' ? cardRows.ac : cardRows.pc).get(key);
+  if (!cands || !cands.length) return;
+  const total = cands.reduce((n, c) => n + c.v, 0);
+  const nm = (which === 'ac' ? acName : pcName).get(key) || '';
+  const rest = cands.slice(6);
+  const restV = rest.reduce((n, c) => n + c.v, 0);
+  card.innerHTML =
+    `<div class="top"><div class="who">
+       <p class="sub">${which === 'ac' ? 'Assembly constituency' : 'Lok Sabha constituency'}</p>
+       <h3>${nm}</h3>
+       <p class="meta"><span>${cands.length} candidates</span><span>${nf(total)} votes polled</span></p>
+     </div>${faceFor(which, key)}</div>
+     <table><thead><tr><th>Party</th><th>Candidate</th><th>Votes</th><th>Share</th></tr></thead><tbody>` +
+    cands.slice(0, 6).map(c =>
+      `<tr><td><span class="cell"><i class="sw" style="--c:${colour(c.p)}"></i>${c.p}</span></td>` +
+      `<td class="name" title="${c.n}">${c.n}</td>` +
+      `<td>${nf(c.v)}</td><td>${pc1(total ? c.v / total : 0)}</td></tr>`).join('') +
+    (rest.length ? `<tr class="more"><td>+${rest.length} more</td><td></td><td>${nf(restV)}</td>` +
+      `<td>${pc1(total ? restV / total : 0)}</td></tr>` : '') +
+    `</tbody></table>`;
+  card.classList.add('on');
+  const r = card.getBoundingClientRect();
+  card.style.left = Math.max(8, Math.min(x + 18, innerWidth - r.width - 12)) + 'px';
+  card.style.top = Math.max(8, Math.min(y + 14, innerHeight - r.height - 12)) + 'px';
+}
+function hideCard() { card.classList.remove('on'); }
+
+/* ── focus and context — each panel answers only for itself ───────────── */
+function focusPanel(which, keys) {
+  const p = P[which];
+  if (!p) return;
+  const bound = which === 'ac' ? acPaths : pcPaths;
+  const els = [...keys].map(k => bound.get(k)).filter(Boolean);
+  if (!els.length) return clearPanel(which);
+  const ds = els.map(el => el.getAttribute('d'));
+  p.hole.setAttribute('d', ds.join(' '));
+  p.lift.setAttribute('d', ds.join(' '));
+  (which === 'ac' ? $('#panel-ac') : $('#panel-pc')).classList.add('has-focus');
+  for (const [k, el] of bound) el.classList.toggle('marked', keys.has(k));
+}
+function clearPanel(which) {
+  const p = P[which];
+  if (!p) return;
+  p.hole.setAttribute('d', '');
+  p.lift.setAttribute('d', '');
+  for (const el of (which === 'ac' ? acPaths : pcPaths).values()) el.classList.remove('marked');
+  (which === 'ac' ? $('#panel-ac') : $('#panel-pc')).classList.remove('has-focus');
+}
+
+function wire(svg, which) {
+  const keyOf = e => {
+    const el = e.target.closest && e.target.closest('path[data-key]');
+    return el && el.dataset.key;
+  };
+  svg.addEventListener('pointerover', e => {
+    const k = keyOf(e); if (!k) return;
+    focusPanel(which, new Set([k]));
+    showCard(which, k, e.clientX, e.clientY);
+  });
+  svg.addEventListener('pointermove', e => {
+    const k = keyOf(e); if (!k || !card.classList.contains('on')) return;
+    showCard(which, k, e.clientX, e.clientY);
+  });
+  svg.addEventListener('pointerleave', () => { hideCard(); clearPanel(which); });
+  svg.addEventListener('focusin', e => {
+    const k = keyOf(e); if (!k) return;
+    focusPanel(which, new Set([k]));
+    const r = e.target.getBoundingClientRect();
+    showCard(which, k, r.left + r.width / 2, r.top + r.height / 2);
+  });
+  svg.addEventListener('focusout', () => { hideCard(); clearPanel(which); });
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { hideCard(); clearPanel('ac'); clearPanel('pc'); } });
+
+/* ── year controls: two of them, independent ──────────────────────────── */
+function buildYears(container, years, initial, onPick) {
+  container.textContent = '';
+  for (const y of years) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'year'; b.dataset.year = y; b.textContent = y;
+    b.setAttribute('aria-pressed', String(y === initial));
+    b.addEventListener('click', () => onPick(y));
+    container.appendChild(b);
+  }
+}
+
+const uidToSeat = new Map(pcs.features.map(f => [f.properties.unique_id, String(f.properties.ls_seat_code)]));
+// the portrait directory is keyed by geometry unique_id; the card is keyed by ls_seat_code
+const seatToUid = new Map();
+for (const [uid, seat] of uidToSeat) if (!seatToUid.has(seat)) seatToUid.set(seat, uid);
+// portraits are filed per seat for the term a member currently sits in, so 2024 only
+const PHOTO_YEAR = 2024;
+function faceFor(which, key) {
+  if (which !== 'pc' || !lastPC || lastPC.year !== PHOTO_YEAR) return '';
+  const uid = seatToUid.get(key);
+  if (!uid) return '';
+  return `<div class="face"><img src="../data/photos/ls/${PHOTO_YEAR}/${uid}.jpg" alt=""` +
+         ` decoding="async" onerror="this.parentNode.remove()"></div>`;
+}
+const acNums = acs ? new Set(acs.features.map(f => String(f.properties.no))) : new Set();
+
+function paintPC(data) {
+  const fills = new Map(), rows = new Map();
+  for (const [uid, c] of Object.entries(data.pcRows)) {
+    const seat = uidToSeat.get(uid);
+    if (seat) fills.set(seat, colour(c.p));
+  }
+  for (const [uid, d] of detail.pc) {
+    const seat = uidToSeat.get(uid);
+    if (seat) rows.set(seat, d.c);
+  }
+  cardRows.pc = rows;
+  for (const [k, el] of pcPaths) el.style.setProperty('--c', fills.get(k) || 'var(--paper-2)');
+}
+function paintAC(data) {
+  const fills = new Map();
+  if (data.acRows) for (const [no, c] of Object.entries(data.acRows)) fills.set(String(no), colour(c.p));
+  // entries are {c:[...]}; take the array, not the wrapper
+  cardRows.ac = new Map([...detail.ac].filter(([k]) => acNums.has(k)).map(([k, v]) => [k, v.c]));
+  for (const [k, el] of acPaths) el.style.setProperty('--c', fills.get(k) || 'var(--paper-2)');
+}
+
+let lastAC = null, lastPC = null;
+function repaintAll() { if (lastPC) paintPC(lastPC); if (lastAC) paintAC(lastAC); }
+
+async function loadLS(year) {
+  const all = await fetch(`../data/results/ls/pc/${year}.json`).then(r => r.json());
+  const pcRows = Object.fromEntries(Object.entries(all.constituencies).filter(([, c]) => c.st === stateCode));
+  await loadPCDetail(year);
+  return { year, pcRows, pcAgg: aggregateFrom(pcRows) };
+}
+async function loadLA(year) {
+  if (!hasAC) return null;
+  const doc = await fetch(`../data/results/ac/${stateCode}/${year}.json`).then(r => r.json());
+  await loadACDetail(year);
+  return { year, acRows: doc.constituencies, acAgg: aggregateFrom(doc.constituencies) };
+}
+
+let firstPaintDone = false;
+async function markReady() {
+  if (firstPaintDone) return;
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  $('#panels').classList.add('ready');
+  firstPaintDone = true;
+}
+
+async function selectLS(y) {
+  for (const b of $('#years-pc').children) { b.setAttribute('aria-pressed', String(+b.dataset.year === y)); b.disabled = true; }
+  clearPanel('pc'); hideCard();
+  try {
+    const data = await loadLS(y);
+    lastPC = data;
+    const n = Object.keys(data.pcRows).length;
+    $('#cap-pc').textContent = `${n} seats`;
+    renderTable($('#table-pc'), data.pcAgg, 'pc', $('#reset-pc'));
+    layout(); paintPC(data);
+    await markReady();
+  } finally { for (const b of $('#years-pc').children) b.disabled = false; }
+}
+async function selectLA(y) {
+  if (!hasAC) return;
+  for (const b of $('#years-ac').children) { b.setAttribute('aria-pressed', String(+b.dataset.year === y)); b.disabled = true; }
+  clearPanel('ac'); hideCard();
+  try {
+    const data = await loadLA(y);
+    lastAC = data;
+    const n = Object.keys(data.acRows).length;
+    $('#cap-ac').textContent = `${n} seats`;
+    renderTable($('#table-ac'), data.acAgg, 'ac', $('#reset-ac'));
+    layout(); paintAC(data);
+    await markReady();
+  } finally { for (const b of $('#years-ac').children) b.disabled = false; }
+}
+
+$('#reset-pc').addEventListener('click', () => {
+  sortState.pc = { key: DEFAULT_SORT.key, dir: DEFAULT_SORT.dir };
+  if (lastPC) renderTable($('#table-pc'), lastPC.pcAgg, 'pc', $('#reset-pc'));
+});
+$('#reset-ac').addEventListener('click', () => {
+  sortState.ac = { key: DEFAULT_SORT.key, dir: DEFAULT_SORT.dir };
+  if (lastAC) renderTable($('#table-ac'), lastAC.acAgg, 'ac', $('#reset-ac'));
+});
+
+if (!hasAC) {
+  svgAC.remove();
+  const v = document.createElement('div');
+  v.className = 'void';
+  v.innerHTML = '<p>There is no map of this state\u2019s assembly constituencies here. The only ' +
+    'current national boundary set is licensed for viewing and not for reuse, so drawing from it ' +
+    'would not be ours to publish. The Lok Sabha map beside this is complete and can be read on ' +
+    'its own.</p>';
+  $('#panel-ac figure').replaceWith(v);
+  $('#cap-ac').textContent = 'not mapped';
+}
+
+wire(svgAC, 'ac');
+wire(svgPC, 'pc');
+// the India map drills in carrying the year it was showing; honour it when this
+// state has that year, otherwise fall back to the latest available
+const wantsYear = Number(qs.get('y')) || 0;
+const firstLS = LS_YEARS.includes(wantsYear) ? wantsYear : LS_YEARS[LS_YEARS.length - 1];
+buildYears($('#years-pc'), LS_YEARS, firstLS, selectLS);
+if (hasAC) buildYears($('#years-ac'), LA_YEARS, LA_YEARS[LA_YEARS.length - 1], selectLA);
+
+let rt;
+new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(() => layout(), 80); }).observe($('#panels'));
+
+// the two timelines load independently and never touch each other
+await Promise.all([
+  selectLS(firstLS),
+  hasAC ? selectLA(LA_YEARS[LA_YEARS.length - 1]) : Promise.resolve(),
+]);
+</script>
+</body>
+</html>
