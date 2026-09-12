@@ -25,26 +25,27 @@
   --pad:max(clamp(1.25rem,4vw,4.5rem),calc((100vw - var(--col)) / 2));
   --ease:cubic-bezier(.2,0,0,1);
 
-  /* Everything above and below the map, inside one screen: the masthead, the
-     plate's vertical padding, and a little air at the foot. The map's height is
-     the viewport minus this, so the map can never push the page past one screen. */
-  --chrome:9.5rem;
   /* The one dial. 1 = the map fits the screen exactly and never scrolls.
      Raise it to trade vertical scroll for width: India is taller than wide, so
-     at 1 a laptop gives the map about half the screen width, and every extra
-     tenth of a screen of scroll buys roughly a tenth more width. */
+     at 1 a laptop gives the map about half the screen width. */
   --map-spill:1;
-  --map-h:calc((100vh - var(--chrome)) * var(--map-spill));
 }
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
+html,body{height:100%}
 body{
   margin:0;background:var(--paper);color:var(--ink);
   font-family:var(--serif);font-optical-sizing:auto;
   font-size:1.0625rem;line-height:1.65;
   font-variant-numeric:tabular-nums;
   -webkit-font-smoothing:antialiased;
+  /* One screen, and the browser does the arithmetic. There is no hand-tuned
+     chrome constant left to drift out of step with the masthead: main takes the
+     whole viewport, the masthead takes what it needs, and the map takes exactly
+     the remainder. */
+  display:flex;flex-direction:column;
+  min-height:100dvh;
 }
 p{margin:0}
 .lbl{
@@ -53,11 +54,11 @@ p{margin:0}
 }
 
 /* ── shell ────────────────────────────────────────────────────────────── */
-main{padding:0 var(--pad)}
+main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var(--pad)}
 .hair{height:1px;background:var(--rule);border:0;margin:0}
 
 /* ── masthead ─────────────────────────────────────────────────────────── */
-.masthead{padding-top:clamp(1rem,2.4vw,2rem)}
+.masthead{flex:0 0 auto;padding-top:clamp(1rem,2.4vw,2rem)}
 .mh-top{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s5);flex-wrap:wrap}
 .mh-top .lbl{margin:0}
 .years{display:flex;align-items:baseline;gap:2px;margin-bottom:-6px}
@@ -73,10 +74,14 @@ main{padding:0 var(--pad)}
 .year[disabled]{opacity:.4;cursor:default}
 
 /* ── the plate ────────────────────────────────────────────────────────── */
-.field{padding:clamp(.75rem,2vw,1.5rem) 0 clamp(1rem,2.5vw,2rem)}
-.mapfig{margin:0;min-width:0}
+.field{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:clamp(.5rem,1.5vw,1rem) 0 clamp(.75rem,1.2vw,1.25rem)}
+.mapfig{
+  flex:1 1 auto;min-height:0;margin:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:var(--s3);
+}
 #map{
-  display:block;margin:0 auto;height:auto;overflow:visible;
+  display:block;margin:0 auto;overflow:visible;
   /* India's projected extent is 0.8839 wide to 1 tall — taller than wide, which
      is the whole problem. A map wide enough to fill a 1440px viewport is 1629px
      tall; one that fits a 900px viewport is 795px wide. Width and height cannot
@@ -85,8 +90,14 @@ main{padding:0 var(--pad)}
      column so it can never spill sideways either.
      0.8839 = geoMercator extent of lon 68.09..97.40 by lat 6.76..37.04. */
   aspect-ratio:884 / 1000;
-  --map-h:calc((100dvh - var(--chrome)) * var(--map-spill));
-  width:min(100%, calc(var(--map-h) * .8839));
+  /* Height is the constraint, so it is the one that is set; width follows from
+     India's ratio. max-width catches the narrow screen where the derived width
+     would exceed the column — there the map is width-bound instead, and because
+     the svg letterboxes its own drawing, the map simply centres in the space
+     rather than distorting. */
+  height:calc(100% * var(--map-spill));
+  width:auto;
+  max-width:100%;
 }
 
 /* Constituency fill. No stroke: a boundary is only visible where two adjacent
@@ -115,7 +126,7 @@ main{padding:0 var(--pad)}
 
 /* The note is a status line, not a caption: it holds the message when a year has
    no result file, and takes no space at all the rest of the time. */
-.mapnote{margin-top:var(--s4);text-align:center}
+.mapnote{flex:0 0 auto;text-align:center}
 .mapnote:empty{display:none}
 
 /* ── the hover card ───────────────────────────────────────────────────── */
@@ -151,15 +162,6 @@ main{padding:0 var(--pad)}
   box-shadow:inset 0 0 0 1px rgba(15,18,32,.2)}
 #card .more{color:var(--muted)}
 
-/* ── footer ───────────────────────────────────────────────────────────── */
-.foot{padding:var(--s6) var(--pad) var(--s7);font-family:var(--mono);font-size:.6875rem;line-height:1.75;color:var(--muted)}
-.foot a{color:var(--muted)}
-.foot-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));
-  gap:var(--s5) var(--s6);margin:0 0 var(--s5);
-}
-.foot-grid dt{letter-spacing:.11em;text-transform:uppercase;font-size:.5625rem;color:var(--ink);opacity:.7}
-.foot-grid dd{margin:6px 0 0}
 
 /* ── responsive ───────────────────────────────────────────────────────── */
 @media (max-width:44rem){
@@ -192,27 +194,6 @@ main{padding:0 var(--pad)}
   </section>
 </main>
 
-<footer class="foot">
-  <dl class="foot-grid">
-    <div>
-      <dt>Real</dt>
-      <dd>The 543 parliamentary constituencies, their boundaries, the 36 states and union territories, and how many seats each state returns — Uttar Pradesh 80, Maharashtra 48, and so on.</dd>
-    </div>
-    <div>
-      <dt>Not real</dt>
-      <dd>Which party won any constituency. Every constituency result on this page is a placeholder, generated from the state totals so the layers agree with each other. The Election Commission's own constituency-wise figures exist for 2019 and 2024 and are the intended replacement.</dd>
-    </div>
-    <div>
-      <dt>Derived, not stored</dt>
-      <dd>Constituency files hold an absolute vote count and a party code, nothing else. Each state's seats won, votes and vote shares are aggregated in the browser from its own constituencies as the page loads.</dd>
-    </div>
-    <div>
-      <dt>Boundaries</dt>
-      <dd>Drawn to India's official territorial claim, which reaches about 37°N: the parts of Jammu and Kashmir administered by Pakistan and the Aksai Chin area administered by China are shown as Indian territory. Boundaries come from the 2019 structure — Ladakh as its own union territory — via a public-domain file built by georeferencing Election Commission maps. Those borders are approximate, and a Survey of India source should replace them before anyone relies on them.</dd>
-    </div>
-  </dl>
-  <p class="foot-links"><a href="/">← Akshay Prabhakant</a></p>
-</footer>
 
 <div id="card" role="status" aria-live="polite"></div>
 
