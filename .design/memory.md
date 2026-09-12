@@ -95,6 +95,52 @@ Scores: **v1 5.6 → v2 6.3**.
 piece of work sat 1.94 screens down. The fix was not to trim About but to **fold it into the title
 plate**, which also removed one of five identical opener bands. Work's first row went y1744 → y1375.
 
+15. **A chart whose labels contradict the numbers beside it is worse than no chart.** The seat strip
+    grouped states by the party each *leads*, so a run labelled "BJP 387" sat an inch from a readout
+    saying "BJP 211". Both were right. A reader had no way to learn they counted different things, and
+    no amount of styling fixes a graphic that means two things at once. When two numbers sit on one
+    screen, make them count the same thing or say plainly what each counts.
+
+16. **When colour is the only channel, the palette is a data problem — score it against the data's own
+    adjacency, not against taste.** Deriving the border graph from the TopoJSON's shared arcs turned
+    "these colours look fine" into 32 pairs and a ΔE per pair. It found TDP amber 22 ΔE from BJP
+    saffron across three real borders, and two parties that were byte-identical. It also proved one
+    pair *cannot* be fixed: TDP/BJP/DMK form a triangle inside the orange-to-red arc, so any three
+    colours there are either indistinguishable or stop being recognisable as those parties. The
+    answer was a second channel, not a cleverer palette. **Optimising a colour metric alone will
+    happily hand you a muddy brown for the BJP.** Constrain hue family first, then separate.
+
+17. **A redraw silently invalidates everything bound to the old elements.** `drawMap()` rebuilds every
+    `<path>` on resize; listeners attached per path died with them, so the map drew perfectly and did
+    nothing at all — and the paths also lost the inline `--c` that coloured them, rendering black.
+    Both were invisible in a screenshot. Delegate events from a stable ancestor, and treat "apply
+    state to elements" as a function that must re-run after any rebuild.
+
+18. **Mixing projected and geographic coordinates fails silently.** `geoPath.centroid()` returns
+    pixels; `geoContains()` takes [longitude, latitude]. Every containment test returned false, every
+    map label was dropped, and nothing threw. The guard `if (at) continue` turned a units bug into a
+    blank feature.
+
+19. **Headless `--virtual-time-budget` freezes CSS transitions.** A computed style read after a state
+    change returns a mid-interpolation colour — an orange that was on its way to grey read as "the
+    empty state is broken". Assert rendered colours with transitions disabled, or the measurement
+    will send you chasing a bug that is not there.
+
+20. **Measure the composition; do not eyeball it.** "The map looks a bit small" is not actionable.
+    `getBBox()` against the container said the map filled **65%** of its column — 216px of dead space —
+    and that the strip's axis fell 27px below the fold. Resizing the column to the map's real ink
+    dimensions took it to 97%, and putting the readout's totals beside its table rather than above it
+    brought the whole instrument back above 900px. Both were arithmetic, not taste.
+
+21. **Not every defect is a layout defect.** The mobile footer was 629px of fine print and read as a
+    spacing failure. Two columns measured **634px against 629px** — halving the width doubles the
+    lines and the pairing saves nothing. The height was text volume. Measure the competing fix before
+    rewriting the layout.
+
+22. **A breakpoint should drop a channel, not shrink it.** The seat strip keeps its party runs below
+    60rem and drops the per-state subdivisions. The state split stops being legible long before the
+    party split does, so keeping both would mean neither reads — and the bar would be 23% gaps.
+
 ## Numbers worth keeping
 
 | | v1 | v2 | v3 |

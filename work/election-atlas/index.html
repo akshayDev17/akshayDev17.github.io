@@ -71,7 +71,14 @@ main{padding:0 var(--pad)}
   padding:var(--s5) 0 clamp(1.5rem,3vw,2.5rem);
 }
 .mapfig{margin:0;min-width:0}
-#map{display:block;width:100%;height:clamp(21rem,58vh,34rem);overflow:visible}
+#map{
+  display:block;width:100%;height:auto;overflow:visible;
+  /* India's projected ink is 410x438. Declaring that as the intrinsic ratio, and
+     capping only the WIDTH, means the height always follows from the width — the
+     map can never be letterboxed inside its own box, at any breakpoint. */
+  aspect-ratio:410 / 438;
+  max-width:calc(clamp(20rem,58vh,34rem) * .9361);
+}
 #map path{
   stroke:var(--paper);stroke-width:.75;stroke-linejoin:round;
   fill:var(--c);cursor:pointer;
@@ -130,8 +137,13 @@ main{padding:0 var(--pad)}
 }
 .strip{position:relative;display:flex;gap:6px;height:clamp(3rem,7vw,4.5rem);align-items:stretch}
 .run{display:flex;gap:1px;min-width:0}
-.rg{display:block;min-width:0;border-radius:1px;background:var(--c);
-    transition:background .22s var(--ease),opacity .16s var(--ease)}
+.rg{
+  display:block;min-width:0;background:var(--c);
+  /* No border-radius here on purpose. A 1px radius is invisible on a 77px block
+     and destroys a 2px one: at 390px a seat is 0.68px wide, so most blocks in the
+     tail are 1-5px and rounding them turned 42% of the mobile bar into
+     anti-aliased edge. Rounded corners are for boxes that can afford them. */
+  transition:background .22s var(--ease),opacity .16s var(--ease)}
 .rg.is-active{opacity:1;box-shadow:0 0 0 1.5px var(--ink)}
 /* Seat-level hairlines only where a seat is genuinely wide enough to be seen as
    one. Below this the texture would be a dither, so it is not drawn at all. */
@@ -139,13 +151,9 @@ main{padding:0 var(--pad)}
   .rg{background-image:linear-gradient(to right,transparent calc(100% - 1px),var(--paper) 0);
       background-size:calc(100% / var(--seats)) 100%}
 }
-.majline{position:absolute;top:-6px;bottom:-6px;width:1px;background:var(--ink);pointer-events:none}
+.majline{position:absolute;top:-7px;bottom:-7px;width:1px;background:var(--ink);pointer-events:none}
 .majline::before{
-  content:"";position:absolute;top:0;left:-3px;width:7px;height:1px;background:var(--ink);
-}
-.majline b{
-  position:absolute;top:-16px;left:0;transform:translateX(-50%);
-  font-family:var(--mono);font-size:.625rem;font-weight:500;letter-spacing:.06em;white-space:nowrap;
+  content:"";position:absolute;top:0;left:-4px;width:9px;height:1px;background:var(--ink);
 }
 .axis{position:relative;height:1.15rem;margin-top:7px}
 .axis span{position:absolute;top:0;font-family:var(--mono);font-size:.625rem;color:var(--muted);white-space:nowrap}
@@ -186,7 +194,6 @@ main{padding:0 var(--pad)}
   .intro{order:1}
   .mapfig{order:2}
   .readout{order:3}
-  #map{height:clamp(20rem,62vw,28rem)}
   .side{gap:var(--s5)}
   /* Narrow: the state split stops being legible long before the party split
      does, so the strip keeps the party structure and drops the subdivisions
@@ -216,7 +223,7 @@ main{padding:0 var(--pad)}
 
   <section class="field">
     <figure class="mapfig">
-      <svg id="map" viewBox="0 0 600 520" preserveAspectRatio="xMidYMid meet"
+      <svg id="map" viewBox="0 0 410 438" preserveAspectRatio="xMidYMid meet"
            role="img" aria-label="Map of India; each state and union territory filled with the colour of the party that won the most seats there."></svg>
       <p class="lbl mapnote" id="mapnote">Point at or tab through a state to read it. Click to hold it.</p>
     </figure>
@@ -536,8 +543,6 @@ function measureStrip() {
   if (lineX !== null) {
     const line = el('div', 'majline');
     line.style.left = lineX.toFixed(2) + 'px';
-    const b = el('b'); b.textContent = MAJORITY;
-    line.appendChild(b);
     stripEl.appendChild(line);
   }
 

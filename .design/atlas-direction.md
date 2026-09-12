@@ -169,3 +169,25 @@ becomes the tallest element, and **the whole instrument now ends at 898px — ab
 - Two-column footer tested at 390px: **634px tall against 629px for one column.** Halving the width
   doubles the lines; the pairing saves nothing. The footer's height is text volume, not layout, so it
   stays one readable column.
+
+## The QA pass, and what it took to run it
+
+The vision backend was rate-limited for this session, so the critique could not be a model looking
+at a screenshot. It was done the other way: a small pure-Python PNG decoder, a row-by-row profile of
+the render, and colour histograms against the party registry. That turned out to find things a look
+would have missed as easily as it missed them.
+
+- **The 272 was printed on top of the INC label.** The majority line sat at x=668 and the `INC 107`
+  run label is centred at x=657 — 11px apart, both drawn, both illegible. The axis beneath the bar
+  already said "272 — a majority" at the same x, so the number above the line was a duplicate before
+  it was a collision. Deleted. Verified after: the run labels occupy y762-768, the line y772-857, the
+  axis label x620-716 centred on a line at x=668.
+- **A 1px border-radius was destroying the mobile bar.** At 390px a seat is 0.68px wide, so the tail
+  blocks are 1–5px and rounding them anti-aliased most of the block away: **42% of the mobile strip
+  was blended edge**. Removing the radius took it to **0%, with exact-colour pixels going 54% → 95%**
+  (desktop 71% → 86%). A radius that is invisible on a 77px block is not invisible on a 2px one.
+- **The rendered palette was confirmed against the registry, not assumed.** Decoding the map area
+  returned exactly six saturated colours — `#E8590C #FFC300 #00A2E8 #C62828 #1E9E52 #0B72B8` — the
+  six leading parties and nothing else.
+- **The map fills 96–98% of its box on both axes at every width from 360 to 2560**, and no viewport
+  in that range scrolls horizontally.
