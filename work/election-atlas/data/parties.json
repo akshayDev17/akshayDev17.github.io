@@ -1,0 +1,190 @@
+{
+  "schema": 1,
+  "note": "Controlled party vocabulary. `code` is the join key everywhere else; `aliases` are the spellings sources actually print. Colours are a display concern and live here so the front end never invents them per chart.",
+  "parties": [
+    {
+      "code": "BJP",
+      "name": "Bharatiya Janata Party",
+      "colour": "#F26B21",
+      "aliases": [
+        "Bharatiya Janata Party",
+        "Bharatiya Janta Party",
+        "B.J.P."
+      ]
+    },
+    {
+      "code": "INC",
+      "name": "Indian National Congress",
+      "colour": "#00A2E8",
+      "aliases": [
+        "Indian National Congress",
+        "Congress",
+        "I.N.C.",
+        "INC(I)"
+      ]
+    },
+    {
+      "code": "SP",
+      "name": "Samajwadi Party",
+      "colour": "#D32F2F",
+      "aliases": [
+        "Samajwadi Party",
+        "Samajwadi Janta Party"
+      ]
+    },
+    {
+      "code": "BSP",
+      "name": "Bahujan Samaj Party",
+      "colour": "#1F3C88",
+      "aliases": [
+        "Bahujan Samaj Party"
+      ]
+    },
+    {
+      "code": "AITC",
+      "name": "All India Trinamool Congress",
+      "colour": "#1E9E52",
+      "aliases": [
+        "All India Trinamool Congress",
+        "Trinamool Congress",
+        "TMC",
+        "AITC"
+      ]
+    },
+    {
+      "code": "CPM",
+      "name": "Communist Party of India (Marxist)",
+      "colour": "#C62828",
+      "aliases": [
+        "Communist Party of India (Marxist)",
+        "CPI(M)",
+        "CPI-M"
+      ]
+    },
+    {
+      "code": "CPI",
+      "name": "Communist Party of India",
+      "colour": "#E53935",
+      "aliases": [
+        "Communist Party of India"
+      ]
+    },
+    {
+      "code": "DMK",
+      "name": "Dravida Munnetra Kazhagam",
+      "colour": "#E03C31",
+      "aliases": [
+        "Dravida Munnetra Kazhagam"
+      ]
+    },
+    {
+      "code": "AIADMK",
+      "name": "All India Anna Dravida Munnetra Kazhagam",
+      "colour": "#2E7D32",
+      "aliases": [
+        "All India Anna Dravida Munnetra Kazhagam",
+        "Anna Dravida Munnetra Kazhagam",
+        "ADMK"
+      ]
+    },
+    {
+      "code": "YSRCP",
+      "name": "Yuvajana Sramika Rythu Congress Party",
+      "colour": "#1565C0",
+      "aliases": [
+        "Yuvajana Sramika Rythu Congress Party",
+        "YSR Congress Party"
+      ]
+    },
+    {
+      "code": "TDP",
+      "name": "Telugu Desam Party",
+      "colour": "#F9A825",
+      "aliases": [
+        "Telugu Desam Party"
+      ]
+    },
+    {
+      "code": "BRS",
+      "name": "Bharat Rashtra Samithi",
+      "colour": "#C2185B",
+      "aliases": [
+        "Bharat Rashtra Samithi",
+        "Telangana Rashtra Samithi",
+        "TRS"
+      ]
+    },
+    {
+      "code": "JDU",
+      "name": "Janata Dal (United)",
+      "colour": "#43A047",
+      "aliases": [
+        "Janata Dal (United)",
+        "JD(U)"
+      ]
+    },
+    {
+      "code": "RJD",
+      "name": "Rashtriya Janata Dal",
+      "colour": "#2E7D5B",
+      "aliases": [
+        "Rashtriya Janata Dal"
+      ]
+    },
+    {
+      "code": "SHS",
+      "name": "Shiv Sena",
+      "colour": "#FF6F00",
+      "aliases": [
+        "Shiv Sena"
+      ]
+    },
+    {
+      "code": "NCP",
+      "name": "Nationalist Congress Party",
+      "colour": "#00838F",
+      "aliases": [
+        "Nationalist Congress Party"
+      ]
+    },
+    {
+      "code": "AAP",
+      "name": "Aam Aadmi Party",
+      "colour": "#00838F",
+      "aliases": [
+        "Aam Aadmi Party"
+      ]
+    },
+    {
+      "code": "BJD",
+      "name": "Biju Janata Dal",
+      "colour": "#00695C",
+      "aliases": [
+        "Biju Janata Dal"
+      ]
+    },
+    {
+      "code": "IND",
+      "name": "Independent",
+      "colour": "#78909C",
+      "aliases": [
+        "Independent",
+        "Independents"
+      ]
+    },
+    {
+      "code": "NOTA",
+      "name": "None of the Above",
+      "colour": "#B0BEC5",
+      "aliases": [
+        "None of the Above",
+        "NOTA"
+      ]
+    }
+  ],
+  "fallback": {
+    "code": "OTHER",
+    "name": "Other",
+    "colour": "#B0BEC5"
+  }
+}

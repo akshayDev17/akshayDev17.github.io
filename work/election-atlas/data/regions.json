@@ -1,0 +1,307 @@
+{
+  "schema": 1,
+  "note": "Canonical region registry. Every source value must resolve to one of these codes before geometry or results can be joined. `sourceNames` lists the spellings seen in sources; anything unmatched is a build error, not a silent drop.",
+  "regions": [
+    {
+      "code": "IN-AP",
+      "name": "Andhra Pradesh",
+      "type": "state",
+      "sourceNames": [
+        "Andhra Pradesh"
+      ]
+    },
+    {
+      "code": "IN-AR",
+      "name": "Arunachal Pradesh",
+      "type": "state",
+      "sourceNames": [
+        "Arunachal Pradesh"
+      ]
+    },
+    {
+      "code": "IN-AS",
+      "name": "Assam",
+      "type": "state",
+      "sourceNames": [
+        "Assam"
+      ]
+    },
+    {
+      "code": "IN-BR",
+      "name": "Bihar",
+      "type": "state",
+      "sourceNames": [
+        "Bihar"
+      ]
+    },
+    {
+      "code": "IN-CT",
+      "name": "Chhattisgarh",
+      "type": "state",
+      "sourceNames": [
+        "Chhattisgarh"
+      ]
+    },
+    {
+      "code": "IN-GA",
+      "name": "Goa",
+      "type": "state",
+      "sourceNames": [
+        "Goa"
+      ]
+    },
+    {
+      "code": "IN-GJ",
+      "name": "Gujarat",
+      "type": "state",
+      "sourceNames": [
+        "Gujarat"
+      ]
+    },
+    {
+      "code": "IN-HR",
+      "name": "Haryana",
+      "type": "state",
+      "sourceNames": [
+        "Haryana"
+      ]
+    },
+    {
+      "code": "IN-HP",
+      "name": "Himachal Pradesh",
+      "type": "state",
+      "sourceNames": [
+        "Himachal Pradesh"
+      ]
+    },
+    {
+      "code": "IN-JH",
+      "name": "Jharkhand",
+      "type": "state",
+      "sourceNames": [
+        "Jharkhand"
+      ]
+    },
+    {
+      "code": "IN-KA",
+      "name": "Karnataka",
+      "type": "state",
+      "sourceNames": [
+        "Karnataka"
+      ]
+    },
+    {
+      "code": "IN-KL",
+      "name": "Kerala",
+      "type": "state",
+      "sourceNames": [
+        "Kerala"
+      ]
+    },
+    {
+      "code": "IN-MP",
+      "name": "Madhya Pradesh",
+      "type": "state",
+      "sourceNames": [
+        "Madhya Pradesh"
+      ]
+    },
+    {
+      "code": "IN-MH",
+      "name": "Maharashtra",
+      "type": "state",
+      "sourceNames": [
+        "Maharashtra"
+      ]
+    },
+    {
+      "code": "IN-MN",
+      "name": "Manipur",
+      "type": "state",
+      "sourceNames": [
+        "Manipur"
+      ]
+    },
+    {
+      "code": "IN-ML",
+      "name": "Meghalaya",
+      "type": "state",
+      "sourceNames": [
+        "Meghalaya"
+      ]
+    },
+    {
+      "code": "IN-MZ",
+      "name": "Mizoram",
+      "type": "state",
+      "sourceNames": [
+        "Mizoram"
+      ]
+    },
+    {
+      "code": "IN-NL",
+      "name": "Nagaland",
+      "type": "state",
+      "sourceNames": [
+        "Nagaland"
+      ]
+    },
+    {
+      "code": "IN-OD",
+      "name": "Odisha",
+      "type": "state",
+      "sourceNames": [
+        "Orissa",
+        "Odisha"
+      ]
+    },
+    {
+      "code": "IN-PB",
+      "name": "Punjab",
+      "type": "state",
+      "sourceNames": [
+        "Punjab"
+      ]
+    },
+    {
+      "code": "IN-RJ",
+      "name": "Rajasthan",
+      "type": "state",
+      "sourceNames": [
+        "Rajasthan"
+      ]
+    },
+    {
+      "code": "IN-SK",
+      "name": "Sikkim",
+      "type": "state",
+      "sourceNames": [
+        "Sikkim"
+      ]
+    },
+    {
+      "code": "IN-TN",
+      "name": "Tamil Nadu",
+      "type": "state",
+      "sourceNames": [
+        "Tamil Nadu"
+      ]
+    },
+    {
+      "code": "IN-TG",
+      "name": "Telangana",
+      "type": "state",
+      "sourceNames": [
+        "Telangana"
+      ]
+    },
+    {
+      "code": "IN-TR",
+      "name": "Tripura",
+      "type": "state",
+      "sourceNames": [
+        "Tripura"
+      ]
+    },
+    {
+      "code": "IN-UP",
+      "name": "Uttar Pradesh",
+      "type": "state",
+      "sourceNames": [
+        "Uttar Pradesh"
+      ]
+    },
+    {
+      "code": "IN-UT",
+      "name": "Uttarakhand",
+      "type": "state",
+      "sourceNames": [
+        "Uttaranchal",
+        "Uttarakhand"
+      ]
+    },
+    {
+      "code": "IN-WB",
+      "name": "West Bengal",
+      "type": "state",
+      "sourceNames": [
+        "West Bengal"
+      ]
+    },
+    {
+      "code": "IN-AN",
+      "name": "Andaman and Nicobar Islands",
+      "type": "ut",
+      "sourceNames": [
+        "Andaman and Nicobar",
+        "Andaman and Nicobar Islands"
+      ]
+    },
+    {
+      "code": "IN-CH",
+      "name": "Chandigarh",
+      "type": "ut",
+      "sourceNames": [
+        "Chandigarh"
+      ]
+    },
+    {
+      "code": "IN-DH",
+      "name": "Dadra and Nagar Haveli and Daman and Diu",
+      "type": "ut",
+      "sourceNames": [
+        "Dadra and Nagar Haveli",
+        "Daman and Diu",
+        "Dadra and Nagar Haveli and Daman and Diu"
+      ],
+      "mergeFrom": [
+        "Dadra and Nagar Haveli",
+        "Daman and Diu"
+      ]
+    },
+    {
+      "code": "IN-DL",
+      "name": "Delhi",
+      "type": "ut",
+      "sourceNames": [
+        "Delhi"
+      ]
+    },
+    {
+      "code": "IN-JK",
+      "name": "Jammu and Kashmir",
+      "type": "ut",
+      "sourceNames": [
+        "Jammu and Kashmir"
+      ]
+    },
+    {
+      "code": "IN-LA",
+      "name": "Ladakh",
+      "type": "ut",
+      "sourceNames": [
+        "Ladakh"
+      ]
+    },
+    {
+      "code": "IN-LD",
+      "name": "Lakshadweep",
+      "type": "ut",
+      "sourceNames": [
+        "Lakshadweep"
+      ]
+    },
+    {
+      "code": "IN-PY",
+      "name": "Puducherry",
+      "type": "ut",
+      "sourceNames": [
+        "Puducherry"
+      ]
+    }
+  ],
+  "buildCaveats": [
+    "The current geometry source predates the 2019 reorganisation: there is no Ladakh, Jammu and Kashmir still carries Ladakh's area, Dadra and Nagar Haveli and Daman and Diu appear as two regions rather than one, and Odisha/Uttarakhand use the older spellings.",
+    "Resolving this needs a post-2019 authoritative boundary source, not hand-edited geometry. Until then IN-LA has no polygon and IN-DH needs two regions merged."
+  ]
+}

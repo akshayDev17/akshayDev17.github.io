@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "title": "Election Atlas of India",
+  "note": "Declares the level tree and the path template for each level's geometry and results. File granularity matches map granularity: one file per year nationally, per region per year one level down, per city per year at ward level. A template that resolves to a missing file means that level is not published yet, not that the data is broken.",
+  "registries": {
+    "regions": "regions.json",
+    "parties": "parties.json"
+  },
+  "levels": [
+    {
+      "id": "state",
+      "label": "State / UT",
+      "parent": null,
+      "geometry": "geo/india-states.json",
+      "results": "results/ls/{year}.json",
+      "counts": {
+        "regions": 36
+      }
+    },
+    {
+      "id": "parliamentary",
+      "label": "Parliamentary constituency",
+      "parent": "state",
+      "geometry": "geo/ls/{region}.json",
+      "results": "results/ls/{region}/{year}.json"
+    },
+    {
+      "id": "assembly",
+      "label": "Assembly constituency",
+      "parent": "state",
+      "geometry": "geo/ac/{region}.json",
+      "results": "results/ac/{region}/{year}.json"
+    },
+    {
+      "id": "ward",
+      "label": "Ward / councillor",
+      "parent": "region",
+      "geometry": "geo/wards/{region}.json",
+      "results": "results/wards/{region}/{year}.json"
+    }
+  ],
+  "elections": {
+    "ls": {
+      "label": "Lok Sabha",
+      "level": "state",
+      "years": []
+    },
+    "ac": {
+      "label": "Legislative Assembly",
+      "level": "assembly",
+      "years": []
+    },
+    "ward": {
+      "label": "Municipal",
+      "level": "ward",
+      "years": []
+    }
+  }
+}
