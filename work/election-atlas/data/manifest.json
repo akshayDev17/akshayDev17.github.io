@@ -6,12 +6,18 @@
     "regions": "regions.json",
     "parties": "parties.json"
   },
+  "geometryFormat": "topojson",
+  "note_geometryFormat": "Every level's geometry file is TopoJSON. Each level names the object inside its topology that holds that level's geometries; a reader must use that key rather than the first key it finds.",
+  "note_join": "Regions join to geometries on the region code carried in the geometry's properties. Where a geometry file's own naming differs from the canonical code, the level declares 'geometryKeys': { \"<canonical code>\": \"<properties key used in the geometry file>\" } so the join is explicit rather than guessed.",
+  "note_results": "Result files carry region codes and party codes only — never names, never percentages. Every share, leader and majority figure on a page is derived from the absolute counts at read time.",
   "levels": [
     {
       "id": "state",
       "label": "State / UT",
       "parent": null,
       "geometry": "geo/india-states.json",
+      "topologyObject": "states",
+      "geometryKey": "NAME_1",
       "results": "results/ls/{year}.json",
       "counts": {
         "regions": 36
@@ -22,6 +28,8 @@
       "label": "Parliamentary constituency",
       "parent": "state",
       "geometry": "geo/ls/{region}.json",
+      "topologyObject": "constituencies",
+      "geometryKey": "PC_NAME",
       "results": "results/ls/{region}/{year}.json"
     },
     {
@@ -29,6 +37,8 @@
       "label": "Assembly constituency",
       "parent": "state",
       "geometry": "geo/ac/{region}.json",
+      "topologyObject": "constituencies",
+      "geometryKey": "AC_NAME",
       "results": "results/ac/{region}/{year}.json"
     },
     {
@@ -36,6 +46,8 @@
       "label": "Ward / councillor",
       "parent": "region",
       "geometry": "geo/wards/{region}.json",
+      "topologyObject": "wards",
+      "geometryKey": "WARD_NAME",
       "results": "results/wards/{region}/{year}.json"
     }
   ],

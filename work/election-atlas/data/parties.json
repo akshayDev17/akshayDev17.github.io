@@ -5,7 +5,7 @@
     {
       "code": "BJP",
       "name": "Bharatiya Janata Party",
-      "colour": "#F26B21",
+      "colour": "#E8590C",
       "aliases": [
         "Bharatiya Janata Party",
         "Bharatiya Janta Party",
@@ -54,7 +54,7 @@
     {
       "code": "CPM",
       "name": "Communist Party of India (Marxist)",
-      "colour": "#C62828",
+      "colour": "#9E1B32",
       "aliases": [
         "Communist Party of India (Marxist)",
         "CPI(M)",
@@ -64,7 +64,7 @@
     {
       "code": "CPI",
       "name": "Communist Party of India",
-      "colour": "#E53935",
+      "colour": "#F0645A",
       "aliases": [
         "Communist Party of India"
       ]
@@ -72,7 +72,7 @@
     {
       "code": "DMK",
       "name": "Dravida Munnetra Kazhagam",
-      "colour": "#E03C31",
+      "colour": "#C62828",
       "aliases": [
         "Dravida Munnetra Kazhagam"
       ]
@@ -99,7 +99,7 @@
     {
       "code": "TDP",
       "name": "Telugu Desam Party",
-      "colour": "#F9A825",
+      "colour": "#FFC300",
       "aliases": [
         "Telugu Desam Party"
       ]
@@ -134,7 +134,7 @@
     {
       "code": "SHS",
       "name": "Shiv Sena",
-      "colour": "#FF6F00",
+      "colour": "#FF9500",
       "aliases": [
         "Shiv Sena"
       ]
@@ -150,7 +150,7 @@
     {
       "code": "AAP",
       "name": "Aam Aadmi Party",
-      "colour": "#00838F",
+      "colour": "#0B72B8",
       "aliases": [
         "Aam Aadmi Party"
       ]
@@ -186,5 +186,6 @@
     "code": "OTHER",
     "name": "Other",
     "colour": "#B0BEC5"
-  }
+  },
+  "note_colour": "Colours are display colours, tuned for the map rather than copied from party flags: each party keeps its real-world hue family, but lightness and hue are pulled apart where two parties that actually border each other on the map would otherwise read as one fill. Tuned against the derived map adjacency graph and scored with CIE Lab deltaE. Where a pair cannot be separated without destroying a party's identity (BJP saffron vs DMK red on the Karnataka-Tamil Nadu border), the page resolves it with the centroid label instead of with colour: colour is never the only channel."
 }
