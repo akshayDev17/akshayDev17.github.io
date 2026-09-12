@@ -61,6 +61,18 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 .masthead{flex:0 0 auto;padding-top:clamp(1rem,2.4vw,2rem)}
 .mh-top{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s5);flex-wrap:wrap}
 .mh-top .lbl{margin:0}
+.mh-left{display:flex;align-items:baseline;gap:var(--s5);flex-wrap:wrap;margin:0}
+/* The way back. This page is reached from the portfolio and until now had no
+   route home again — the footer that carried it was deleted. Same type as the
+   eyebrow beside it, so it reads as part of the masthead rather than as chrome. */
+.back{
+  font-family:var(--mono);font-size:.625rem;line-height:1.4;
+  letter-spacing:.15em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;
+  transition:color .18s var(--ease);
+}
+.back:hover{color:var(--ink)}
+.back:focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:2px}
 .years{display:flex;align-items:baseline;gap:2px;margin-bottom:-6px}
 .year{
   appearance:none;background:none;border:0;cursor:pointer;
@@ -208,7 +220,10 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 <main>
   <header class="masthead">
     <div class="mh-top">
-      <p class="lbl">Election Atlas of India</p>
+      <div class="mh-left">
+        <a class="back" href="/">← Akshay Prabhakant</a>
+        <p class="lbl">Election Atlas of India</p>
+      </div>
       <div class="years" id="years" role="group" aria-label="General election year"></div>
     </div>
     <hr class="hair" style="margin-top:var(--s4)">
