@@ -115,15 +115,6 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 #map .st:hover,#map .st.is-active{stroke-width:2.4}
 #map .st:focus-visible{outline:none;stroke-width:3.2}
 
-/* State codes are the map's second channel. Colour alone cannot separate twenty
-   parties, so where two neighbouring fills sit close together the text is what
-   tells the reader which state they are looking at. */
-#map text{
-  font-family:var(--mono);font-size:10px;letter-spacing:.06em;
-  fill:var(--ink);paint-order:stroke fill;stroke:var(--paper);stroke-width:3px;
-  stroke-linejoin:round;pointer-events:none;text-anchor:middle;
-}
-
 /* The note is a status line, not a caption: it holds the message when a year has
    no result file, and takes no space at all the rest of the time. */
 .mapnote{flex:0 0 auto;text-align:center}
@@ -165,9 +156,6 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 
 /* ── responsive ───────────────────────────────────────────────────────── */
 @media (max-width:44rem){
-  /* Below a 400px-wide map the label pass drops every label anyway, so this
-     states an intent the geometry already enforces. */
-  #map text{display:none}
   #card{min-width:0;max-width:calc(100vw - 20px)}
 }
 @media (prefers-reduced-motion:reduce){
@@ -303,58 +291,10 @@ function drawMap() {
   mapEl.appendChild(gST);
 
   applyYear();
-  drawLabels();
 }
 
 /* Labels select on the size of the shape, not on seats returned: selecting on
    seats hid Ladakh, which is one seat and the largest shape on the map. */
-function drawLabels() {
-  mapEl.querySelectorAll('text').forEach(t => t.remove());
-  if (!currentYear) return;
-  const W = +mapEl.getAttribute('viewBox').split(' ')[2];
-  if (W < 400) return;
-
-  const candidates = [];
-  for (const f of states.features) {
-    const code = regionBySource.get(f.properties[level.geometryKey]);
-    if (!code || !statePaths.has(code)) continue;
-    const [[bx0, by0], [bx1, by1]] = pathGen.bounds(f);
-    if (bx1 - bx0 < 26 || by1 - by0 < 13) continue;
-    // geoCentroid and geoContains both take [longitude, latitude]; geoPath's own
-    // centroid returns projected pixels, and mixing the two silently drops every
-    // candidate. Work in geographic space and project at the end.
-    const c = geo.geoCentroid(f);
-    if (!isFinite(c[0]) || !isFinite(c[1])) continue;
-    const bd = geo.geoBounds(f);
-    const mid = [(bd[0][0] + bd[1][0]) / 2, (bd[0][1] + bd[1][1]) / 2];
-    let at = null;
-    for (const pt of [c, [(c[0] + mid[0]) / 2, (c[1] + mid[1]) / 2], mid,
-                      [(c[0] * 2 + mid[0]) / 3, (c[1] * 2 + mid[1]) / 3]]) {
-      if (isFinite(pt[0]) && isFinite(pt[1]) && geo.geoContains(f, pt)) { at = pt; break; }
-    }
-    if (!at) continue;
-    const xy = projection(at);
-    if (!isFinite(xy[0]) || !isFinite(xy[1])) continue;
-    candidates.push({ code, at: xy, area: (bx1 - bx0) * (by1 - by0) });
-  }
-
-  // Largest shapes place first, so when two labels collide the reader keeps the
-  // one they are more likely to be looking for.
-  candidates.sort((a, b) => b.area - a.area);
-  const placed = [];
-  for (const c of candidates) {
-    const t = document.createElementNS(NS, 'text');
-    t.setAttribute('x', c.at[0].toFixed(1));
-    t.setAttribute('y', c.at[1].toFixed(1));
-    t.textContent = c.code.slice(3);        // IN-UP -> UP, the standard postal code
-    t.dataset.region = c.code;
-    mapEl.appendChild(t);
-    const box = t.getBoundingClientRect();
-    const hits = placed.some(p => box.left < p.right && p.left < box.right &&
-                                  box.top < p.bottom && p.top < box.bottom);
-    if (!box.width || hits) t.remove(); else placed.push(box);
-  }
-}
 
 /* ── colour from the loaded year ──────────────────────────────────────── */
 function applyYear() {
@@ -463,7 +403,6 @@ async function selectYear(y) {
     agg = aggregate(currentYear);
     noteEl.textContent = '';
     applyYear();
-    drawLabels();
   } catch (err) {
     currentYear = null; agg = null;
     noteEl.textContent = `${y} has no constituency result file yet.`;
