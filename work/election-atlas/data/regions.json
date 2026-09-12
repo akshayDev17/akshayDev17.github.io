@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "note": "Canonical region registry. Every source value must resolve to one of these codes before geometry or results can be joined. `sourceNames` lists the spellings seen in sources; anything unmatched is a build error, not a silent drop.",
+  "note": "Canonical state and union territory codes, with the exact name each carries in the current geometry file so the join is explicit rather than guessed.",
   "regions": [
     {
       "code": "IN-AP",
@@ -151,7 +151,6 @@
       "name": "Odisha",
       "type": "state",
       "sourceNames": [
-        "Orissa",
         "Odisha"
       ]
     },
@@ -216,7 +215,6 @@
       "name": "Uttarakhand",
       "type": "state",
       "sourceNames": [
-        "Uttaranchal",
         "Uttarakhand"
       ]
     },
@@ -233,8 +231,7 @@
       "name": "Andaman and Nicobar Islands",
       "type": "ut",
       "sourceNames": [
-        "Andaman and Nicobar",
-        "Andaman and Nicobar Islands"
+        "Andaman & Nicobar"
       ]
     },
     {
@@ -250,8 +247,6 @@
       "name": "Dadra and Nagar Haveli and Daman and Diu",
       "type": "ut",
       "sourceNames": [
-        "Dadra and Nagar Haveli",
-        "Daman and Diu",
         "Dadra and Nagar Haveli and Daman and Diu"
       ],
       "mergeFrom": [
@@ -272,7 +267,7 @@
       "name": "Jammu and Kashmir",
       "type": "ut",
       "sourceNames": [
-        "Jammu and Kashmir"
+        "Jammu & Kashmir"
       ]
     },
     {
@@ -301,7 +296,8 @@
     }
   ],
   "buildCaveats": [
-    "The current geometry source predates the 2019 reorganisation: there is no Ladakh, Jammu and Kashmir still carries Ladakh's area, Dadra and Nagar Haveli and Daman and Diu appear as two regions rather than one, and Odisha/Uttarakhand use the older spellings.",
-    "Resolving this needs a post-2019 authoritative boundary source, not hand-edited geometry. Until then IN-LA has no polygon and IN-DH needs two regions merged."
+    "Boundaries are the 2019 structure: Ladakh is a separate union territory, Dadra and Nagar Haveli and Daman and Diu are one, and Odisha and Uttarakhand carry their current names.",
+    "The outline follows India's official territorial claim, extending to about 37.0 N: the areas of Jammu and Kashmir administered by Pakistan and the Aksai Chin area administered by China are drawn as part of India, which is the position the Survey of India publishes.",
+    "Source: shijithpk/2024_maps_supplement (Unlicense / public domain), built by georeferencing Election Commission of India press-note maps in QGIS. The author states the international borders are approximate and the all-India seat maps are not research grade. A Survey of India or NIC source should replace it before this is relied on."
   ]
 }

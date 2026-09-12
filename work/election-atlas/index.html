@@ -21,7 +21,7 @@
 
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px;
   --r1:3px; --r2:6px;
-  --col:72rem;
+  --col:86rem;
   --pad:max(clamp(1.25rem,4vw,4.5rem),calc((100vw - var(--col)) / 2));
   --ease:cubic-bezier(.2,0,0,1);
 }
@@ -68,12 +68,14 @@ main{padding:0 var(--pad)}
 .field{padding:clamp(1rem,3vw,2.5rem) 0 clamp(2rem,5vw,4rem)}
 .mapfig{margin:0;min-width:0}
 #map{
-  display:block;margin:0 auto;height:auto;overflow:visible;
-  /* India's projected ink is 410x438. Declaring that as the intrinsic ratio, and
-     capping only the WIDTH, means the height always follows from the width — the
-     map can never be letterboxed inside its own box, at any breakpoint. */
-  aspect-ratio:410 / 438;
-  max-width:calc(clamp(20rem,74vh,46rem) * .9361);
+  display:block;width:100%;height:auto;overflow:visible;
+  /* The map is the page, so its width is the content column and its height is
+     whatever that width implies. Declaring India's projected extent as the
+     intrinsic ratio is what makes that true: height is derived from width, so
+     the map can never be letterboxed inside its own box at any breakpoint, and
+     widening it genuinely enlarges it instead of adding margin.
+     0.8839 = the geoMercator extent of lon 68.09..97.40 by lat 6.76..37.04. */
+  aspect-ratio:884 / 1000;
 }
 #map path{
   stroke:var(--paper);stroke-width:.75;stroke-linejoin:round;
@@ -138,7 +140,7 @@ main{padding:0 var(--pad)}
   <dl class="foot-grid">
     <div>
       <dt>Real</dt>
-      <dd>State and union territory boundaries, the list of regions, and how many seats each returns — Uttar Pradesh 80, Maharashtra 48, and so on, 543 in all.</dd>
+      <dd>The 36 states and union territories, their boundaries, and how many Lok Sabha seats each returns — Uttar Pradesh 80, Maharashtra 48, and so on, 543 in all.</dd>
     </div>
     <div>
       <dt>Not real</dt>
@@ -150,14 +152,13 @@ main{padding:0 var(--pad)}
     </div>
     <div>
       <dt>Boundaries</dt>
-      <dd>The geometry predates the 2019 reorganisation: Ladakh has no polygon, and Dadra and Nagar Haveli and Daman and Diu are still separate regions. A post-2019 source is needed before publication.</dd>
+      <dd>Drawn to India's official territorial claim, which reaches about 37°N: the parts of Jammu and Kashmir administered by Pakistan and the Aksai Chin area administered by China are shown as Indian territory. Boundaries come from the 2019 structure — Ladakh as its own union territory — via a public-domain file built by georeferencing Election Commission maps. Those borders are approximate, and a Survey of India source should replace them before anyone relies on them.</dd>
     </div>
   </dl>
   <p class="foot-links"><a href="/">← Akshay Prabhakant</a></p>
 </footer>
 
 <script type="module">
-const LABEL_FROM = 15;          // seats above which a state earns a map label
 
 const $ = (s, r = document) => r.querySelector(s);
 const el = (tag, cls) => { const n = document.createElement(tag); if (cls) n.className = cls; return n; };
@@ -257,7 +258,13 @@ function drawLabels() {
   for (const f of collection.features) {
     const code = regionBySource.get(f.properties[keyField]);
     const r = code && currentYear.regions[code];
-    if (!r || r.seats < LABEL_FROM) continue;
+    if (!r) continue;
+    // Whether a state earns a label is a question about the shape, not about how
+    // many seats it returns. Selecting on seats hid Ladakh — one seat, and the
+    // largest shape on the map. Selecting on size labels exactly those states
+    // there is room to write on, and drops Chandigarh and Lakshadweep by itself.
+    const [[bx0, by0], [bx1, by1]] = pathGen.bounds(f);
+    if (bx1 - bx0 < 26 || by1 - by0 < 13) continue;
     // This has to be done in geographic space: geoCentroid and geoContains both
     // take [longitude, latitude], while geoPath.centroid returns projected
     // pixels. Mixing the two silently yields no candidate points at all.
@@ -276,12 +283,12 @@ function drawLabels() {
     if (!at) continue;
     const xy = projection(at);
     if (!isFinite(xy[0]) || !isFinite(xy[1])) continue;
-    candidates.push({ code, at: xy, seats: r.seats });
+    candidates.push({ code, at: xy, area: (bx1 - bx0) * (by1 - by0) });
   }
 
-  // Biggest states place first, so when two labels would collide the reader
-  // keeps the one for the state they are more likely to be looking for.
-  candidates.sort((a, b) => b.seats - a.seats);
+  // Largest shapes place first, so when two labels collide the reader keeps the
+  // one they are more likely to be looking for.
+  candidates.sort((a, b) => b.area - a.area);
   const placed = [];
   for (const c of candidates) {
     const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');

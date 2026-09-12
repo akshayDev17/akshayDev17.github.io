@@ -7,7 +7,7 @@
     "parties": "parties.json"
   },
   "geometryFormat": "topojson",
-  "note_geometryFormat": "Every level's geometry file is TopoJSON. Each level names the object inside its topology that holds that level's geometries; a reader must use that key rather than the first key it finds.",
+  "note_geometryFormat": "Every level's geometry file is TopoJSON. Each level names the object inside its topology that holds that level's geometries, and the property its features carry the region code's own name in, so a reader joins on a declared key rather than guessing one.",
   "note_join": "Regions join to geometries on the region code carried in the geometry's properties. Where a geometry file's own naming differs from the canonical code, the level declares 'geometryKeys': { \"<canonical code>\": \"<properties key used in the geometry file>\" } so the join is explicit rather than guessed.",
   "note_results": "Result files carry region codes and party codes only — never names, never percentages. Every share, leader and majority figure on a page is derived from the absolute counts at read time.",
   "levels": [
@@ -17,7 +17,7 @@
       "parent": null,
       "geometry": "geo/india-states.json",
       "topologyObject": "states",
-      "geometryKey": "NAME_1",
+      "geometryKey": "state_ut_name",
       "results": "results/ls/{year}.json",
       "counts": {
         "regions": 36
