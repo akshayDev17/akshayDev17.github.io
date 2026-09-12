@@ -56,6 +56,18 @@ p{margin:0}
 /* ── shell ────────────────────────────────────────────────────────────── */
 main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var(--pad)}
 .hair{height:1px;background:var(--rule);border:0;margin:0}
+/* The caveat. It has to be read before any figure, so it sits in the masthead
+   and not in a footer, where on level two it would land below the maps it is
+   warning about. It takes a surface and an edge rather than a hue: every
+   saturated colour on this page is a party, and the obvious warning orange is
+   the one BJP already owns. --ink on --paper-2 is 15.28:1 (APCA Lc 91.9). */
+.caveat{
+  font-family:var(--mono);font-size:.6875rem;line-height:1.5;
+  color:var(--ink);background:var(--paper-2);
+  border-inline-start:3px solid var(--ink);
+  padding:var(--s3) var(--s4);
+  margin:var(--s4) 0 0;
+}
 
 /* ── masthead ─────────────────────────────────────────────────────────── */
 .masthead{flex:0 0 auto;padding-top:clamp(1rem,2.4vw,2rem)}
@@ -231,6 +243,7 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
       <div class="years" id="years" role="group" aria-label="General election year"></div>
     </div>
     <hr class="hair" style="margin-top:var(--s4)">
+    <p class="caveat">Work in progress — the assembly figures are synthetic and none of this is verified.</p>
   </header>
 
   <section class="field">
