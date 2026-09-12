@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Experience study — gaurav-gandhi's pattern, decoded</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F4F6FA; --paper-2:#EAEEF6; --paper-3:#DEE4F0; --ink:#0F1220; --muted:#5A6273;
+  --rule:#D3D9E6; --rule-2:#BCC4D6; --annot:#3A4BD8;
+  --serif:"Newsreader",ui-serif,Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --s1:.25rem;--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.5rem;--s6:2rem;--s7:3rem;--s8:4.5rem;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:1.0625rem;line-height:1.7;
+  padding:clamp(1.25rem,5vw,4.5rem);max-width:80rem;justify-self:center}
+h1{font-size:2rem;font-weight:400;letter-spacing:-.02em;line-height:1.15;max-width:32ch}
+h1 em{font-style:italic;color:var(--annot)}
+.lede{margin-top:var(--s4);max-width:70ch;color:#2B3040}
+.note{margin-top:var(--s6);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+  padding:var(--s4) 0;max-width:70ch;font-family:var(--mono);font-size:.75rem;line-height:2;color:var(--muted)}
+.note b{color:var(--ink);font-weight:400}
+h2.panel{margin-top:var(--s8);font-family:var(--mono);font-size:.6875rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);padding-bottom:var(--s2);border-bottom:1px solid var(--rule)}
+h2.panel span{color:var(--annot);margin-right:var(--s2)}
+
+/* ── the pattern, exactly as gaurav builds it ─────────────
+   article: rounded border card, p-6 / md:p-8
+   lg: grid [16rem | 1fr], gap-x 2.5rem
+   meta rail: lg:sticky top-24 self-start
+   ───────────────────────────────────────────────────────── */
+.jobs{margin-top:var(--s6);display:flex;flex-direction:column;gap:var(--s6)}
+.job{border:1px solid var(--rule);background:color-mix(in srgb,var(--paper-2) 55%,var(--paper));
+  border-radius:12px;padding:var(--s6)}
+@media (min-width:1024px){
+  .job{display:grid;grid-template-columns:16rem minmax(0,1fr);column-gap:2.5rem;padding:var(--s7)}
+  .job-meta{position:sticky;top:6rem;align-self:start}
+}
+.job-meta h3{font-size:1.25rem;font-weight:500;line-height:1.25}
+.job-meta .range{font-family:var(--mono);font-size:.75rem;color:var(--muted);display:block;margin-top:var(--s1)}
+.job-meta .loc{margin-top:var(--s2);font-size:.875rem;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:var(--s2);margin-top:var(--s5)}
+.chips span{border:1px solid var(--rule);border-radius:999px;padding:3px 10px;
+  font-family:var(--mono);font-size:.6875rem;color:var(--muted)}
+.job-body{display:flex;flex-direction:column;gap:var(--s5)}
+.role h4{font-size:.9375rem;font-weight:400}
+.role h4 .t{font-weight:500}
+.role h4 .d{font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+.role ul{list-style:none;margin-top:var(--s3);display:flex;flex-direction:column;gap:var(--s2)}
+/* bullets carry a 2px LEFT BORDER, not a dash */
+.role li{border-left:2px solid var(--rule);padding-left:var(--s4);
+  font-size:.9375rem;line-height:1.65;color:var(--muted)}
+
+/* the ladder: only for companies with more than one role */
+.ladder{position:relative;display:flex;flex-direction:column;gap:var(--s6);padding-left:var(--s5)}
+.ladder-line{position:absolute;left:5px;top:.5rem;bottom:.5rem;width:1px;background:var(--rule)}
+.rung{position:relative}
+.rung .dot{position:absolute;left:calc(-1 * var(--s5));top:.45rem;width:11px;height:11px;border-radius:50%;
+  border:1px solid var(--rule-2);background:var(--paper)}
+.rung[data-current="true"] .dot{border-color:var(--annot);background:var(--annot)}
+
+.foot{margin-top:var(--s8);padding-top:var(--s4);border-top:1px solid var(--rule);
+  font-family:var(--mono);font-size:.6875rem;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<h1>Experience — <em>what gaurav actually does</em>, decoded from his source</h1>
+<p class="lede">My earlier read was wrong. I inferred the structure from the rendered headings, which showed only <span style="font-family:var(--mono);font-size:.9em">company → role · dates</span> and nothing else — so I concluded he had no bullets. He does. The bullets are plain <span style="font-family:var(--mono);font-size:.9em">&lt;li&gt;</span> elements, which is exactly why they never appeared in a heading dump. Here is the real pattern, rebuilt from <span style="font-family:var(--mono);font-size:.9em">components/sections/experience.tsx</span>.</p>
+
+<div class="note">
+  <b>THE MECHANICS</b><br>
+  1 · Each company is one bordered card, not a row in a list.<br>
+  2 · At ≥1024px the card is a two-column grid: a <b>16rem meta rail</b> beside the bullets column.<br>
+  3 · The rail is <b>sticky</b> while its own card is in view — so the company name stays visible when the bullets run long.<br>
+  4 · The rail carries company name, date range, location, and a row of <b>tech chips</b> (rounded pills, mono).<br>
+  5 · A company with <b>more than one role gets a ladder</b>: a vertical line with a dot per role. One role = no ladder, just a plain stack.<br>
+  6 · Role titles are <b>h4 under the company's h3</b> — that is document outline for screen readers, never styling.<br>
+  7 · Bullets are marked by a <b>2px left border</b>, never a dash or a bullet glyph.<br>
+  8 · Role dates are <b>hidden when they equal the company range</b> — no repeated "Jul 2025 — Present" on both lines.<br>
+  9 · Below 1024px everything stacks: rail on top, chips drop to the bottom of the card.<br>
+  10 · The section closes with one "View the full resume" button.
+</div>
+
+<h2 class="panel"><span>①</span>The pattern, using gaurav's own content</h2>
+<div class="jobs">
+
+  <article class="job">
+    <div class="job-meta">
+      <h3>Uber Technologies, Uber AI</h3>
+      <span class="range">Jun 2024 – Present</span>
+      <p class="loc">via Indium Software · Bengaluru, India</p>
+      <p class="chips"><span>LoRA / QLoRA</span><span>Qwen</span><span>ViT</span><span>Hybrid RAG</span><span>NL2SQL</span></p>
+    </div>
+    <div class="job-body">
+      <div class="ladder">
+        <div class="ladder-line" aria-hidden="true"></div>
+        <div class="rung" data-current="true">
+          <span class="dot" aria-hidden="true"></span>
+          <h4><span class="t">Lead Data Scientist</span> <span class="d">· Aug 2026 – Present</span></h4>
+          <ul>
+            <li>Lead a 5-person data-science team across GenAI document-intelligence workstreams, setting the modelling roadmap and evaluation strategy.</li>
+          </ul>
+        </div>
+        <div class="rung">
+          <span class="dot" aria-hidden="true"></span>
+          <h4><span class="t">Senior Data Scientist</span> <span class="d">· May 2025 – Aug 2026</span></h4>
+          <ul>
+            <li>Automated roughly 70% of earner document verification with a dual-threshold policy on a Vision Transformer.</li>
+            <li>Raised field-level extraction accuracy above 97% with a parameter-efficient fine-tuning framework for Qwen.</li>
+          </ul>
+        </div>
+        <div class="rung">
+          <span class="dot" aria-hidden="true"></span>
+          <h4><span class="t">Data Scientist</span> <span class="d">· Jun 2024 – May 2025</span></h4>
+          <ul>
+            <li>Delivered $10M+ in annual savings by displacing manual document review across 144 A100 GPUs.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="job">
+    <div class="job-meta">
+      <h3>FedEx Express</h3>
+      <span class="range">Nov 2021 – Jun 2024</span>
+      <p class="loc">Decision Scientist · Hyderabad, India</p>
+      <p class="chips"><span>Python</span><span>Time Series</span><span>Operations Research</span></p>
+    </div>
+    <div class="job-body">
+      <div class="role">
+        <h4><span class="t">Decision Scientist</span></h4>
+        <ul>
+          <li>Single-role company, so no ladder and no repeated date — the company's range already says it.</li>
+        </ul>
+      </div>
+    </div>
+  </article>
+
+</div>
+
+<h2 class="panel"><span>②</span>The same pattern carrying your content</h2>
+<div class="jobs">
+
+  <article class="job">
+    <div class="job-meta">
+      <h3>RunWhen</h3>
+      <span class="range">Jul 2025 – Present</span>
+      <p class="loc">Founding Product Engineer · Pune, India</p>
+      <p class="chips"><span>PII redaction</span><span>Redis</span><span>GCS</span><span>PromQL</span><span>SLI / SLO</span><span>ECharts</span></p>
+    </div>
+    <div class="job-body">
+      <div class="role">
+        <h4><span class="t">Founding Product Engineer</span></h4>
+        <ul>
+          <li>Architected a fail-closed PII and secret scrubber that redacts content before every LLM call, without re-scrubbing prior turns.</li>
+          <li>Moved agent caching off the framework's artifact service onto a pluggable Redis backend, adding GCS storage.</li>
+          <li>Built interactive SLI/SLO charts in the AI assistant and fixed the PromQL behind them, so error budgets are accurate rather than approximate.</li>
+        </ul>
+      </div>
+    </div>
+  </article>
+
+  <article class="job">
+    <div class="job-meta">
+      <h3>XPO Logistics</h3>
+      <span class="range">Jul 2021 – Mar 2025</span>
+      <p class="loc">Pune, India</p>
+      <p class="chips"><span>BigQuery</span><span>Gemini</span><span>RAG</span><span>scikit-learn</span><span>A/B testing</span><span>DataStudio</span></p>
+    </div>
+    <div class="job-body">
+      <div class="ladder">
+        <div class="ladder-line" aria-hidden="true"></div>
+        <div class="rung" data-current="true">
+          <span class="dot" aria-hidden="true"></span>
+          <h4><span class="t">Data Scientist 2</span> <span class="d">· Jul 2022 – Mar 2025</span></h4>
+          <ul>
+            <li>Built an end-to-end shipment ETA pipeline on random-forest regressors: 90% day-to-delivery accuracy against 84% before, lifting on-time shipments from 83—87% to 88—92%.</li>
+            <li>Built a Gemini-flash retrieval chatbot over the external help centre at recall@5 and precision@5 of 80%.</li>
+            <li>Quantified price elasticity and a willingness-to-pay index in BigQuery and DataStudio, driving a 9% volume increase and 7% revenue lift.</li>
+          </ul>
+        </div>
+        <div class="rung">
+          <span class="dot" aria-hidden="true"></span>
+          <h4><span class="t">Data Scientist</span> <span class="d">· Jul 2021 – Jun 2022</span></h4>
+          <ul>
+            <li>Traced the causes of damaged shipments through BigQuery — weight, handling counts, distance, NMFC class, workforce type, in-house versus third-party transport — contributing to a 19% reduction.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </article>
+
+</div>
+
+<p class="foot">Two roles inside XPO's card get the ladder; RunWhen has one, so it stays a plain stack. Resize the window below 1024px to see both cards collapse to one column with the chips dropping underneath.</p>
+
+</body>
+</html>

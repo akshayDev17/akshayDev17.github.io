@@ -1,0 +1,13 @@
+# working scratch — third-party HTML dumps, never published
+_research/
+
+# OS / editor
+.DS_Store
+
+# when this becomes a Next.js build
+node_modules/
+.next/
+out/
+
+# headless-browser scratch profiles from the design renders
+.tmp/
