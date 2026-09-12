@@ -22,6 +22,9 @@
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px;
   --r1:3px; --r2:6px;
   --col:86rem;
+  /* The table's measure is fixed, not proportional: a table whose columns move
+     as the window changes is a table the reader has to re-read every time. */
+  --table-w:clamp(16.5rem,20vw,19rem);
   --pad:max(clamp(1.25rem,4vw,4.5rem),calc((100vw - var(--col)) / 2));
   --ease:cubic-bezier(.2,0,0,1);
 
@@ -97,15 +100,30 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 .year:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:2px}
 .year[disabled]{opacity:.4;cursor:default}
 
-/* ── the plate ────────────────────────────────────────────────────────── */
-.field{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:clamp(.5rem,1.5vw,1rem) 0 clamp(.75rem,1.2vw,1.25rem)}
+/* ── the plate and its key ────────────────────────────────────────────── *
+ * The map is height-bound: at 1440px it is 649px wide inside a 1325px column,
+ * because India is taller than wide and height is what binds. So the table is
+ * not taking room from the map — it is occupying ground the map could never
+ * have used. The map is left-justified so that vacated width lands where the
+ * table goes, instead of sitting as a gutter on both sides. */
+.field{
+  flex:1 1 auto;min-height:0;
+  /* max-content, not 1fr: the map is height-bound, so a fractional column takes
+     all the slack and pushes the table to the far edge — leaving a gap that
+     measured 76px at 900 wide and 421px at 1280. A fixed track keeps the table
+     beside the plate, and the slack falls past both as a trailing margin, which
+     is the one form of empty space a reader reads as intended. */
+  display:grid;grid-template-columns:max-content var(--table-w);
+  gap:clamp(1.25rem,2.6vw,3rem);
+  padding:clamp(.5rem,1.5vw,1rem) 0 clamp(.75rem,1.2vw,1.25rem);
+}
 .mapfig{
-  flex:1 1 auto;min-height:0;margin:0;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:0;margin:0;
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
   gap:var(--s3);
 }
 #map{
-  display:block;margin:0 auto;overflow:visible;
+  display:block;margin:0;overflow:visible;
   /* India's projected extent is 0.8839 wide to 1 tall — taller than wide, which
      is the whole problem. A map wide enough to fill a 1440px viewport is 1629px
      tall; one that fits a 900px viewport is 795px wide. Width and height cannot
@@ -182,8 +200,84 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 
 /* The note is a status line, not a caption: it holds the message when a year has
    no result file, and takes no space at all the rest of the time. */
-.mapnote{flex:0 0 auto;text-align:center}
+.mapnote{flex:0 0 auto;text-align:left}
 .mapnote:empty{display:none}
+
+/* ── the national table ───────────────────────────────────────────────── *
+ * The map shows the shape of a result; this shows its arithmetic and acts on
+ * the map rather than describing it. Rows are controls, so they have to look
+ * operable. Selection is --ink on a --paper-2 surface, never a hue: every
+ * saturated colour on this page belongs to a party, and a selection highlight
+ * in the usual warning orange would read as BJP. */
+.ntable{display:flex;flex-direction:column;min-height:0;font-family:var(--mono)}
+.ntable-head{display:flex;align-items:baseline;justify-content:space-between;
+  gap:var(--s3);padding:0 0 var(--s2)}
+.ntable-head .lbl{margin:0}
+/* Both resets stay hidden until they apply — but the one that escapes a
+   filtered map is the head's loudest control, not its quietest, so clearing a
+   selection is set at body scale in --ink while the sort reset stays a label. */
+.ntable-actions{display:flex;align-items:baseline;gap:var(--s3)}
+.reset{
+  appearance:none;background:none;border:0;cursor:pointer;padding:2px 4px;
+  font-family:var(--mono);font-size:.5625rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);transition:color .18s var(--ease);
+}
+.reset:hover{color:var(--ink)}
+.reset:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:2px}
+.reset[hidden]{display:none}
+.reset.loud{font-size:.6875rem;letter-spacing:.04em;text-transform:none;color:var(--ink)}
+/* The contract, stated once and kept live: a reader should never have to
+   discover by accident that these rows drive that map. */
+.ntable-hint{
+  font-family:var(--mono);font-size:.6875rem;line-height:1.5;color:var(--muted);
+  margin:0 0 var(--s2);
+}
+.ntable-hint b{font-weight:400;color:var(--ink)}
+.ntable-scroll{flex:1 1 auto;min-height:0;overflow:auto}
+/* fixed layout: otherwise every column re-measures when a sort arrow changes
+   the header label, so the figures shift sideways on each sort. */
+.ntable table{width:100%;border-collapse:collapse;font-size:.6875rem;table-layout:fixed}
+.ntable th:nth-child(2){width:4.25rem}
+.ntable th:nth-child(3){width:5.75rem}
+.ntable th:nth-child(4){width:3.5rem}
+.ntable th{
+  font-weight:400;font-size:.5625rem;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--muted);text-align:right;padding:0;border-bottom:1px solid var(--rule-2);
+}
+.ntable th button{
+  appearance:none;background:none;border:0;cursor:pointer;width:100%;text-align:right;
+  font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit;
+  padding:0 0 5px;transition:color .18s var(--ease);
+}
+.ntable th button:hover{color:var(--ink)}
+.ntable th button:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:2px}
+.ntable th[aria-sort="ascending"] button,
+.ntable th[aria-sort="descending"] button{color:var(--ink)}
+.ntable th:first-child button{text-align:left;cursor:default}
+.ntable td{
+  padding:5px 0;text-align:right;border-top:1px solid var(--rule);
+  transition:color .18s var(--ease);
+}
+.ntable tr:first-child td{border-top:0}
+.ntable th:first-child,.ntable td:first-child{text-align:left}
+.ntable th+th,.ntable td+td{padding-inline-start:var(--s4)}
+.ntable .pick{
+  appearance:none;background:none;border:0;padding:0;cursor:pointer;font:inherit;
+  color:inherit;display:flex;align-items:center;gap:7px;width:100%;text-align:left;
+}
+.ntable .pick:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:2px}
+.ntable .sw{width:9px;height:9px;border-radius:2px;flex:0 0 auto;background:var(--c);
+  box-shadow:inset 0 0 0 1px rgba(15,18,32,.2);transition:opacity .18s var(--ease)}
+.ntable tbody tr{cursor:pointer;transition:background .14s var(--ease),color .18s var(--ease)}
+/* Hover and selection must never share a shape. Hover is a FILL; selection is a
+   LEADING EDGE. Sharing one surface meant that with a filter live, hovering a
+   row left out of the selection wore exactly what the selected rows were
+   wearing, and a 2px line was the only thing telling them apart. */
+.ntable tbody tr:hover{background:var(--paper-2)}
+.ntable tbody tr.sel{box-shadow:inset 2px 0 0 var(--ink)}
+/* with a selection standing, the rows left out of it say so quietly */
+.ntable tbody.has-sel tr:not(.sel){color:var(--muted)}
+.ntable tbody.has-sel tr:not(.sel) .sw{opacity:.4}
 
 /* ── the hover card ───────────────────────────────────────────────────── */
 #card{
@@ -224,11 +318,24 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 
 
 /* ── responsive ───────────────────────────────────────────────────────── */
+/* Side by side until the map can no longer hold its shape in the width left
+   over. Below that the table moves under the plate into a bounded region with
+   its own scroll, so the PAGE still never scrolls: the no-scroll rule is the
+   primary constraint here, so the table gives ground rather than the map. */
+@media (max-width:56rem){
+  .field{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:minmax(0,3fr) minmax(0,2fr);
+    gap:var(--s4);
+  }
+  .ntable{border-top:1px solid var(--rule-2);padding-top:var(--s2)}
+}
 @media (max-width:44rem){
   #card{min-width:0;max-width:calc(100vw - 20px)}
 }
 @media (prefers-reduced-motion:reduce){
-  #map .pc,#map .st,#map .scrim,#map .lift,.year,#card{transition:none}
+  #map .pc,#map .st,#map .scrim,#map .lift,.year,#card,
+  .ntable td,.ntable tbody tr,.ntable .sw{transition:none}
 }
 </style>
 </head>
@@ -252,6 +359,30 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
            role="group" aria-label="Map of India. Each of the 543 parliamentary constituencies is filled with the colour of the party that won it; the borders drawn over them are state and union territory boundaries."></svg>
       <p class="lbl mapnote" id="mapnote" role="status"></p>
     </figure>
+
+    <section class="ntable" aria-labelledby="ntable-title">
+      <div class="ntable-head">
+        <p class="lbl" id="ntable-title">National result</p>
+        <span class="ntable-actions">
+          <button class="reset" id="reset-sort" type="button" hidden>default order</button>
+          <button class="reset loud" id="clear-sel" type="button" hidden>clear selection</button>
+        </span>
+      </div>
+      <p class="ntable-hint" id="ntable-hint"></p>
+      <div class="ntable-scroll">
+        <table>
+          <thead>
+            <tr id="ntable-head-row">
+              <th>Party</th>
+              <th aria-sort="none"><button type="button" data-sort="seats" data-label="Seats">Seats</button></th>
+              <th aria-sort="none"><button type="button" data-sort="votes" data-label="Votes">Votes</button></th>
+              <th aria-sort="none"><button type="button" data-sort="share" data-label="Share">Share</button></th>
+            </tr>
+          </thead>
+          <tbody id="ntable-body"></tbody>
+        </table>
+      </div>
+    </section>
   </section>
 </main>
 
@@ -305,20 +436,26 @@ const pcs = topojson.feature(pcsTopo, pcsTopo.objects[pcLevel.topologyObject]);
 /* ── the constituency files carry counts; everything shown is derived ─── */
 function aggregate(year) {
   const byRegion = new Map();
+  const national = new Map();
   let totalVotes = 0;
+  const bump = (m, code, seats, votes) => {
+    const w = m.get(code) || { seats: 0, votes: 0 };
+    w.seats += seats; w.votes += votes; m.set(code, w);
+  };
   for (const c of Object.values(year.constituencies)) {
     let m = byRegion.get(c.st);
     if (!m) byRegion.set(c.st, m = new Map());
-    const w = m.get(c.p) || { seats: 0, votes: 0 };
-    w.seats++; w.votes += c.v; totalVotes += c.v;
-    m.set(c.p, w);
+    bump(m, c.p, 1, c.v);
+    bump(national, c.p, 1, c.v);
+    totalVotes += c.v;
     // parties that polled in the constituency but won nothing still count votes
     for (const [code, v] of Object.entries(c.o || {})) {
-      const o = m.get(code) || { seats: 0, votes: 0 };
-      o.votes += v; totalVotes += v; m.set(code, o);
+      bump(m, code, 0, v);
+      bump(national, code, 0, v);
+      totalVotes += v;
     }
   }
-  return { byRegion, totalVotes };
+  return { byRegion, national, totalVotes };
 }
 
 /* ── draw ─────────────────────────────────────────────────────────────── */
@@ -405,18 +542,46 @@ function drawMap() {
 
   applyYear();
   // a resize rebuilds every element, so the focus has to be re-stated
-  if (focused) setFocus(focused);
+  if (focused) paintFocus();
 }
 
 /* Labels select on the size of the shape, not on seats returned: selecting on
    seats hid Ladakh, which is one seat and the largest shape on the map. */
 
 /* ── colour from the loaded year ──────────────────────────────────────── */
+
+/* Who is currently picked out. A selection is a FILTER ON THE COUNTRY, not a
+   highlight on a row: parties left out fall to --paper-2, so picking two
+   parties shows the two-party contest and its geography at a glance. */
+const selection = new Set();
+
+/* One GeoJSON collection per party, built from the constituency features that
+   party won. geoPath() renders a whole FeatureCollection to a single `d`, which
+   is what lets a party focus reuse the existing one-element scrim and lift —
+   the cost of focusing a party that won 240 seats is one `d` write, not 240. */
+let partyShapes = new Map();
+function buildPartyShapes() {
+  partyShapes = new Map();
+  if (!currentYear) return;
+  for (const f of pcs.features) {
+    const c = currentYear.constituencies[f.properties.unique_id];
+    if (!c) continue;
+    let arr = partyShapes.get(c.p);
+    if (!arr) partyShapes.set(c.p, arr = []);
+    arr.push(f);
+  }
+  for (const [code, features] of partyShapes) {
+    partyShapes.set(code, { type: 'FeatureCollection', features });
+  }
+}
+
 function applyYear() {
   if (!currentYear) return;
+  buildPartyShapes();
   for (const [uid, p] of pcPaths) {
     const c = currentYear.constituencies[uid];
-    p.style.setProperty('--c', c ? colour(c.p) : 'var(--paper-2)');
+    const leftOut = c && selection.size && !selection.has(c.p);
+    p.style.setProperty('--c', !c || leftOut ? 'var(--paper-2)' : colour(c.p));
   }
   for (const [code, p] of statePaths) {
     const m = agg.byRegion.get(code);
@@ -470,15 +635,32 @@ function showCard(code, x, y) { if (fillCard(code)) placeCard(x, y); }
 /* Focus + context. The hovered state keeps its colour and its full-strength
    border; the rest of the map is washed back and its borders fade, so the eye
    has one place to go instead of 543. */
-function setFocus(code) {
-  const st = statePaths.get(code);
-  if (!st || !maskHoleEl) return clearFocus();
-  focused = code;
-  const d = st.getAttribute('d');
+/* Focus now has two sources — a state read off the map, and a party read off
+   the table — but one mechanism: a mask hole and a lift, each driven by a
+   single `d`. A state contributes its own outline; a party contributes the
+   union of every seat it won, which geoPath renders in one string. */
+function setFocus(kind, value) {
+  focused = { kind, value };
+  paintFocus();
+}
+
+function paintFocus() {
+  if (!focused || !maskHoleEl) return clearFocus();
+  let d = null;
+  if (focused.kind === 'state') {
+    const st = statePaths.get(focused.value);
+    d = st && st.getAttribute('d');
+  } else {
+    const fc = partyShapes.get(focused.value);
+    d = fc && pathGen(fc);
+  }
+  if (!d) return clearFocus();
   maskHoleEl.setAttribute('d', d);
   liftEl.setAttribute('d', d);
   mapEl.classList.add('has-focus');
-  for (const [c, p] of statePaths) p.classList.toggle('is-active', c === code);
+  for (const [c, p] of statePaths) {
+    p.classList.toggle('is-active', focused.kind === 'state' && c === focused.value);
+  }
 }
 
 function clearFocus() {
@@ -494,6 +676,105 @@ function hideCard() {
   clearFocus();
 }
 
+/* ── the national table ───────────────────────────────────────────────── *
+ * The map shows the shape of a result; this shows its arithmetic and acts on
+ * the map rather than describing it. Hovering a row focuses that party with
+ * the same treatment hovering a state gets; clicking one toggles it into the
+ * filter, and clicking it again takes it out. */
+const NAT_DEFAULT = { key: 'seats', dir: -1 };
+let natSort = { ...NAT_DEFAULT };
+const natHead = $('#ntable-head-row'), natBody = $('#ntable-body');
+const natResetBtn = $('#reset-sort'), natClearBtn = $('#clear-sel'), natHint = $('#ntable-hint');
+
+/* 743 party codes polled nationally in 2024, so a table of all of them is a
+   dump rather than a readout — but a capped first page with a "+N more"
+   remainder reads as rows being withheld. The cut is explicit and stated in the
+   hint instead: hold a seat, OR poll half a percent. Both clauses are needed —
+   a seats-only cut would drop BSP (2.04%), BJD (1.46%) and AIADMK (1.39%),
+   which polled in the millions and won nothing. 48 parties, 96.6% of the vote. */
+const NAT_MIN_SHARE = 0.005;
+function nationalRows() {
+  const total = agg ? agg.totalVotes : 0;
+  return [...(agg ? agg.national : new Map())]
+    .map(([code, v]) => ({ code, seats: v.seats, votes: v.votes, share: total ? v.votes / total : 0 }))
+    .filter(r => r.seats > 0 || r.share >= NAT_MIN_SHARE)
+    .sort((a, b) =>
+      natSort.dir * (a[natSort.key] - b[natSort.key]) || b.seats - a.seats || b.votes - a.votes);
+}
+
+function paintNatHead() {
+  for (const th of natHead.querySelectorAll('th')) {
+    const b = th.querySelector('button[data-sort]');
+    if (!b) continue;
+    const on = natSort.key === b.dataset.sort;
+    b.textContent = b.dataset.label + (on ? (natSort.dir === -1 ? ' ↓' : ' ↑') : '');
+    th.setAttribute('aria-sort', on ? (natSort.dir === -1 ? 'descending' : 'ascending') : 'none');
+  }
+  natResetBtn.hidden = natSort.key === NAT_DEFAULT.key && natSort.dir === NAT_DEFAULT.dir;
+}
+
+function renderNational() {
+  if (!natBody) return;
+  const rows = nationalRows();
+  /* Every party, not a capped first page with a "+N more" remainder. That row
+     carried populated figures and sat under rows the reader had just learned
+     were clickable, so it read as withheld rather than summarised, and invited
+     a click it could not answer. The scroll region is the honest container. */
+  natBody.innerHTML = rows.map(r => {
+    const on = selection.has(r.code);
+    return `<tr data-party="${r.code}"${on ? ' class="sel"' : ''}>` +
+      `<td><button type="button" class="pick" aria-pressed="${on}">` +
+      `<i class="sw" style="--c:${colour(r.code)}"></i><span>${r.code}</span></button></td>` +
+      `<td>${r.seats}</td><td>${nf(r.votes)}</td><td>${pc1(r.share)}</td></tr>`;
+  }).join('');
+  // the whole tbody dims its left-out rows, so the table and the map agree
+  natBody.classList.toggle('has-sel', selection.size > 0);
+  natClearBtn.hidden = selection.size === 0;
+  /* The contract and its present state in one line: a reader should not have to
+     discover that these rows drive that map, nor wonder whether a filter is on. */
+  natHint.innerHTML = selection.size
+    ? `<b>${selection.size}</b> selected — the map shows only these.`
+    : `Parties holding a seat, or polling 0.5% of the vote. Select one to filter the map.`;
+  paintNatHead();
+}
+
+function toggleParty(code) {
+  if (selection.has(code)) selection.delete(code); else selection.add(code);
+  applyYear();
+  renderNational();
+}
+
+function bindTable() {
+  if (!natBody) return;
+  natBody.addEventListener('pointerover', e => {
+    const tr = e.target.closest('tr[data-party]');
+    if (!tr) return;
+    hideCard();                       // the row is the readout here, not the card
+    setFocus('party', tr.dataset.party);
+  });
+  natBody.addEventListener('pointerleave', clearFocus);
+  /* The pick button is the tab stop; its click bubbles to the row, so pointer
+     and keyboard go through exactly one handler. */
+  natBody.addEventListener('click', e => {
+    const tr = e.target.closest('tr[data-party]');
+    if (tr) toggleParty(tr.dataset.party);
+  });
+  natHead.addEventListener('click', e => {
+    const b = e.target.closest('button[data-sort]');
+    if (!b) return;
+    const k = b.dataset.sort;
+    if (natSort.key === k) natSort.dir = -natSort.dir;
+    else { natSort.key = k; natSort.dir = -1; }
+    renderNational();
+  });
+  natResetBtn.addEventListener('click', () => { natSort = { ...NAT_DEFAULT }; renderNational(); });
+  natClearBtn.addEventListener('click', () => {
+    selection.clear();
+    applyYear();
+    renderNational();
+  });
+}
+
 /* Delegated, so a redraw on resize cannot strand the handlers on detached paths. */
 function bindEvents() {
   const codeOf = e => {
@@ -502,7 +783,7 @@ function bindEvents() {
   };
   mapEl.addEventListener('pointerover', e => {
     const c = codeOf(e); if (!c) return;
-    setFocus(c);
+    setFocus('state', c);
     showCard(c, e.clientX, e.clientY);
   });
   mapEl.addEventListener('pointermove', e => {
@@ -515,7 +796,7 @@ function bindEvents() {
   mapEl.addEventListener('pointerleave', hideCard);
   mapEl.addEventListener('focusin', e => {
     const c = codeOf(e); if (!c) return;
-    setFocus(c);
+    setFocus('state', c);
     const r = e.target.getBoundingClientRect();
     showCard(c, r.left + r.width / 2, r.top + r.height / 2);
   });
@@ -558,11 +839,13 @@ async function selectYear(y) {
     agg = aggregate(currentYear);
     noteEl.textContent = '';
     applyYear();
+    renderNational();
   } catch (err) {
     currentYear = null; agg = null;
     noteEl.textContent = `${y} has no constituency result file yet.`;
     for (const p of pcPaths.values()) p.style.setProperty('--c', 'var(--paper-2)');
     for (const p of statePaths.values()) p.removeAttribute('aria-label');
+    renderNational();
   } finally {
     for (const b of yearsEl.children) b.disabled = false;
   }
@@ -580,6 +863,7 @@ for (const y of manifest.elections.ls.years) {
 
 drawMap();
 bindEvents();
+bindTable();
 let rt;
 new ResizeObserver(() => {
   clearTimeout(rt);

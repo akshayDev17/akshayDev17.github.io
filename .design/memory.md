@@ -3,6 +3,9 @@
 Read this before the next design session. It exists so the next page starts from these decisions
 instead of rediscovering them.
 
+**This file covers the home page.** For `work/election-atlas/` read `.design/atlas-memory.md`,
+which carries the atlas tokens, its measurements, and what its critic pass caught.
+
 ## Tokens in use (`home-v1/index.html`)
 
 **Palette** — cool ground, one blue-violet accent with a job. Replaced the warm/terracotta system in v4.
