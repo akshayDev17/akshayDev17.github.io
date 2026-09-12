@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Election Atlas of India</title>
-<meta name="description" content="Every state and union territory coloured by the party that won the most seats there, with the 543 seats drawn against the 272 that make a majority. 2014, 2019 and 2024.">
+<meta name="description" content="All 543 Lok Sabha constituencies, each shaded by the party that won it, with state borders drawn over them. Hover a state for its party-wise result. 2014, 2019 and 2024.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -17,13 +17,14 @@
 
   /* No accent colour on this page. Every hue here belongs to a party: an accent
      would compete with the palette that carries the data. The one non-party
-     colour is --ink, used for the majority line and for state outlines. */
+     colour is --ink, used for the state outlines and the card's structure. */
 
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px;
   --r1:3px; --r2:6px;
   --col:86rem;
   --pad:max(clamp(1.25rem,4vw,4.5rem),calc((100vw - var(--col)) / 2));
   --ease:cubic-bezier(.2,0,0,1);
+
   /* Everything above and below the map, inside one screen: the masthead, the
      plate's vertical padding, and a little air at the foot. The map's height is
      the viewport minus this, so the map can never push the page past one screen. */
@@ -45,14 +46,11 @@ body{
   font-variant-numeric:tabular-nums;
   -webkit-font-smoothing:antialiased;
 }
-h1{margin:0;font-weight:400;font-size:clamp(1.75rem,2.7vw,2.625rem);line-height:1.1;letter-spacing:-.018em}
 p{margin:0}
-.mono{font-family:var(--mono)}
 .lbl{
   font-family:var(--mono);font-size:.625rem;line-height:1.4;
   letter-spacing:.15em;text-transform:uppercase;color:var(--muted);
 }
-.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
 
 /* ── shell ────────────────────────────────────────────────────────────── */
 main{padding:0 var(--pad)}
@@ -90,23 +88,68 @@ main{padding:0 var(--pad)}
   --map-h:calc((100dvh - var(--chrome)) * var(--map-spill));
   width:min(100%, calc(var(--map-h) * .8839));
 }
-#map path{
-  stroke:var(--paper);stroke-width:.75;stroke-linejoin:round;
-  fill:var(--c);cursor:pointer;
-  transition:fill .22s var(--ease),stroke .16s var(--ease),stroke-width .16s var(--ease);
+
+/* Constituency fill. No stroke: a boundary is only visible where two adjacent
+   seats were won by different parties, which is the whole point of shading at
+   this granularity. */
+#map .pc{fill:var(--c);stroke:none;transition:fill .22s var(--ease)}
+
+/* The only line the map draws. fill:none plus pointer-events:all makes the whole
+   area of a state hoverable while drawing nothing inside it. */
+#map .st{
+  fill:none;stroke:var(--ink);stroke-width:1.1;stroke-linejoin:round;
+  pointer-events:all;cursor:pointer;
+  transition:stroke-width .16s var(--ease);
 }
-#map path:hover,
-#map path.is-active{stroke:var(--ink);stroke-width:1.4}
-#map path:focus-visible{outline:none;stroke:var(--ink);stroke-width:2.4}
+#map .st:hover,#map .st.is-active{stroke-width:2.4}
+#map .st:focus-visible{outline:none;stroke-width:3.2}
+
+/* State codes are the map's second channel. Colour alone cannot separate twenty
+   parties, so where two neighbouring fills sit close together the text is what
+   tells the reader which state they are looking at. */
 #map text{
   font-family:var(--mono);font-size:10px;letter-spacing:.06em;
   fill:var(--ink);paint-order:stroke fill;stroke:var(--paper);stroke-width:3px;
   stroke-linejoin:round;pointer-events:none;text-anchor:middle;
 }
+
 /* The note is a status line, not a caption: it holds the message when a year has
    no result file, and takes no space at all the rest of the time. */
 .mapnote{margin-top:var(--s4);text-align:center}
 .mapnote:empty{display:none}
+
+/* ── the hover card ───────────────────────────────────────────────────── */
+#card{
+  position:fixed;z-index:9;min-width:19rem;max-width:24rem;
+  background:#fff;border:1px solid var(--rule-2);border-radius:var(--r2);
+  box-shadow:0 6px 26px rgba(15,18,32,.14);
+  padding:14px 16px 12px;
+  opacity:0;pointer-events:none;
+  transition:opacity .14s var(--ease);
+}
+#card.on{opacity:1}
+#card .sub{font-family:var(--mono);font-size:.625rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 2px}
+#card h2{margin:0;font-size:1.125rem;font-weight:400;line-height:1.2;letter-spacing:-.01em}
+#card .meta{font-family:var(--mono);font-size:.6875rem;color:var(--muted);margin:4px 0 10px}
+#card table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.6875rem}
+#card th{
+  font-weight:400;font-size:.5625rem;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--muted);text-align:right;padding:0 0 5px;border-bottom:1px solid var(--rule-2);
+}
+#card td{padding:4px 0;text-align:right;border-top:1px solid var(--rule)}
+#card tr:first-child td{border-top:0}
+/* The label column is the only one that is not a number, so it is the only one
+   that is left-aligned. Everything else right-aligns so digits line up on the
+   ones place — mixing the two made the party labels and the seat counts meet at
+   the same cell edge with no gap at all. */
+#card th:first-child,#card td:first-child{text-align:left}
+/* a gutter, so two columns cannot touch however narrow the card gets */
+#card th+th,#card td+td{padding-left:16px}
+#card td.p{display:flex;align-items:center;gap:7px}
+#card .sw{width:9px;height:9px;border-radius:2px;flex:0 0 auto;background:var(--c);
+  box-shadow:inset 0 0 0 1px rgba(15,18,32,.2)}
+#card .more{color:var(--muted)}
 
 /* ── footer ───────────────────────────────────────────────────────────── */
 .foot{padding:var(--s6) var(--pad) var(--s7);font-family:var(--mono);font-size:.6875rem;line-height:1.75;color:var(--muted)}
@@ -117,16 +160,16 @@ main{padding:0 var(--pad)}
 }
 .foot-grid dt{letter-spacing:.11em;text-transform:uppercase;font-size:.5625rem;color:var(--ink);opacity:.7}
 .foot-grid dd{margin:6px 0 0}
-.foot-links{max-width:none}
 
 /* ── responsive ───────────────────────────────────────────────────────── */
 @media (max-width:44rem){
   /* Below a 400px-wide map the label pass drops every label anyway, so this
      states an intent the geometry already enforces. */
   #map text{display:none}
+  #card{min-width:0;max-width:calc(100vw - 20px)}
 }
 @media (prefers-reduced-motion:reduce){
-  #map path,.year{transition:none}
+  #map .pc,#map .st,.year,#card{transition:none}
 }
 </style>
 </head>
@@ -142,8 +185,8 @@ main{padding:0 var(--pad)}
 
   <section class="field">
     <figure class="mapfig">
-      <svg id="map" viewBox="0 0 410 438" preserveAspectRatio="xMidYMid meet"
-           role="group" aria-label="Map of India. Each state and union territory is filled with the colour of the party that won the most seats there."></svg>
+      <svg id="map" viewBox="0 0 884 1000" preserveAspectRatio="xMidYMid meet"
+           role="group" aria-label="Map of India. Each of the 543 parliamentary constituencies is filled with the colour of the party that won it; the borders drawn over them are state and union territory boundaries."></svg>
       <p class="lbl mapnote" id="mapnote" role="status"></p>
     </figure>
   </section>
@@ -153,15 +196,15 @@ main{padding:0 var(--pad)}
   <dl class="foot-grid">
     <div>
       <dt>Real</dt>
-      <dd>The 36 states and union territories, their boundaries, and how many Lok Sabha seats each returns — Uttar Pradesh 80, Maharashtra 48, and so on, 543 in all.</dd>
+      <dd>The 543 parliamentary constituencies, their boundaries, the 36 states and union territories, and how many seats each state returns — Uttar Pradesh 80, Maharashtra 48, and so on.</dd>
     </div>
     <div>
       <dt>Not real</dt>
-      <dd>Which party won anything. The party-level seat splits, and every vote and elector figure, are placeholders: internally consistent, but not the published result. The colours on this map are therefore illustrative, not fact.</dd>
+      <dd>Which party won any constituency. Every constituency result on this page is a placeholder, generated from the state totals so the layers agree with each other. The Election Commission's own constituency-wise figures exist for 2019 and 2024 and are the intended replacement.</dd>
     </div>
     <div>
       <dt>Derived, not stored</dt>
-      <dd>Result files hold absolute counts only. Which party leads each state — the one thing the map is coloured by — is computed in the browser as the page loads.</dd>
+      <dd>Constituency files hold an absolute vote count and a party code, nothing else. Each state's seats won, votes and vote shares are aggregated in the browser from its own constituencies as the page loads.</dd>
     </div>
     <div>
       <dt>Boundaries</dt>
@@ -171,10 +214,14 @@ main{padding:0 var(--pad)}
   <p class="foot-links"><a href="/">← Akshay Prabhakant</a></p>
 </footer>
 
-<script type="module">
+<div id="card" role="status" aria-live="polite"></div>
 
-const $ = (s, r = document) => r.querySelector(s);
-const el = (tag, cls) => { const n = document.createElement(tag); if (cls) n.className = cls; return n; };
+<script type="module">
+const NS = 'http://www.w3.org/2000/svg';
+const $ = s => document.querySelector(s);
+const el = (t, c) => { const n = document.createElement(t); if (c) n.className = c; return n; };
+const nf = n => Math.round(n).toLocaleString('en-IN');
+const pc1 = n => (n * 100).toFixed(1) + '%';
 
 let geo, topojson;
 try {
@@ -187,14 +234,15 @@ try {
   throw err;
 }
 
-const mapEl = $('#map'), noteEl = $('#mapnote'), yearsEl = $('#years');
+const mapEl = $('#map'), noteEl = $('#mapnote'), yearsEl = $('#years'), card = $('#card');
 
-/* ── load the fixed vocabularies and the geometry ──────────────────────── */
-const [manifest, regionsDoc, partiesDoc, topo] = await Promise.all([
+/* ── fixed vocabularies and geometry ──────────────────────────────────── */
+const [manifest, regionsDoc, partiesDoc, statesTopo, pcsTopo] = await Promise.all([
   fetch('data/manifest.json').then(r => r.json()),
   fetch('data/regions.json').then(r => r.json()),
   fetch('data/parties.json').then(r => r.json()),
   fetch('data/geo/india-states.json').then(r => r.json()),
+  fetch('data/geo/india-pcs.json').then(r => r.json()),
 ]);
 
 const regionByCode = new Map(regionsDoc.regions.map(r => [r.code, r]));
@@ -203,91 +251,101 @@ for (const r of regionsDoc.regions) for (const s of r.sourceNames) regionBySourc
 
 const partyByCode = new Map(partiesDoc.parties.map(p => [p.code, p]));
 const fallback = partiesDoc.fallback;
+const colour = c => (partyByCode.get(c) || fallback).colour;
 const partyName = c => (partyByCode.get(c) || fallback).name;
-const partyColour = c => (partyByCode.get(c) || fallback).colour;
 
-const level = manifest.levels.find(l => l.id === manifest.elections.ls.level);
-const collection = topojson.feature(topo, topo.objects[level.topologyObject]);
-const keyField = level.geometryKey;
+const level = manifest.levels.find(l => l.id === 'state');
+const pcLevel = manifest.levels.find(l => l.id === 'parliamentary');
 
-/* ── derive, never store ──────────────────────────────────────────────── */
-// Every number below is computed from the absolute counts in the result file.
-// The files carry no percentages and no leader, deliberately.
+const states = topojson.feature(statesTopo, statesTopo.objects[level.topologyObject]);
+const pcs = topojson.feature(pcsTopo, pcsTopo.objects[pcLevel.topologyObject]);
 
+/* ── the constituency files carry counts; everything shown is derived ─── */
+function aggregate(year) {
+  const byRegion = new Map();
+  let totalVotes = 0;
+  for (const c of Object.values(year.constituencies)) {
+    let m = byRegion.get(c.st);
+    if (!m) byRegion.set(c.st, m = new Map());
+    const w = m.get(c.p) || { seats: 0, votes: 0 };
+    w.seats++; w.votes += c.v; totalVotes += c.v;
+    m.set(c.p, w);
+    // parties that polled in the constituency but won nothing still count votes
+    for (const [code, v] of Object.entries(c.o || {})) {
+      const o = m.get(code) || { seats: 0, votes: 0 };
+      o.votes += v; totalVotes += v; m.set(code, o);
+    }
+  }
+  return { byRegion, totalVotes };
+}
 
-/* ── the map ──────────────────────────────────────────────────────────── */
-/* code -> [path]. An array, not a single path: two geometries can resolve to
-   one region — Dadra and Nagar Haveli and Daman and Diu are still separate
-   features in this pre-2019 source — and both must take IN-DH's colour. */
-const paths = new Map();
-
+/* ── draw ─────────────────────────────────────────────────────────────── */
+const pcPaths = new Map();      // unique_id -> path
+const statePaths = new Map();   // region code -> path
 let projection, pathGen;
+
 function drawMap() {
   const box = mapEl.getBoundingClientRect();
   const W = Math.max(320, Math.round(box.width));
   const H = Math.max(260, Math.round(box.height));
   mapEl.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  projection = geo.geoMercator().fitExtent([[6, 6], [W - 6, H - 6]], collection);
+  projection = geo.geoMercator().fitExtent([[2, 2], [W - 2, H - 2]], states);
   pathGen = geo.geoPath(projection);
-
   mapEl.textContent = '';
-  paths.clear();
-  const frag = document.createDocumentFragment();
+  pcPaths.clear(); statePaths.clear();
 
-  for (const f of collection.features) {
-    const code = regionBySource.get(f.properties[keyField]);
-    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  const gPC = document.createElementNS(NS, 'g');
+  for (const f of pcs.features) {
+    const p = document.createElementNS(NS, 'path');
     p.setAttribute('d', pathGen(f));
+    p.setAttribute('class', 'pc');
+    p.dataset.uid = f.properties.unique_id;
+    gPC.appendChild(p);
+    pcPaths.set(f.properties.unique_id, p);
+  }
+  mapEl.appendChild(gPC);
+
+  const gST = document.createElementNS(NS, 'g');
+  for (const f of states.features) {
+    const code = regionBySource.get(f.properties[level.geometryKey]);
+    const p = document.createElementNS(NS, 'path');
+    p.setAttribute('d', pathGen(f));
+    p.setAttribute('class', 'st');
     if (code) {
       p.dataset.region = code;
       p.setAttribute('tabindex', '0');
       p.setAttribute('role', 'button');
-      if (!paths.has(code)) paths.set(code, []);
-      paths.get(code).push(p);
-    } else {
-      // geometry with no registry entry: draw it, but it is not part of the data
-      p.style.fill = 'var(--paper-2)';
-      p.style.cursor = 'default';
+      statePaths.set(code, p);
     }
-    frag.appendChild(p);
+    gST.appendChild(p);
   }
-  mapEl.appendChild(frag);
+  mapEl.appendChild(gST);
 
-  applyFills();
+  applyYear();
   drawLabels();
 }
 
-/* The map labels are the map's second channel, not a decoration. Colour alone
-   cannot separate twenty parties, so every state large enough to be a real
-   shape carries its postal code: where two neighbouring fills sit close
-   together, the text is what disambiguates them. */
+/* Labels select on the size of the shape, not on seats returned: selecting on
+   seats hid Ladakh, which is one seat and the largest shape on the map. */
 function drawLabels() {
   mapEl.querySelectorAll('text').forEach(t => t.remove());
   if (!currentYear) return;
   const W = +mapEl.getAttribute('viewBox').split(' ')[2];
-  if (W < 400) return;                      // too cramped to place text honestly
+  if (W < 400) return;
 
   const candidates = [];
-  for (const f of collection.features) {
-    const code = regionBySource.get(f.properties[keyField]);
-    const r = code && currentYear.regions[code];
-    if (!r) continue;
-    // Whether a state earns a label is a question about the shape, not about how
-    // many seats it returns. Selecting on seats hid Ladakh — one seat, and the
-    // largest shape on the map. Selecting on size labels exactly those states
-    // there is room to write on, and drops Chandigarh and Lakshadweep by itself.
+  for (const f of states.features) {
+    const code = regionBySource.get(f.properties[level.geometryKey]);
+    if (!code || !statePaths.has(code)) continue;
     const [[bx0, by0], [bx1, by1]] = pathGen.bounds(f);
     if (bx1 - bx0 < 26 || by1 - by0 < 13) continue;
-    // This has to be done in geographic space: geoCentroid and geoContains both
-    // take [longitude, latitude], while geoPath.centroid returns projected
-    // pixels. Mixing the two silently yields no candidate points at all.
+    // geoCentroid and geoContains both take [longitude, latitude]; geoPath's own
+    // centroid returns projected pixels, and mixing the two silently drops every
+    // candidate. Work in geographic space and project at the end.
     const c = geo.geoCentroid(f);
     if (!isFinite(c[0]) || !isFinite(c[1])) continue;
     const bd = geo.geoBounds(f);
     const mid = [(bd[0][0] + bd[1][0]) / 2, (bd[0][1] + bd[1][1]) / 2];
-    // An area-weighted centroid is not guaranteed to fall inside a concave or
-    // islanded state. Walk from it toward the bounding-box centre and take the
-    // first point that actually lands on the state.
     let at = null;
     for (const pt of [c, [(c[0] + mid[0]) / 2, (c[1] + mid[1]) / 2], mid,
                       [(c[0] * 2 + mid[0]) / 3, (c[1] * 2 + mid[1]) / 3]]) {
@@ -304,7 +362,7 @@ function drawLabels() {
   candidates.sort((a, b) => b.area - a.area);
   const placed = [];
   for (const c of candidates) {
-    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    const t = document.createElementNS(NS, 'text');
     t.setAttribute('x', c.at[0].toFixed(1));
     t.setAttribute('y', c.at[1].toFixed(1));
     t.textContent = c.code.slice(3);        // IN-UP -> UP, the standard postal code
@@ -317,78 +375,99 @@ function drawLabels() {
   }
 }
 
-
-/* The leading party is derived, never stored: result files carry absolute seat
-   and vote counts and nothing else, so "who leads here" is computed on read. */
-function leaderOf(parties) {
-  return parties.reduce((a, b) =>
-    (b.seats > a.seats || (b.seats === a.seats && b.votes > a.votes)) ? b : a);
-}
-
-/* Colour comes from the loaded year, and has to be re-applied every time the
-   map is redrawn: a redraw builds fresh <path> elements and a fresh path has
-   no --c, which leaves it filled black. */
-function applyFills() {
+/* ── colour from the loaded year ──────────────────────────────────────── */
+function applyYear() {
   if (!currentYear) return;
-  for (const [code, list] of paths) {
-    const r = currentYear.regions[code];
-    const lead = r && leaderOf(r.parties);
-    const label = r
-      ? `${regionByCode.get(code).name}, ${r.seats} seats. ${partyName(lead.code)} wins ${lead.seats}.`
-      : `${(regionByCode.get(code) || {}).name || code}, no result for this year`;
-    for (const p of list) {
-      p.style.setProperty('--c', lead ? partyColour(lead.code) : 'var(--paper-2)');
-      p.style.cursor = r ? 'pointer' : 'default';
-      p.setAttribute('tabindex', r ? '0' : '-1');
-      p.setAttribute('aria-label', label);
-    }
+  for (const [uid, p] of pcPaths) {
+    const c = currentYear.constituencies[uid];
+    p.style.setProperty('--c', c ? colour(c.p) : 'var(--paper-2)');
+  }
+  for (const [code, p] of statePaths) {
+    const m = agg.byRegion.get(code);
+    const lead = m ? [...m.entries()].sort((a, b) => b[1].seats - a[1].seats)[0] : null;
+    p.setAttribute('aria-label', lead
+      ? `${regionByCode.get(code).name}. ${lead[0]} won ${lead[1].seats} constituencies.`
+      : `${regionByCode.get(code).name}. No result for this year.`);
   }
 }
 
+/* ── the card ─────────────────────────────────────────────────────────── */
+const MAX_ROWS = 7;
+function fillCard(code) {
+  const rows = [...(agg.byRegion.get(code) || new Map())]
+    .map(([p, v]) => ({ code: p, seats: v.seats, votes: v.votes }))
+    .filter(r => r.seats > 0 || r.votes > 0)
+    .sort((a, b) => b.seats - a.seats || b.votes - a.votes);
+  if (!rows.length) return false;
 
+  const totalVotes = rows.reduce((n, r) => n + r.votes, 0);
+  const totalSeats = rows.reduce((n, r) => n + r.seats, 0);
+  const region = regionByCode.get(code);
+  const rest = rows.slice(MAX_ROWS);
+  const restVotes = rest.reduce((n, r) => n + r.votes, 0);
 
-/* ── interaction ──────────────────────────────────────────────────────── */
-let currentYear = null, pinned = null, hovered = null;
-
-function activeCode() { return pinned || hovered; }
-
-/* Highlight only. There is no reading panel on this page: the figures a state
-   carries belong to the drill-down, and a label here would be a second, worse
-   copy of them. */
-function paintActive() {
-  const code = activeCode();
-  for (const [c, list] of paths) for (const p of list) p.classList.toggle('is-active', c === code);
+  card.innerHTML =
+    `<p class="sub">${region.type === 'ut' ? 'Union territory' : 'State'}</p>
+     <h2>${region.name}</h2>
+     <p class="meta">${totalSeats} constituencies · ${nf(totalVotes)} votes polled</p>
+     <table><thead><tr><th>Party</th><th>Seats won</th><th>Votes</th><th>Share</th></tr></thead><tbody>` +
+    rows.slice(0, MAX_ROWS).map(r =>
+      `<tr><td class="p"><i class="sw" style="--c:${colour(r.code)}"></i>${r.code}</td>` +
+      `<td>${r.seats}</td><td>${nf(r.votes)}</td><td>${pc1(totalVotes ? r.votes / totalVotes : 0)}</td></tr>`).join('') +
+    (rest.length ? `<tr class="more"><td class="p">+${rest.length} more</td>` +
+      `<td>${rest.reduce((n, r) => n + r.seats, 0)}</td><td>${nf(restVotes)}</td>` +
+      `<td>${pc1(totalVotes ? restVotes / totalVotes : 0)}</td></tr>` : '') +
+    `</tbody></table>`;
+  card.title = `${rows[0].code} leads ${region.name} — ${partyName(rows[0].code)}`;
+  return true;
 }
 
-function setHover(code) { if (hovered === code) return; hovered = code; paintActive(); }
+function placeCard(x, y) {
+  card.classList.add('on');
+  const r = card.getBoundingClientRect();
+  card.style.left = Math.max(8, Math.min(x + 18, innerWidth - r.width - 12)) + 'px';
+  card.style.top = Math.max(8, Math.min(y + 14, innerHeight - r.height - 12)) + 'px';
+}
+function showCard(code, x, y) { if (fillCard(code)) placeCard(x, y); }
+function hideCard() {
+  card.classList.remove('on');
+  for (const p of statePaths.values()) p.classList.remove('is-active');
+}
 
-/* Delegated rather than bound per path: drawMap() rebuilds every <path> on a
-   resize, and listeners attached to the old elements would go with them —
-   leaving a map that is drawn correctly and completely inert. */
-function togglePin(code) { pinned = pinned === code ? null : code; paintActive(); }
-function bindRegionEvents() {
-  const regionOf = e => {
-    const p = e.target.closest && e.target.closest('path[data-region]');
+/* Delegated, so a redraw on resize cannot strand the handlers on detached paths. */
+function bindEvents() {
+  const codeOf = e => {
+    const p = e.target.closest && e.target.closest('path.st[data-region]');
     return p && p.dataset.region;
   };
-  mapEl.addEventListener('pointerover', e => { const c = regionOf(e); if (c) setHover(c); });
-  mapEl.addEventListener('focusin', e => { const c = regionOf(e); if (c) setHover(c); });
-  mapEl.addEventListener('click', e => { const c = regionOf(e); if (c) togglePin(c); });
-  mapEl.addEventListener('keydown', e => {
-    const c = regionOf(e);
-    if (c && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); togglePin(c); }
+  mapEl.addEventListener('pointerover', e => {
+    const c = codeOf(e); if (!c) return;
+    statePaths.get(c).classList.add('is-active');
+    showCard(c, e.clientX, e.clientY);
   });
-  // Leaving the map drops the highlight; the click is what holds it.
-  mapEl.addEventListener('pointerleave', () => setHover(null));
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && pinned) { pinned = null; paintActive(); }
+  mapEl.addEventListener('pointermove', e => {
+    const c = codeOf(e); if (!c || !card.classList.contains('on')) return;
+    placeCard(e.clientX, e.clientY);
   });
+  mapEl.addEventListener('pointerout', e => { if (codeOf(e)) hideCard(); });
+  mapEl.addEventListener('focusin', e => {
+    const c = codeOf(e); if (!c) return;
+    statePaths.get(c).classList.add('is-active');
+    const r = e.target.getBoundingClientRect();
+    showCard(c, r.left + r.width / 2, r.top + r.height / 2);
+  });
+  mapEl.addEventListener('focusout', hideCard);
+  mapEl.addEventListener('click', e => { const c = codeOf(e); if (c) showCard(c, e.clientX, e.clientY); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') hideCard(); });
 }
 
-/* ── year switching ───────────────────────────────────────────────────── */
+/* ── years ────────────────────────────────────────────────────────────── */
+let currentYear = null, agg = null;
 const yearCache = new Map();
 async function loadYear(y) {
-  if (!yearCache.has(y)) yearCache.set(y, fetch(`data/results/ls/${y}.json`).then(r => {
+  /* manifest paths are relative to the data directory, not to the page */
+  const url = 'data/' + pcLevel.results.replace('{year}', y);
+  if (!yearCache.has(y)) yearCache.set(y, fetch(url).then(r => {
     if (!r.ok) throw new Error(`${y} is not published`);
     return r.json();
   }));
@@ -396,28 +475,19 @@ async function loadYear(y) {
 }
 
 async function selectYear(y) {
-  for (const b of yearsEl.children) {
-    b.setAttribute('aria-pressed', String(+b.dataset.year === y));
-    b.disabled = true;
-  }
+  for (const b of yearsEl.children) { b.setAttribute('aria-pressed', String(+b.dataset.year === y)); b.disabled = true; }
+  hideCard();
   try {
-    const year = await loadYear(y);
-    currentYear = year;
-    pinned = null; hovered = null;
+    currentYear = await loadYear(y);
+    agg = aggregate(currentYear);
     noteEl.textContent = '';
-    applyFills();
+    applyYear();
     drawLabels();
   } catch (err) {
-    currentYear = null;
-    pinned = null; hovered = null;
-    noteEl.textContent = `${y} has no result file yet.`;
-    for (const list of paths.values()) for (const p of list) {
-      p.style.setProperty('--c', 'var(--paper-2)');
-      p.style.cursor = 'default';
-      p.setAttribute('tabindex', '-1');
-      p.removeAttribute('aria-label');
-    }
-    paintActive();
+    currentYear = null; agg = null;
+    noteEl.textContent = `${y} has no constituency result file yet.`;
+    for (const p of pcPaths.values()) p.style.setProperty('--c', 'var(--paper-2)');
+    for (const p of statePaths.values()) p.removeAttribute('aria-label');
   } finally {
     for (const b of yearsEl.children) b.disabled = false;
   }
@@ -434,12 +504,13 @@ for (const y of manifest.elections.ls.years) {
 }
 
 drawMap();
-bindRegionEvents();
+bindEvents();
 let rt;
 new ResizeObserver(() => {
   clearTimeout(rt);
-  rt = setTimeout(drawMap, 60);
+  rt = setTimeout(() => { drawMap(); }, 60);
 }).observe(mapEl);
+
 await selectYear(manifest.elections.ls.years[manifest.elections.ls.years.length - 1]);
 </script>
 </body>

@@ -9,7 +9,7 @@
   "geometryFormat": "topojson",
   "note_geometryFormat": "Every level's geometry file is TopoJSON. Each level names the object inside its topology that holds that level's geometries, and the property its features carry the region code's own name in, so a reader joins on a declared key rather than guessing one.",
   "note_join": "Regions join to geometries on the region code carried in the geometry's properties. Where a geometry file's own naming differs from the canonical code, the level declares 'geometryKeys': { \"<canonical code>\": \"<properties key used in the geometry file>\" } so the join is explicit rather than guessed.",
-  "note_results": "Result files carry region codes and party codes only — never names, never percentages. Every share, leader and majority figure on a page is derived from the absolute counts at read time.",
+  "note_results": "Result files carry region codes, constituency ids and party codes only — never names, never percentages. Every seat count, vote total and vote share on a page is aggregated from the absolute counts at read time.",
   "levels": [
     {
       "id": "state",
@@ -27,10 +27,15 @@
       "id": "parliamentary",
       "label": "Parliamentary constituency",
       "parent": "state",
-      "geometry": "geo/ls/{region}.json",
-      "topologyObject": "constituencies",
-      "geometryKey": "PC_NAME",
-      "results": "results/ls/{region}/{year}.json"
+      "geometry": "geo/india-pcs.json",
+      "topologyObject": "pcs",
+      "geometryKey": "state_ut_name",
+      "results": "results/ls/pc/{year}.json",
+      "counts": {
+        "regions": 543
+      },
+      "note": "One national file of all 543 constituencies. Its geometry is the source the state layer above is dissolved from, so a state's outline is exactly the union of its constituencies and the two layers cannot disagree.",
+      "note_results": "SYNTHETIC as published. Each state's party seat and vote totals are distributed across that state's constituencies. The Election Commission's own constituency-wise results exist for 2019 and 2024 and are the intended replacement."
     },
     {
       "id": "assembly",
