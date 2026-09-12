@@ -205,6 +205,28 @@ td .cell{display:flex;align-items:center;gap:7px}
   box-shadow:inset 0 0 0 1px rgba(15,18,32,.2)}
 .more{color:var(--muted)}
 
+/* ── the table rows are controls, exactly as on level one ─────────────── *
+ * Scoped to .table on purpose: the hover card contains a table too, and a bare
+ * `tbody tr` rule would make its candidate rows look clickable.
+ * Hover and selection must never share a shape — hover is a FILL, selection is
+ * a LEADING EDGE — or a hovered row left out of the selection wears exactly
+ * what the selected rows are wearing. */
+.table-actions{display:flex;align-items:baseline;gap:var(--s3)}
+.reset.loud{font-size:.6875rem;letter-spacing:.04em;text-transform:none;color:var(--ink)}
+.sw{transition:opacity .18s var(--ease)}
+.table tbody tr{cursor:pointer;transition:background .14s var(--ease),color .18s var(--ease)}
+.table tbody tr:hover{background:var(--paper-2)}
+.table tbody tr.sel{box-shadow:inset 2px 0 0 var(--ink)}
+.table tbody.has-sel tr:not(.sel){color:var(--muted)}
+.table tbody.has-sel tr:not(.sel) .sw{opacity:.4}
+.table tbody tr.more{cursor:default}
+.table tbody tr.more:hover{background:none}
+.table .pick{
+  appearance:none;background:none;border:0;padding:0;cursor:pointer;font:inherit;
+  color:inherit;display:flex;align-items:center;gap:7px;width:100%;text-align:left;
+}
+.table .pick:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:2px}
+
 .void{
   min-height:12rem;display:flex;align-items:center;justify-content:center;
   border:1px solid var(--rule);border-radius:var(--r2);padding:var(--s5);
@@ -249,11 +271,14 @@ td .cell{display:flex;align-items:center;gap:7px}
       <div class="table">
         <div class="table-head">
           <p class="lbl">Seats won</p>
-          <button class="reset" id="reset-ac" type="button" hidden>
-            <svg width="10" height="10" viewBox="0 0 12 12" aria-hidden="true" fill="none"
-                 stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
-              <path d="M2 6a4 4 0 1 0 1.2-2.8"/><path d="M2 1.6V4h2.4"/>
-            </svg>default order</button>
+          <span class="table-actions">
+            <button class="reset" id="reset-ac" type="button" hidden>
+              <svg width="10" height="10" viewBox="0 0 12 12" aria-hidden="true" fill="none"
+                   stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                <path d="M2 6a4 4 0 1 0 1.2-2.8"/><path d="M2 1.6V4h2.4"/>
+              </svg>default order</button>
+            <button class="reset loud" id="clear-ac" type="button" hidden>clear selection</button>
+          </span>
         </div>
         <div id="table-ac"></div>
       </div>
@@ -270,11 +295,14 @@ td .cell{display:flex;align-items:center;gap:7px}
       <div class="table">
         <div class="table-head">
           <p class="lbl">Seats won</p>
-          <button class="reset" id="reset-pc" type="button" hidden>
-            <svg width="10" height="10" viewBox="0 0 12 12" aria-hidden="true" fill="none"
-                 stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
-              <path d="M2 6a4 4 0 1 0 1.2-2.8"/><path d="M2 1.6V4h2.4"/>
-            </svg>default order</button>
+          <span class="table-actions">
+            <button class="reset" id="reset-pc" type="button" hidden>
+              <svg width="10" height="10" viewBox="0 0 12 12" aria-hidden="true" fill="none"
+                   stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                <path d="M2 6a4 4 0 1 0 1.2-2.8"/><path d="M2 1.6V4h2.4"/>
+              </svg>default order</button>
+            <button class="reset loud" id="clear-pc" type="button" hidden>clear selection</button>
+          </span>
         </div>
         <div id="table-pc"></div>
       </div>
@@ -464,23 +492,38 @@ function sortedRows(agg, which) {
   });
 }
 
-function renderTable(el, agg, which, resetBtn) {
-  if (!agg || !agg.m.size) { el.innerHTML = ''; if (resetBtn) resetBtn.hidden = true; return; }
+function renderTable(el, agg, which, resetBtn, clearBtn) {
+  if (!agg || !agg.m.size) {
+    el.innerHTML = '';
+    if (resetBtn) resetBtn.hidden = true;
+    if (clearBtn) clearBtn.hidden = true;
+    return;
+  }
   const rows = sortedRows(agg, which);
   const total = agg.total, rest = rows.slice(MAX_ROWS);
   const restV = rest.reduce((n, r) => n + r.votes, 0);
   const s = sortState[which];
+  const on = sel[which];
   const isDefault = s.key === DEFAULT_SORT.key && s.dir === DEFAULT_SORT.dir;
   if (resetBtn) resetBtn.hidden = isDefault;
+  if (clearBtn) clearBtn.hidden = on.size === 0;
   const arrow = k => s.key === k ? (s.dir === -1 ? ' ↓' : ' ↑') : '';
   const th = (k, label) =>
     `<th aria-sort="${s.key === k ? (s.dir === -1 ? 'descending' : 'ascending') : 'none'}">` +
     `<button type="button" data-sort="${k}">${label}${arrow(k)}</button></th>`;
+  /* The rows are controls, exactly as on level one: the pick button is the tab
+     stop and its click bubbles to the row, so pointer and keyboard go through
+     one handler rather than two that can disagree. */
   el.innerHTML =
-    `<table><thead><tr><th>Party</th>${th('seats', 'Seats won')}${th('votes', 'Votes')}${th('share', 'Share')}</tr></thead><tbody>` +
-    rows.slice(0, MAX_ROWS).map(r =>
-      `<tr><td><span class="cell"><i class="sw" style="--c:${colour(r.code)}"></i>${r.code}</span></td>` +
-      `<td>${r.seats}</td><td>${nf(r.votes)}</td><td>${pc1(total ? r.votes / total : 0)}</td></tr>`).join('') +
+    `<table><thead><tr><th>Party</th>${th('seats', 'Seats won')}${th('votes', 'Votes')}${th('share', 'Share')}</tr></thead>` +
+    `<tbody${on.size ? ' class="has-sel"' : ''}>` +
+    rows.slice(0, MAX_ROWS).map(r => {
+      const picked = on.has(r.code);
+      return `<tr data-party="${r.code}"${picked ? ' class="sel"' : ''}>` +
+        `<td><button type="button" class="pick" aria-pressed="${picked}">` +
+        `<i class="sw" style="--c:${colour(r.code)}"></i><span>${r.code}</span></button></td>` +
+        `<td>${r.seats}</td><td>${nf(r.votes)}</td><td>${pc1(total ? r.votes / total : 0)}</td></tr>`;
+    }).join('') +
     (rest.length ? `<tr class="more"><td><span class="cell">+${rest.length} more</span></td>` +
       `<td>${rest.reduce((n, r) => n + r.seats, 0)}</td><td>${nf(restV)}</td>` +
       `<td>${pc1(total ? restV / total : 0)}</td></tr>` : '') +
@@ -490,7 +533,7 @@ function renderTable(el, agg, which, resetBtn) {
       const k = b.dataset.sort;
       const st = sortState[which];
       if (st.key === k) st.dir = -st.dir; else { st.key = k; st.dir = -1; }
-      renderTable(el, agg, which, resetBtn);
+      renderTable(el, agg, which, resetBtn, clearBtn);
     });
   }
 }
@@ -614,29 +657,103 @@ function faceFor(which, key) {
 }
 const acNums = acs ? new Set(acs.features.map(f => String(f.properties.no))) : new Set();
 
+/* ── selection, one per panel and independent of the other ────────────── *
+ * The same grammar as level one: picking a party is a FILTER ON THIS STATE'S
+ * MAP, not a highlight on a row, so the parties left out drop to --paper-2 and
+ * the reader sees the contest between what they chose.
+ * The two panels never share a selection. They are different elections on
+ * different cycles, and coupling them would be the cross-highlight this page
+ * already had removed once. */
+const sel = { ac: new Set(), pc: new Set() };
+const seatParty = { ac: new Map(), pc: new Map() };   // seat key -> party code
+const partySeats = { ac: new Map(), pc: new Map() };  // party code -> [seat key]
+
+function paintFills(which) {
+  const bound = which === 'ac' ? acPaths : pcPaths;
+  const on = sel[which];
+  for (const [k, el] of bound) {
+    const party = seatParty[which].get(k);
+    const leftOut = party && on.size && !on.has(party);
+    el.style.setProperty('--c', !party || leftOut ? 'var(--paper-2)' : colour(party));
+  }
+}
+
 function paintPC(data) {
-  const fills = new Map(), rows = new Map();
+  const rows = new Map();
+  seatParty.pc = new Map();
+  partySeats.pc = new Map();
   for (const [uid, c] of Object.entries(data.pcRows)) {
     const seat = uidToSeat.get(uid);
-    if (seat) fills.set(seat, colour(c.p));
+    if (!seat) continue;
+    seatParty.pc.set(seat, c.p);
+    const arr = partySeats.pc.get(c.p);
+    if (arr) arr.push(seat); else partySeats.pc.set(c.p, [seat]);
   }
   for (const [uid, d] of detail.pc) {
     const seat = uidToSeat.get(uid);
     if (seat) rows.set(seat, d.c);
   }
   cardRows.pc = rows;
-  for (const [k, el] of pcPaths) el.style.setProperty('--c', fills.get(k) || 'var(--paper-2)');
+  paintFills('pc');
 }
 function paintAC(data) {
-  const fills = new Map();
-  if (data.acRows) for (const [no, c] of Object.entries(data.acRows)) fills.set(String(no), colour(c.p));
+  seatParty.ac = new Map();
+  partySeats.ac = new Map();
+  if (data.acRows) for (const [no, c] of Object.entries(data.acRows)) {
+    const k = String(no);
+    seatParty.ac.set(k, c.p);
+    const arr = partySeats.ac.get(c.p);
+    if (arr) arr.push(k); else partySeats.ac.set(c.p, [k]);
+  }
   // entries are {c:[...]}; take the array, not the wrapper
   cardRows.ac = new Map([...detail.ac].filter(([k]) => acNums.has(k)).map(([k, v]) => [k, v.c]));
-  for (const [k, el] of acPaths) el.style.setProperty('--c', fills.get(k) || 'var(--paper-2)');
+  paintFills('ac');
 }
 
 let lastAC = null, lastPC = null;
 function repaintAll() { if (lastPC) paintPC(lastPC); if (lastAC) paintAC(lastAC); }
+
+/* ── selection controls, one set per panel ────────────────────────────── */
+function panelEls(which) {
+  return which === 'ac'
+    ? { table: $('#table-ac'), agg: lastAC && lastAC.acAgg, reset: $('#reset-ac'), clear: $('#clear-ac') }
+    : { table: $('#table-pc'), agg: lastPC && lastPC.pcAgg, reset: $('#reset-pc'), clear: $('#clear-pc') };
+}
+function renderPanel(which) {
+  const e = panelEls(which);
+  if (e.agg) renderTable(e.table, e.agg, which, e.reset, e.clear);
+}
+function toggleParty(which, code) {
+  const on = sel[which];
+  if (on.has(code)) on.delete(code); else on.add(code);
+  repaintAll();
+  renderPanel(which);
+}
+function clearSel(which) {
+  sel[which].clear();
+  repaintAll();
+  renderPanel(which);
+}
+/* A row is a control here too. Hovering one focuses that party's seats with the
+   same scrim and lift hovering a shape gets — focusPanel already unions any
+   number of shapes into one `d`, so a party that won 33 seats is one write. */
+function bindPanelTable(which) {
+  const e = panelEls(which);
+  if (!e.table) return;
+  e.table.addEventListener('pointerover', ev => {
+    const tr = ev.target.closest('tr[data-party]');
+    if (!tr) return;
+    hideCard();
+    const seats = partySeats[which].get(tr.dataset.party);
+    if (seats) focusPanel(which, new Set(seats));
+  });
+  e.table.addEventListener('pointerleave', () => clearPanel(which));
+  e.table.addEventListener('click', ev => {
+    const tr = ev.target.closest('tr[data-party]');
+    if (tr) toggleParty(which, tr.dataset.party);
+  });
+  if (e.clear) e.clear.addEventListener('click', () => clearSel(which));
+}
 
 async function loadLS(year) {
   const all = await fetch(`../data/results/ls/pc/${year}.json`).then(r => r.json());
@@ -667,7 +784,7 @@ async function selectLS(y) {
     lastPC = data;
     const n = Object.keys(data.pcRows).length;
     $('#cap-pc').textContent = `${n} seats`;
-    renderTable($('#table-pc'), data.pcAgg, 'pc', $('#reset-pc'));
+    renderTable($('#table-pc'), data.pcAgg, 'pc', $('#reset-pc'), $('#clear-pc'));
     layout(); paintPC(data);
     await markReady();
   } finally { for (const b of $('#years-pc').children) b.disabled = false; }
@@ -681,7 +798,7 @@ async function selectLA(y) {
     lastAC = data;
     const n = Object.keys(data.acRows).length;
     $('#cap-ac').textContent = `${n} seats`;
-    renderTable($('#table-ac'), data.acAgg, 'ac', $('#reset-ac'));
+    renderTable($('#table-ac'), data.acAgg, 'ac', $('#reset-ac'), $('#clear-ac'));
     layout(); paintAC(data);
     await markReady();
   } finally { for (const b of $('#years-ac').children) b.disabled = false; }
@@ -689,11 +806,11 @@ async function selectLA(y) {
 
 $('#reset-pc').addEventListener('click', () => {
   sortState.pc = { key: DEFAULT_SORT.key, dir: DEFAULT_SORT.dir };
-  if (lastPC) renderTable($('#table-pc'), lastPC.pcAgg, 'pc', $('#reset-pc'));
+  if (lastPC) renderTable($('#table-pc'), lastPC.pcAgg, 'pc', $('#reset-pc'), $('#clear-pc'));
 });
 $('#reset-ac').addEventListener('click', () => {
   sortState.ac = { key: DEFAULT_SORT.key, dir: DEFAULT_SORT.dir };
-  if (lastAC) renderTable($('#table-ac'), lastAC.acAgg, 'ac', $('#reset-ac'));
+  if (lastAC) renderTable($('#table-ac'), lastAC.acAgg, 'ac', $('#reset-ac'), $('#clear-ac'));
 });
 
 if (!hasAC) {
@@ -710,6 +827,8 @@ if (!hasAC) {
 
 wire(svgAC, 'ac');
 wire(svgPC, 'pc');
+bindPanelTable('ac');
+bindPanelTable('pc');
 // the India map drills in carrying the year it was showing; honour it when this
 // state has that year, otherwise fall back to the latest available
 const wantsYear = Number(qs.get('y')) || 0;
