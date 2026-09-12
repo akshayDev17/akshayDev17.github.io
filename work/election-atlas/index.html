@@ -24,6 +24,16 @@
   --col:86rem;
   --pad:max(clamp(1.25rem,4vw,4.5rem),calc((100vw - var(--col)) / 2));
   --ease:cubic-bezier(.2,0,0,1);
+  /* Everything above and below the map, inside one screen: the masthead, the
+     plate's vertical padding, and a little air at the foot. The map's height is
+     the viewport minus this, so the map can never push the page past one screen. */
+  --chrome:9.5rem;
+  /* The one dial. 1 = the map fits the screen exactly and never scrolls.
+     Raise it to trade vertical scroll for width: India is taller than wide, so
+     at 1 a laptop gives the map about half the screen width, and every extra
+     tenth of a screen of scroll buys roughly a tenth more width. */
+  --map-spill:1;
+  --map-h:calc((100vh - var(--chrome)) * var(--map-spill));
 }
 
 *{box-sizing:border-box}
@@ -49,7 +59,7 @@ main{padding:0 var(--pad)}
 .hair{height:1px;background:var(--rule);border:0;margin:0}
 
 /* ── masthead ─────────────────────────────────────────────────────────── */
-.masthead{padding-top:clamp(1.5rem,3.4vw,3rem)}
+.masthead{padding-top:clamp(1rem,2.4vw,2rem)}
 .mh-top{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s5);flex-wrap:wrap}
 .mh-top .lbl{margin:0}
 .years{display:flex;align-items:baseline;gap:2px;margin-bottom:-6px}
@@ -65,17 +75,20 @@ main{padding:0 var(--pad)}
 .year[disabled]{opacity:.4;cursor:default}
 
 /* ── the plate ────────────────────────────────────────────────────────── */
-.field{padding:clamp(1rem,3vw,2.5rem) 0 clamp(2rem,5vw,4rem)}
+.field{padding:clamp(.75rem,2vw,1.5rem) 0 clamp(1rem,2.5vw,2rem)}
 .mapfig{margin:0;min-width:0}
 #map{
-  display:block;width:100%;height:auto;overflow:visible;
-  /* The map is the page, so its width is the content column and its height is
-     whatever that width implies. Declaring India's projected extent as the
-     intrinsic ratio is what makes that true: height is derived from width, so
-     the map can never be letterboxed inside its own box at any breakpoint, and
-     widening it genuinely enlarges it instead of adding margin.
-     0.8839 = the geoMercator extent of lon 68.09..97.40 by lat 6.76..37.04. */
+  display:block;margin:0 auto;height:auto;overflow:visible;
+  /* India's projected extent is 0.8839 wide to 1 tall — taller than wide, which
+     is the whole problem. A map wide enough to fill a 1440px viewport is 1629px
+     tall; one that fits a 900px viewport is 795px wide. Width and height cannot
+     both be filled, so height is the binding constraint and width is derived:
+     whatever height the viewport can spare, times the ratio, capped by the
+     column so it can never spill sideways either.
+     0.8839 = geoMercator extent of lon 68.09..97.40 by lat 6.76..37.04. */
   aspect-ratio:884 / 1000;
+  --map-h:calc((100dvh - var(--chrome)) * var(--map-spill));
+  width:min(100%, calc(var(--map-h) * .8839));
 }
 #map path{
   stroke:var(--paper);stroke-width:.75;stroke-linejoin:round;
