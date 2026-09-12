@@ -110,10 +110,51 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 #map .st{
   fill:none;stroke:var(--ink);stroke-width:1.1;stroke-linejoin:round;
   pointer-events:all;cursor:pointer;
-  transition:stroke-width .16s var(--ease);
+  transition:stroke-width .16s var(--ease),stroke-opacity .24s var(--ease);
 }
 #map .st:hover,#map .st.is-active{stroke-width:2.4}
 #map .st:focus-visible{outline:none;stroke-width:3.2}
+
+/* Clicking inside the map but not on a state leaves the click on the <svg> root,
+   and the browser focuses it and paints its default focus ring around the whole
+   element — which arrives in the OS accent colour, so it is orange on a machine
+   whose accent is orange and reads as a border this page drew. It does not come
+   from here; no rule below draws anything on the root.
+   Removing it costs no keyboard user anything. The root is not a tab stop, and
+   every element inside it that IS reachable by keyboard shows focus three other
+   ways at once: its stroke goes 1.1px -> 3.2px, it is the one region the scrim
+   does not wash, and it lifts off the plane on a cast shadow. */
+#map,#map .st:focus{outline:none}
+
+/* ── focus + context ──────────────────────────────────────────────────── *
+ * Highlighting a border alone asks the reader to find the difference between
+ * two 1px lines. Instead the map is divided into a focus and a context: the
+ * hovered state keeps its colour, and everything else recedes — the map plane
+ * is pushed back so the one region comes forward.
+ *
+ * Two layers, both sharing one mask whose hole is the hovered state:
+ *
+ *   .scrim  a wash of the page colour over the whole map. It desaturates the
+ *           context by moving it toward the background rather than toward grey,
+ *           so the country's shape stays legible while its colours stop
+ *           competing. The mask keeps the wash off the focus itself.
+ *
+ *   .lift   the same shape again, nudged down and blurred, and masked the same
+ *           way so only the part falling OUTSIDE the hovered state survives.
+ *           What is left is a cast shadow, which is what actually reads as
+ *           height — you are seeing the state lifted off the plane, not just
+ *           tinted differently.
+ *
+ * Both are one element each, updated by writing a `d` attribute, so the cost of
+ * hovering does not scale with 543 constituencies.
+ */
+#map .scrim,#map .lift{pointer-events:none;transition:opacity .24s var(--ease)}
+#map .scrim{fill:var(--paper);opacity:0}
+#map .lift{fill:var(--ink);opacity:0}
+#map.has-focus .scrim{opacity:.62}
+#map.has-focus .lift{opacity:.24}
+/* with one state brought forward, the other borders become noise */
+#map.has-focus .st:not(.is-active){stroke-opacity:.26}
 
 /* The note is a status line, not a caption: it holds the message when a year has
    no result file, and takes no space at all the rest of the time. */
@@ -159,7 +200,7 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
   #card{min-width:0;max-width:calc(100vw - 20px)}
 }
 @media (prefers-reduced-motion:reduce){
-  #map .pc,#map .st,.year,#card{transition:none}
+  #map .pc,#map .st,#map .scrim,#map .lift,.year,#card{transition:none}
 }
 </style>
 </head>
@@ -252,6 +293,7 @@ function aggregate(year) {
 const pcPaths = new Map();      // unique_id -> path
 const statePaths = new Map();   // region code -> path
 let projection, pathGen;
+let scrimEl, liftEl, maskHoleEl, focused = null;
 
 function drawMap() {
   const box = mapEl.getBoundingClientRect();
@@ -263,6 +305,26 @@ function drawMap() {
   mapEl.textContent = '';
   pcPaths.clear(); statePaths.clear();
 
+  /* The mask is the whole mechanism: white means the layer shows, and the hole
+     is the one state currently in focus. Both the scrim and the cast shadow read
+     from it, so moving the focus is two `d` writes rather than a repaint of 543
+     constituencies. */
+  /* A tight, dark shadow reads as a rim around the state; a wider, softer one
+     reads as height. Blur and offset are both proportional to the map so the
+     lift looks the same at any size. */
+  const blur = Math.max(3.5, W / 145);
+  const drop = Math.max(4, W / 105);
+  const defs = document.createElementNS(NS, 'defs');
+  defs.innerHTML =
+    `<mask id="focusMask" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}">
+       <rect x="0" y="0" width="${W}" height="${H}" fill="#fff"/>
+       <path id="maskHole" fill="#000"/>
+     </mask>
+     <filter id="liftBlur" x="-30%" y="-30%" width="160%" height="160%">
+       <feGaussianBlur stdDeviation="${blur.toFixed(2)}"/>
+     </filter>`;
+  mapEl.appendChild(defs);
+
   const gPC = document.createElementNS(NS, 'g');
   for (const f of pcs.features) {
     const p = document.createElementNS(NS, 'path');
@@ -273,6 +335,25 @@ function drawMap() {
     pcPaths.set(f.properties.unique_id, p);
   }
   mapEl.appendChild(gPC);
+
+  // context muting: a wash of the page colour, held off the focused state by the mask
+  scrimEl = document.createElementNS(NS, 'rect');
+  scrimEl.setAttribute('class', 'scrim');
+  scrimEl.setAttribute('x', '0'); scrimEl.setAttribute('y', '0');
+  scrimEl.setAttribute('width', W); scrimEl.setAttribute('height', H);
+  scrimEl.setAttribute('mask', 'url(#focusMask)');
+  mapEl.appendChild(scrimEl);
+
+  // the lift: the same shape nudged down and blurred, masked so only the part
+  // outside the state survives. What remains is a cast shadow.
+  liftEl = document.createElementNS(NS, 'path');
+  liftEl.setAttribute('class', 'lift');
+  liftEl.setAttribute('mask', 'url(#focusMask)');
+  liftEl.setAttribute('filter', 'url(#liftBlur)');
+  liftEl.setAttribute('transform', `translate(0,${drop.toFixed(1)})`);
+  mapEl.appendChild(liftEl);
+
+  maskHoleEl = defs.querySelector('#maskHole');
 
   const gST = document.createElementNS(NS, 'g');
   for (const f of states.features) {
@@ -291,6 +372,8 @@ function drawMap() {
   mapEl.appendChild(gST);
 
   applyYear();
+  // a resize rebuilds every element, so the focus has to be re-stated
+  if (focused) setFocus(focused);
 }
 
 /* Labels select on the size of the shape, not on seats returned: selecting on
@@ -350,9 +433,32 @@ function placeCard(x, y) {
   card.style.top = Math.max(8, Math.min(y + 14, innerHeight - r.height - 12)) + 'px';
 }
 function showCard(code, x, y) { if (fillCard(code)) placeCard(x, y); }
+
+/* Focus + context. The hovered state keeps its colour and its full-strength
+   border; the rest of the map is washed back and its borders fade, so the eye
+   has one place to go instead of 543. */
+function setFocus(code) {
+  const st = statePaths.get(code);
+  if (!st || !maskHoleEl) return clearFocus();
+  focused = code;
+  const d = st.getAttribute('d');
+  maskHoleEl.setAttribute('d', d);
+  liftEl.setAttribute('d', d);
+  mapEl.classList.add('has-focus');
+  for (const [c, p] of statePaths) p.classList.toggle('is-active', c === code);
+}
+
+function clearFocus() {
+  focused = null;
+  if (maskHoleEl) maskHoleEl.setAttribute('d', '');
+  if (liftEl) liftEl.setAttribute('d', '');
+  mapEl.classList.remove('has-focus');
+  for (const p of statePaths.values()) p.classList.remove('is-active');
+}
+
 function hideCard() {
   card.classList.remove('on');
-  for (const p of statePaths.values()) p.classList.remove('is-active');
+  clearFocus();
 }
 
 /* Delegated, so a redraw on resize cannot strand the handlers on detached paths. */
@@ -363,17 +469,20 @@ function bindEvents() {
   };
   mapEl.addEventListener('pointerover', e => {
     const c = codeOf(e); if (!c) return;
-    statePaths.get(c).classList.add('is-active');
+    setFocus(c);
     showCard(c, e.clientX, e.clientY);
   });
   mapEl.addEventListener('pointermove', e => {
     const c = codeOf(e); if (!c || !card.classList.contains('on')) return;
     placeCard(e.clientX, e.clientY);
   });
-  mapEl.addEventListener('pointerout', e => { if (codeOf(e)) hideCard(); });
+  // pointerleave on the svg, not pointerout on a path: leaving one state for its
+  // neighbour fires out-then-over, which would drop the focus and re-set it on
+  // every move between adjacent states.
+  mapEl.addEventListener('pointerleave', hideCard);
   mapEl.addEventListener('focusin', e => {
     const c = codeOf(e); if (!c) return;
-    statePaths.get(c).classList.add('is-active');
+    setFocus(c);
     const r = e.target.getBoundingClientRect();
     showCard(c, r.left + r.width / 2, r.top + r.height / 2);
   });
