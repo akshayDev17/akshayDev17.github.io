@@ -210,9 +210,11 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
  * saturated colour on this page belongs to a party, and a selection highlight
  * in the usual warning orange would read as BJP. */
 .ntable{display:flex;flex-direction:column;min-height:0;font-family:var(--mono)}
-.ntable-head{display:flex;align-items:baseline;justify-content:space-between;
-  gap:var(--s3);padding:0 0 var(--s2)}
-.ntable-head .lbl{margin:0}
+/* The head holds only the two resets, and both are hidden until they apply, so
+   the row keeps a reserved height rather than letting the table jump down the
+   moment a reset appears. */
+.ntable-head{display:flex;align-items:baseline;justify-content:flex-end;
+  gap:var(--s3);min-height:1.25rem;padding:0 0 var(--s2)}
 /* Both resets stay hidden until they apply — but the one that escapes a
    filtered map is the head's loudest control, not its quietest, so clearing a
    selection is set at body scale in --ink while the sort reset stays a label. */
@@ -226,14 +228,31 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 .reset:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:2px}
 .reset[hidden]{display:none}
 .reset.loud{font-size:.6875rem;letter-spacing:.04em;text-transform:none;color:var(--ink)}
-/* The contract, stated once and kept live: a reader should never have to
-   discover by accident that these rows drive that map. */
-.ntable-hint{
-  font-family:var(--mono);font-size:.6875rem;line-height:1.5;color:var(--muted);
-  margin:0 0 var(--s2);
+/* No scrollbar. The fades below are the cue instead: a gradient from the page
+   ground at whichever edge still has content behind it, so the rows dissolve
+   rather than being cut by a hard line at the container's edge.
+   What that gives up is the position indicator and click-drag scrolling. Wheel,
+   trackpad and keyboard all still scroll, and tabbing to a row button brings it
+   into view, so every row stays reachable — but it is a real trade, not free. */
+.ntable-view{position:relative;flex:1 1 auto;min-height:0}
+.ntable-scroll{height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.ntable-scroll::-webkit-scrollbar{display:none}
+/* The fade exists only where there IS more: a container already at its end
+   claims no edge it does not have. */
+.ntable-view::before,.ntable-view::after{
+  content:'';position:absolute;inset-inline:0;height:var(--s6);z-index:2;
+  pointer-events:none;opacity:0;transition:opacity .2s var(--ease);
 }
-.ntable-hint b{font-weight:400;color:var(--ink)}
-.ntable-scroll{flex:1 1 auto;min-height:0;overflow:auto}
+.ntable-view::before{
+  inset-block-start:0;
+  background:linear-gradient(to bottom,var(--paper) 25%,transparent);
+}
+.ntable-view::after{
+  inset-block-end:0;
+  background:linear-gradient(to top,var(--paper) 25%,transparent);
+}
+.ntable-view.more-up::before{opacity:1}
+.ntable-view.more-down::after{opacity:1}
 /* fixed layout: otherwise every column re-measures when a sort arrow changes
    the header label, so the figures shift sideways on each sort. */
 .ntable table{width:100%;border-collapse:collapse;font-size:.6875rem;table-layout:fixed}
@@ -360,27 +379,27 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
       <p class="lbl mapnote" id="mapnote" role="status"></p>
     </figure>
 
-    <section class="ntable" aria-labelledby="ntable-title">
+    <section class="ntable" aria-label="National result">
       <div class="ntable-head">
-        <p class="lbl" id="ntable-title">National result</p>
         <span class="ntable-actions">
           <button class="reset" id="reset-sort" type="button" hidden>default order</button>
           <button class="reset loud" id="clear-sel" type="button" hidden>clear selection</button>
         </span>
       </div>
-      <p class="ntable-hint" id="ntable-hint"></p>
-      <div class="ntable-scroll">
-        <table>
-          <thead>
-            <tr id="ntable-head-row">
-              <th>Party</th>
-              <th aria-sort="none"><button type="button" data-sort="seats" data-label="Seats">Seats</button></th>
-              <th aria-sort="none"><button type="button" data-sort="votes" data-label="Votes">Votes</button></th>
-              <th aria-sort="none"><button type="button" data-sort="share" data-label="Share">Share</button></th>
-            </tr>
-          </thead>
-          <tbody id="ntable-body"></tbody>
-        </table>
+      <div class="ntable-view">
+        <div class="ntable-scroll">
+          <table>
+            <thead>
+              <tr id="ntable-head-row">
+                <th>Party</th>
+                <th aria-sort="none"><button type="button" data-sort="seats" data-label="Seats">Seats</button></th>
+                <th aria-sort="none"><button type="button" data-sort="votes" data-label="Votes">Votes</button></th>
+                <th aria-sort="none"><button type="button" data-sort="share" data-label="Share">Share</button></th>
+              </tr>
+            </thead>
+            <tbody id="ntable-body"></tbody>
+          </table>
+        </div>
       </div>
     </section>
   </section>
@@ -684,7 +703,18 @@ function hideCard() {
 const NAT_DEFAULT = { key: 'seats', dir: -1 };
 let natSort = { ...NAT_DEFAULT };
 const natHead = $('#ntable-head-row'), natBody = $('#ntable-body');
-const natResetBtn = $('#reset-sort'), natClearBtn = $('#clear-sel'), natHint = $('#ntable-hint');
+const natResetBtn = $('#reset-sort'), natClearBtn = $('#clear-sel');
+const natView = $('.ntable-view'), natScroll = $('.ntable-scroll');
+
+/* With no scrollbar, the fade is the only cue that there is more below — so it
+   has to be honest, appearing at an edge only while content is actually hidden
+   behind it, and vanishing at both ends. */
+function updateFades() {
+  if (!natView || !natScroll) return;
+  const max = natScroll.scrollHeight - natScroll.clientHeight;
+  natView.classList.toggle('more-up', natScroll.scrollTop > 2);
+  natView.classList.toggle('more-down', natScroll.scrollTop < max - 2);
+}
 
 /* 743 party codes polled nationally in 2024, so a table of all of them is a
    dump rather than a readout — but a capped first page with a "+N more"
@@ -730,12 +760,8 @@ function renderNational() {
   // the whole tbody dims its left-out rows, so the table and the map agree
   natBody.classList.toggle('has-sel', selection.size > 0);
   natClearBtn.hidden = selection.size === 0;
-  /* The contract and its present state in one line: a reader should not have to
-     discover that these rows drive that map, nor wonder whether a filter is on. */
-  natHint.innerHTML = selection.size
-    ? `<b>${selection.size}</b> selected — the map shows only these.`
-    : `Parties holding a seat, or polling 0.5% of the vote. Select one to filter the map.`;
   paintNatHead();
+  updateFades();
 }
 
 function toggleParty(code) {
@@ -746,6 +772,7 @@ function toggleParty(code) {
 
 function bindTable() {
   if (!natBody) return;
+  natScroll.addEventListener('scroll', updateFades, { passive: true });
   natBody.addEventListener('pointerover', e => {
     const tr = e.target.closest('tr[data-party]');
     if (!tr) return;
