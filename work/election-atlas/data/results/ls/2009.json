@@ -1,0 +1,4890 @@
+{
+ "schema": 2,
+ "election": "ls",
+ "year": 2009,
+ "note": "PUBLISHED RESULT. Every value here is an ABSOLUTE COUNT. No percentage is stored anywhere: the page derives every share from these numbers. `electors` is the registered electorate. state totals are the exact sum of the constituency file above; electors come from the ECI's state-wise table. Election Commission of India, General Election 2009 (15th Lok Sabha) — statistical report. Every table for this year is published as PDF only; the constituency-level result was recovered from ECI's PDF and every row is validated by general + postal == total.",
+ "source": {
+  "publisher": "Election Commission of India",
+  "table": null,
+  "detail_table": null,
+  "derivation": "constituency"
+ },
+ "regions": {
+  "IN-TG": {
+   "seats": 17,
+   "electors": 24792983,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 12,
+     "votes": 6110547
+    },
+    {
+     "code": "BRS",
+     "seats": 2,
+     "votes": 2582326
+    },
+    {
+     "code": "TDP",
+     "seats": 2,
+     "votes": 2004450
+    },
+    {
+     "code": "PRAP",
+     "seats": 0,
+     "votes": 1920431
+    },
+    {
+     "code": "BJP",
+     "seats": 0,
+     "votes": 1208325
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 882388
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 666357
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 364215
+    },
+    {
+     "code": "AIMIM",
+     "seats": 1,
+     "votes": 308061
+    },
+    {
+     "code": "LSP",
+     "seats": 0,
+     "votes": 306259
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 184067
+    },
+    {
+     "code": "PPOI",
+     "seats": 0,
+     "votes": 138455
+    },
+    {
+     "code": "MANP",
+     "seats": 0,
+     "votes": 39257
+    },
+    {
+     "code": "TPPP",
+     "seats": 0,
+     "votes": 20901
+    },
+    {
+     "code": "MUL",
+     "seats": 0,
+     "votes": 18720
+    },
+    {
+     "code": "IJP",
+     "seats": 0,
+     "votes": 18196
+    },
+    {
+     "code": "GRIP",
+     "seats": 0,
+     "votes": 18161
+    },
+    {
+     "code": "MCPIS",
+     "seats": 0,
+     "votes": 13443
+    },
+    {
+     "code": "BSPAP",
+     "seats": 0,
+     "votes": 7401
+    },
+    {
+     "code": "RPIA",
+     "seats": 0,
+     "votes": 3279
+    },
+    {
+     "code": "BPD",
+     "seats": 0,
+     "votes": 3237
+    },
+    {
+     "code": "ANC",
+     "seats": 0,
+     "votes": 3095
+    },
+    {
+     "code": "SJPR",
+     "seats": 0,
+     "votes": 2603
+    },
+    {
+     "code": "JDS",
+     "seats": 0,
+     "votes": 1620
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 1347
+    },
+    {
+     "code": "RKSP",
+     "seats": 0,
+     "votes": 1164
+    },
+    {
+     "code": "UWF",
+     "seats": 0,
+     "votes": 699
+    },
+    {
+     "code": "SAP",
+     "seats": 0,
+     "votes": 663
+    },
+    {
+     "code": "AJBP",
+     "seats": 0,
+     "votes": 539
+    }
+   ]
+  },
+  "IN-AP": {
+   "seats": 25,
+   "electors": 33099276,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 21,
+     "votes": 10267394
+    },
+    {
+     "code": "TDP",
+     "seats": 4,
+     "votes": 8477209
+    },
+    {
+     "code": "PRAP",
+     "seats": 0,
+     "votes": 4669615
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 503310
+    },
+    {
+     "code": "BJP",
+     "seats": 0,
+     "votes": 369187
+    },
+    {
+     "code": "LSP",
+     "seats": 0,
+     "votes": 251117
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 200561
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 168014
+    },
+    {
+     "code": "PPOI",
+     "seats": 0,
+     "votes": 126526
+    },
+    {
+     "code": "TPPP",
+     "seats": 0,
+     "votes": 27235
+    },
+    {
+     "code": "RDMP",
+     "seats": 0,
+     "votes": 20457
+    },
+    {
+     "code": "RJD",
+     "seats": 0,
+     "votes": 17028
+    },
+    {
+     "code": "BSSP",
+     "seats": 0,
+     "votes": 15948
+    },
+    {
+     "code": "BHSAS",
+     "seats": 0,
+     "votes": 15718
+    },
+    {
+     "code": "RDHP",
+     "seats": 0,
+     "votes": 9005
+    },
+    {
+     "code": "RPIA",
+     "seats": 0,
+     "votes": 7661
+    },
+    {
+     "code": "RPI",
+     "seats": 0,
+     "votes": 7263
+    },
+    {
+     "code": "ANC",
+     "seats": 0,
+     "votes": 7215
+    },
+    {
+     "code": "AJBP",
+     "seats": 0,
+     "votes": 7028
+    },
+    {
+     "code": "BCUF",
+     "seats": 0,
+     "votes": 6910
+    },
+    {
+     "code": "RKSP",
+     "seats": 0,
+     "votes": 6510
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 5159
+    },
+    {
+     "code": "PBHP",
+     "seats": 0,
+     "votes": 4810
+    },
+    {
+     "code": "RPIKH",
+     "seats": 0,
+     "votes": 4480
+    },
+    {
+     "code": "JDU",
+     "seats": 0,
+     "votes": 4210
+    },
+    {
+     "code": "RPCS",
+     "seats": 0,
+     "votes": 3980
+    },
+    {
+     "code": "BSPAP",
+     "seats": 0,
+     "votes": 3297
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 2589
+    },
+    {
+     "code": "MCPIS",
+     "seats": 0,
+     "votes": 2479
+    },
+    {
+     "code": "UWF",
+     "seats": 0,
+     "votes": 2064
+    },
+    {
+     "code": "BJSH",
+     "seats": 0,
+     "votes": 1296
+    },
+    {
+     "code": "RRS",
+     "seats": 0,
+     "votes": 1284
+    },
+    {
+     "code": "JDS",
+     "seats": 0,
+     "votes": 692
+    }
+   ]
+  },
+  "IN-AR": {
+   "seats": 2,
+   "electors": 734541,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 2,
+     "votes": 255866
+    },
+    {
+     "code": "BJP",
+     "seats": 0,
+     "votes": 186103
+    },
+    {
+     "code": "AC",
+     "seats": 0,
+     "votes": 46539
+    },
+    {
+     "code": "PPA",
+     "seats": 0,
+     "votes": 5996
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 3167
+    },
+    {
+     "code": "LB",
+     "seats": 0,
+     "votes": 2971
+    }
+   ]
+  },
+  "IN-AS": {
+   "seats": 14,
+   "electors": 17470329,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 7,
+     "votes": 4235681
+    },
+    {
+     "code": "BJP",
+     "seats": 4,
+     "votes": 1967813
+    },
+    {
+     "code": "AUDF",
+     "seats": 1,
+     "votes": 1954901
+    },
+    {
+     "code": "AGP",
+     "seats": 1,
+     "votes": 1773103
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 921379
+    },
+    {
+     "code": "BOPF",
+     "seats": 1,
+     "votes": 656430
+    },
+    {
+     "code": "ASDC",
+     "seats": 0,
+     "votes": 123287
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 112208
+    },
+    {
+     "code": "RWS",
+     "seats": 0,
+     "votes": 96499
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 84610
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 65359
+    },
+    {
+     "code": "NCP",
+     "seats": 0,
+     "votes": 28089
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 25376
+    },
+    {
+     "code": "JMM",
+     "seats": 0,
+     "votes": 14834
+    },
+    {
+     "code": "RSPS",
+     "seats": 0,
+     "votes": 12153
+    },
+    {
+     "code": "RDMP",
+     "seats": 0,
+     "votes": 10385
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 8759
+    },
+    {
+     "code": "AIFB",
+     "seats": 0,
+     "votes": 8375
+    },
+    {
+     "code": "RCPIR",
+     "seats": 0,
+     "votes": 7788
+    },
+    {
+     "code": "SHS",
+     "seats": 0,
+     "votes": 7228
+    },
+    {
+     "code": "RPIA",
+     "seats": 0,
+     "votes": 6030
+    },
+    {
+     "code": "BVM",
+     "seats": 0,
+     "votes": 5645
+    },
+    {
+     "code": "AIMF",
+     "seats": 0,
+     "votes": 5509
+    },
+    {
+     "code": "RJD",
+     "seats": 0,
+     "votes": 4399
+    },
+    {
+     "code": "RVNP",
+     "seats": 0,
+     "votes": 3782
+    },
+    {
+     "code": "MUL",
+     "seats": 0,
+     "votes": 1549
+    }
+   ]
+  },
+  "IN-BR": {
+   "seats": 40,
+   "electors": 54505246,
+   "parties": [
+    {
+     "code": "JDU",
+     "seats": 20,
+     "votes": 5825874
+    },
+    {
+     "code": "RJD",
+     "seats": 4,
+     "votes": 4678880
+    },
+    {
+     "code": "BJP",
+     "seats": 12,
+     "votes": 3376109
+    },
+    {
+     "code": "IND",
+     "seats": 2,
+     "votes": 2937221
+    },
+    {
+     "code": "INC",
+     "seats": 2,
+     "votes": 2487008
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 1586404
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 1071808
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 459279
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 339964
+    },
+    {
+     "code": "NCP",
+     "seats": 0,
+     "votes": 294469
+    },
+    {
+     "code": "LTSD",
+     "seats": 0,
+     "votes": 269437
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 124007
+    },
+    {
+     "code": "JMM",
+     "seats": 0,
+     "votes": 108841
+    },
+    {
+     "code": "SHS",
+     "seats": 0,
+     "votes": 99777
+    },
+    {
+     "code": "RSWD",
+     "seats": 0,
+     "votes": 43184
+    },
+    {
+     "code": "IJP",
+     "seats": 0,
+     "votes": 38217
+    },
+    {
+     "code": "BJJD",
+     "seats": 0,
+     "votes": 34528
+    },
+    {
+     "code": "RPP",
+     "seats": 0,
+     "votes": 29151
+    },
+    {
+     "code": "JGP",
+     "seats": 0,
+     "votes": 22117
+    },
+    {
+     "code": "RVNP",
+     "seats": 0,
+     "votes": 21571
+    },
+    {
+     "code": "SJPR",
+     "seats": 0,
+     "votes": 20987
+    },
+    {
+     "code": "JPS",
+     "seats": 0,
+     "votes": 19158
+    },
+    {
+     "code": "RDMP",
+     "seats": 0,
+     "votes": 18280
+    },
+    {
+     "code": "SBSP",
+     "seats": 0,
+     "votes": 17486
+    },
+    {
+     "code": "SSD",
+     "seats": 0,
+     "votes": 16368
+    },
+    {
+     "code": "RKSP",
+     "seats": 0,
+     "votes": 16206
+    },
+    {
+     "code": "JDS",
+     "seats": 0,
+     "votes": 15707
+    },
+    {
+     "code": "RKJP",
+     "seats": 0,
+     "votes": 14278
+    },
+    {
+     "code": "BMF",
+     "seats": 0,
+     "votes": 13737
+    },
+    {
+     "code": "BSKP",
+     "seats": 0,
+     "votes": 13561
+    },
+    {
+     "code": "RJJM",
+     "seats": 0,
+     "votes": 13194
+    },
+    {
+     "code": "SAP",
+     "seats": 0,
+     "votes": 12673
+    },
+    {
+     "code": "ANC",
+     "seats": 0,
+     "votes": 12505
+    },
+    {
+     "code": "ABJS",
+     "seats": 0,
+     "votes": 12068
+    },
+    {
+     "code": "BJKVP",
+     "seats": 0,
+     "votes": 11097
+    },
+    {
+     "code": "NBNP",
+     "seats": 0,
+     "votes": 10748
+    },
+    {
+     "code": "KVSP",
+     "seats": 0,
+     "votes": 10447
+    },
+    {
+     "code": "AD",
+     "seats": 0,
+     "votes": 10040
+    },
+    {
+     "code": "RSP",
+     "seats": 0,
+     "votes": 9853
+    },
+    {
+     "code": "RWS",
+     "seats": 0,
+     "votes": 9411
+    },
+    {
+     "code": "AIFB",
+     "seats": 0,
+     "votes": 7824
+    },
+    {
+     "code": "LPSP",
+     "seats": 0,
+     "votes": 7332
+    },
+    {
+     "code": "RPIA",
+     "seats": 0,
+     "votes": 6845
+    },
+    {
+     "code": "BHJAP",
+     "seats": 0,
+     "votes": 6482
+    },
+    {
+     "code": "ABDBM",
+     "seats": 0,
+     "votes": 6220
+    },
+    {
+     "code": "JVM",
+     "seats": 0,
+     "votes": 6190
+    },
+    {
+     "code": "ABAS",
+     "seats": 0,
+     "votes": 5708
+    },
+    {
+     "code": "LM",
+     "seats": 0,
+     "votes": 5087
+    },
+    {
+     "code": "UWF",
+     "seats": 0,
+     "votes": 4872
+    },
+    {
+     "code": "SJTP",
+     "seats": 0,
+     "votes": 4816
+    },
+    {
+     "code": "STPI",
+     "seats": 0,
+     "votes": 4180
+    },
+    {
+     "code": "KSVP",
+     "seats": 0,
+     "votes": 4035
+    },
+    {
+     "code": "RLD",
+     "seats": 0,
+     "votes": 3542
+    },
+    {
+     "code": "MUL",
+     "seats": 0,
+     "votes": 3491
+    },
+    {
+     "code": "PMSP",
+     "seats": 0,
+     "votes": 3406
+    },
+    {
+     "code": "BLPGL",
+     "seats": 0,
+     "votes": 3359
+    },
+    {
+     "code": "PTSS",
+     "seats": 0,
+     "votes": 3272
+    },
+    {
+     "code": "RPI",
+     "seats": 0,
+     "votes": 2813
+    },
+    {
+     "code": "JKM",
+     "seats": 0,
+     "votes": 2726
+    },
+    {
+     "code": "RMEP",
+     "seats": 0,
+     "votes": 2717
+    },
+    {
+     "code": "AJSP",
+     "seats": 0,
+     "votes": 2678
+    },
+    {
+     "code": "BSPK",
+     "seats": 0,
+     "votes": 2361
+    },
+    {
+     "code": "SLPL",
+     "seats": 0,
+     "votes": 2126
+    },
+    {
+     "code": "BUDM",
+     "seats": 0,
+     "votes": 1265
+    },
+    {
+     "code": "EKSP",
+     "seats": 0,
+     "votes": 1254
+    },
+    {
+     "code": "BJKD",
+     "seats": 0,
+     "votes": 1245
+    },
+    {
+     "code": "BPD",
+     "seats": 0,
+     "votes": 1101
+    }
+   ]
+  },
+  "IN-GA": {
+   "seats": 2,
+   "electors": 1020794,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 252694
+    },
+    {
+     "code": "NCP",
+     "seats": 0,
+     "votes": 131363
+    },
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 127494
+    },
+    {
+     "code": "UGDP",
+     "seats": 0,
+     "votes": 16727
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 13209
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 11827
+    },
+    {
+     "code": "MAG",
+     "seats": 0,
+     "votes": 6638
+    },
+    {
+     "code": "SHS",
+     "seats": 0,
+     "votes": 3186
+    },
+    {
+     "code": "SGF",
+     "seats": 0,
+     "votes": 1117
+    }
+   ]
+  },
+  "IN-GJ": {
+   "seats": 26,
+   "electors": 36484281,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 15,
+     "votes": 8128858
+    },
+    {
+     "code": "INC",
+     "seats": 11,
+     "votes": 7579957
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 832856
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 282761
+    },
+    {
+     "code": "MJP",
+     "seats": 0,
+     "votes": 245174
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 78624
+    },
+    {
+     "code": "JDU",
+     "seats": 0,
+     "votes": 71876
+    },
+    {
+     "code": "NCP",
+     "seats": 0,
+     "votes": 52501
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 32430
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 29653
+    },
+    {
+     "code": "IJP",
+     "seats": 0,
+     "votes": 19537
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 15257
+    },
+    {
+     "code": "ABMSD",
+     "seats": 0,
+     "votes": 14970
+    },
+    {
+     "code": "LPSP",
+     "seats": 0,
+     "votes": 12156
+    },
+    {
+     "code": "ADSP",
+     "seats": 0,
+     "votes": 9936
+    },
+    {
+     "code": "LSWP",
+     "seats": 0,
+     "votes": 9674
+    },
+    {
+     "code": "RPIA",
+     "seats": 0,
+     "votes": 9497
+    },
+    {
+     "code": "ABJS",
+     "seats": 0,
+     "votes": 8531
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 7879
+    },
+    {
+     "code": "BNJD",
+     "seats": 0,
+     "votes": 7194
+    },
+    {
+     "code": "RKSP",
+     "seats": 0,
+     "votes": 5185
+    },
+    {
+     "code": "KKJHS",
+     "seats": 0,
+     "votes": 3448
+    },
+    {
+     "code": "RSPS",
+     "seats": 0,
+     "votes": 2983
+    },
+    {
+     "code": "SVPP",
+     "seats": 0,
+     "votes": 2275
+    },
+    {
+     "code": "RWS",
+     "seats": 0,
+     "votes": 2211
+    },
+    {
+     "code": "SJPR",
+     "seats": 0,
+     "votes": 1810
+    },
+    {
+     "code": "BRP",
+     "seats": 0,
+     "votes": 1407
+    },
+    {
+     "code": "AIMF",
+     "seats": 0,
+     "votes": 1112
+    },
+    {
+     "code": "VHS",
+     "seats": 0,
+     "votes": 935
+    },
+    {
+     "code": "NSCP",
+     "seats": 0,
+     "votes": 902
+    },
+    {
+     "code": "RPIE",
+     "seats": 0,
+     "votes": 755
+    },
+    {
+     "code": "NLHP",
+     "seats": 0,
+     "votes": 579
+    }
+   ]
+  },
+  "IN-HR": {
+   "seats": 10,
+   "electors": 12087710,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 9,
+     "votes": 3407291
+    },
+    {
+     "code": "INLD",
+     "seats": 0,
+     "votes": 1286573
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 1284067
+    },
+    {
+     "code": "BJP",
+     "seats": 0,
+     "votes": 986136
+    },
+    {
+     "code": "HJCBL",
+     "seats": 1,
+     "votes": 816395
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 214084
+    },
+    {
+     "code": "NCP",
+     "seats": 0,
+     "votes": 24969
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 18999
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 17994
+    },
+    {
+     "code": "SMBHP",
+     "seats": 0,
+     "votes": 14435
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 13587
+    },
+    {
+     "code": "IJP",
+     "seats": 0,
+     "votes": 9861
+    },
+    {
+     "code": "JKNPP",
+     "seats": 0,
+     "votes": 9376
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 8398
+    },
+    {
+     "code": "RASJP",
+     "seats": 0,
+     "votes": 5841
+    },
+    {
+     "code": "RPIA",
+     "seats": 0,
+     "votes": 3018
+    },
+    {
+     "code": "JCP",
+     "seats": 0,
+     "votes": 2987
+    },
+    {
+     "code": "BHBP",
+     "seats": 0,
+     "votes": 2875
+    },
+    {
+     "code": "AIFBS",
+     "seats": 0,
+     "votes": 2758
+    },
+    {
+     "code": "RASAP",
+     "seats": 0,
+     "votes": 2754
+    },
+    {
+     "code": "RDMP",
+     "seats": 0,
+     "votes": 2737
+    },
+    {
+     "code": "RND",
+     "seats": 0,
+     "votes": 2583
+    },
+    {
+     "code": "UWF",
+     "seats": 0,
+     "votes": 2552
+    },
+    {
+     "code": "RWS",
+     "seats": 0,
+     "votes": 2322
+    },
+    {
+     "code": "JKM",
+     "seats": 0,
+     "votes": 1727
+    },
+    {
+     "code": "BRPP",
+     "seats": 0,
+     "votes": 1527
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 1332
+    },
+    {
+     "code": "RPI",
+     "seats": 0,
+     "votes": 1211
+    },
+    {
+     "code": "VAJP",
+     "seats": 0,
+     "votes": 1117
+    },
+    {
+     "code": "JJJKMC",
+     "seats": 0,
+     "votes": 1100
+    },
+    {
+     "code": "BHC",
+     "seats": 0,
+     "votes": 1069
+    },
+    {
+     "code": "SHS",
+     "seats": 0,
+     "votes": 1031
+    },
+    {
+     "code": "RJAP",
+     "seats": 0,
+     "votes": 960
+    },
+    {
+     "code": "AIRP",
+     "seats": 0,
+     "votes": 678
+    },
+    {
+     "code": "JUP",
+     "seats": 0,
+     "votes": 595
+    },
+    {
+     "code": "NELU",
+     "seats": 0,
+     "votes": 585
+    },
+    {
+     "code": "NSSP",
+     "seats": 0,
+     "votes": 573
+    },
+    {
+     "code": "KKJHS",
+     "seats": 0,
+     "votes": 456
+    }
+   ]
+  },
+  "IN-HP": {
+   "seats": 4,
+   "electors": 4606674,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 3,
+     "votes": 1333774
+    },
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 1226933
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 42810
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 39991
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 20664
+    },
+    {
+     "code": "RWS",
+     "seats": 0,
+     "votes": 10447
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 7720
+    },
+    {
+     "code": "SHS",
+     "seats": 0,
+     "votes": 4664
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 2120
+    },
+    {
+     "code": "RRD",
+     "seats": 0,
+     "votes": 1167
+    }
+   ]
+  },
+  "IN-JK": {
+   "seats": 5,
+   "electors": 6420405,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 2,
+     "votes": 614158
+    },
+    {
+     "code": "JKPDP",
+     "seats": 0,
+     "votes": 522118
+    },
+    {
+     "code": "JKN",
+     "seats": 3,
+     "votes": 498374
+    },
+    {
+     "code": "BJP",
+     "seats": 0,
+     "votes": 485303
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 83874
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 80909
+    },
+    {
+     "code": "JKNPP",
+     "seats": 0,
+     "votes": 73293
+    },
+    {
+     "code": "JPC",
+     "seats": 0,
+     "votes": 65403
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 16598
+    },
+    {
+     "code": "JKANC",
+     "seats": 0,
+     "votes": 9900
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 8230
+    },
+    {
+     "code": "BCDP",
+     "seats": 0,
+     "votes": 8129
+    },
+    {
+     "code": "AIFB",
+     "seats": 0,
+     "votes": 7458
+    },
+    {
+     "code": "DGPP",
+     "seats": 0,
+     "votes": 5660
+    },
+    {
+     "code": "RKSP",
+     "seats": 0,
+     "votes": 3271
+    },
+    {
+     "code": "ANC",
+     "seats": 0,
+     "votes": 2608
+    },
+    {
+     "code": "RPI",
+     "seats": 0,
+     "votes": 2587
+    },
+    {
+     "code": "RNSP",
+     "seats": 0,
+     "votes": 2041
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 2036
+    },
+    {
+     "code": "BHBP",
+     "seats": 0,
+     "votes": 1985
+    },
+    {
+     "code": "BBP",
+     "seats": 0,
+     "votes": 1552
+    },
+    {
+     "code": "IJP",
+     "seats": 0,
+     "votes": 878
+    },
+    {
+     "code": "SAP",
+     "seats": 0,
+     "votes": 684
+    },
+    {
+     "code": "RPIA",
+     "seats": 0,
+     "votes": 356
+    },
+    {
+     "code": "BSKRP",
+     "seats": 0,
+     "votes": 355
+    }
+   ]
+  },
+  "IN-LA": {
+   "seats": 1,
+   "electors": 152491,
+   "parties": [
+    {
+     "code": "IND",
+     "seats": 1,
+     "votes": 79916
+    },
+    {
+     "code": "INC",
+     "seats": 0,
+     "votes": 29017
+    },
+    {
+     "code": "JKPDP",
+     "seats": 0,
+     "votes": 642
+    }
+   ]
+  },
+  "IN-KA": {
+   "seats": 28,
+   "electors": 41790939,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 19,
+     "votes": 10228790
+    },
+    {
+     "code": "INC",
+     "seats": 6,
+     "votes": 9250984
+    },
+    {
+     "code": "JDS",
+     "seats": 3,
+     "votes": 3335530
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 1012448
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 407648
+    },
+    {
+     "code": "SKP",
+     "seats": 0,
+     "votes": 60333
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 33099
+    },
+    {
+     "code": "JDU",
+     "seats": 0,
+     "votes": 29536
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 24991
+    },
+    {
+     "code": "NCP",
+     "seats": 0,
+     "votes": 22274
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 19298
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 18328
+    },
+    {
+     "code": "RJD",
+     "seats": 0,
+     "votes": 16286
+    },
+    {
+     "code": "PPOI",
+     "seats": 0,
+     "votes": 13695
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 13376
+    },
+    {
+     "code": "AIJMK",
+     "seats": 0,
+     "votes": 11811
+    },
+    {
+     "code": "BPJP",
+     "seats": 0,
+     "votes": 9457
+    },
+    {
+     "code": "PRCP",
+     "seats": 0,
+     "votes": 8656
+    },
+    {
+     "code": "RDMP",
+     "seats": 0,
+     "votes": 8633
+    },
+    {
+     "code": "ABHM",
+     "seats": 0,
+     "votes": 8414
+    },
+    {
+     "code": "SHS",
+     "seats": 0,
+     "votes": 8095
+    },
+    {
+     "code": "ANC",
+     "seats": 0,
+     "votes": 6627
+    },
+    {
+     "code": "BHPP",
+     "seats": 0,
+     "votes": 5226
+    },
+    {
+     "code": "BSC",
+     "seats": 0,
+     "votes": 4758
+    },
+    {
+     "code": "NDEP",
+     "seats": 0,
+     "votes": 2787
+    },
+    {
+     "code": "RKSP",
+     "seats": 0,
+     "votes": 2555
+    },
+    {
+     "code": "KCVP",
+     "seats": 0,
+     "votes": 2269
+    },
+    {
+     "code": "RSP",
+     "seats": 0,
+     "votes": 1870
+    },
+    {
+     "code": "ICSP",
+     "seats": 0,
+     "votes": 1853
+    },
+    {
+     "code": "KTMK",
+     "seats": 0,
+     "votes": 1686
+    },
+    {
+     "code": "IJP",
+     "seats": 0,
+     "votes": 713
+    },
+    {
+     "code": "PTSS",
+     "seats": 0,
+     "votes": 687
+    }
+   ]
+  },
+  "IN-KL": {
+   "seats": 20,
+   "electors": 21859536,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 13,
+     "votes": 6434486
+    },
+    {
+     "code": "CPM",
+     "seats": 4,
+     "votes": 4887333
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 1193300
+    },
+    {
+     "code": "BJP",
+     "seats": 0,
+     "votes": 1011563
+    },
+    {
+     "code": "MUL",
+     "seats": 2,
+     "votes": 813741
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 611810
+    },
+    {
+     "code": "KECM",
+     "seats": 1,
+     "votes": 404962
+    },
+    {
+     "code": "KEC",
+     "seats": 0,
+     "votes": 333688
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 205337
+    },
+    {
+     "code": "NCP",
+     "seats": 0,
+     "votes": 115191
+    },
+    {
+     "code": "SHS",
+     "seats": 0,
+     "votes": 4968
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 4345
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 3730
+    },
+    {
+     "code": "VCK",
+     "seats": 0,
+     "votes": 3014
+    },
+    {
+     "code": "THPI",
+     "seats": 0,
+     "votes": 2910
+    },
+    {
+     "code": "JDU",
+     "seats": 0,
+     "votes": 1849
+    },
+    {
+     "code": "AITC",
+     "seats": 0,
+     "votes": 1606
+    },
+    {
+     "code": "SWJP",
+     "seats": 0,
+     "votes": 585
+    },
+    {
+     "code": "BSA",
+     "seats": 0,
+     "votes": 457
+    }
+   ]
+  },
+  "IN-MP": {
+   "seats": 29,
+   "electors": 38085179,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 16,
+     "votes": 8465524
+    },
+    {
+     "code": "INC",
+     "seats": 12,
+     "votes": 7820333
+    },
+    {
+     "code": "BSP",
+     "seats": 1,
+     "votes": 1140044
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 957495
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 551341
+    },
+    {
+     "code": "GGP",
+     "seats": 0,
+     "votes": 120192
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 74844
+    },
+    {
+     "code": "GMS",
+     "seats": 0,
+     "votes": 73973
+    },
+    {
+     "code": "RJD",
+     "seats": 0,
+     "votes": 51272
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 50401
+    },
+    {
+     "code": "RPIA",
+     "seats": 0,
+     "votes": 34826
+    },
+    {
+     "code": "JDU",
+     "seats": 0,
+     "votes": 21562
+    },
+    {
+     "code": "PRSP",
+     "seats": 0,
+     "votes": 17570
+    },
+    {
+     "code": "RDMP",
+     "seats": 0,
+     "votes": 13111
+    },
+    {
+     "code": "LKSP",
+     "seats": 0,
+     "votes": 11893
+    },
+    {
+     "code": "AIFB",
+     "seats": 0,
+     "votes": 11202
+    },
+    {
+     "code": "SHS",
+     "seats": 0,
+     "votes": 9847
+    },
+    {
+     "code": "AD",
+     "seats": 0,
+     "votes": 7822
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 5537
+    },
+    {
+     "code": "BHBP",
+     "seats": 0,
+     "votes": 4762
+    },
+    {
+     "code": "RPI",
+     "seats": 0,
+     "votes": 4009
+    },
+    {
+     "code": "RSMD",
+     "seats": 0,
+     "votes": 3973
+    },
+    {
+     "code": "IJP",
+     "seats": 0,
+     "votes": 3613
+    },
+    {
+     "code": "SWJP",
+     "seats": 0,
+     "votes": 3534
+    },
+    {
+     "code": "RWS",
+     "seats": 0,
+     "votes": 3186
+    },
+    {
+     "code": "ABHKP",
+     "seats": 0,
+     "votes": 2633
+    },
+    {
+     "code": "SVSP",
+     "seats": 0,
+     "votes": 2486
+    },
+    {
+     "code": "BMSM",
+     "seats": 0,
+     "votes": 2449
+    },
+    {
+     "code": "ASP",
+     "seats": 0,
+     "votes": 1821
+    },
+    {
+     "code": "AIC",
+     "seats": 0,
+     "votes": 1718
+    },
+    {
+     "code": "YVP",
+     "seats": 0,
+     "votes": 1605
+    },
+    {
+     "code": "MUL",
+     "seats": 0,
+     "votes": 1529
+    },
+    {
+     "code": "JMM",
+     "seats": 0,
+     "votes": 1509
+    },
+    {
+     "code": "BJBP",
+     "seats": 0,
+     "votes": 1253
+    },
+    {
+     "code": "BMM",
+     "seats": 0,
+     "votes": 1211
+    },
+    {
+     "code": "IVD",
+     "seats": 0,
+     "votes": 1195
+    },
+    {
+     "code": "ABHM",
+     "seats": 0,
+     "votes": 900
+    },
+    {
+     "code": "RKSP",
+     "seats": 0,
+     "votes": 874
+    },
+    {
+     "code": "RPIE",
+     "seats": 0,
+     "votes": 562
+    },
+    {
+     "code": "RPID",
+     "seats": 0,
+     "votes": 558
+    },
+    {
+     "code": "LPSP",
+     "seats": 0,
+     "votes": 439
+    }
+   ]
+  },
+  "IN-MH": {
+   "seats": 48,
+   "electors": 72954058,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 17,
+     "votes": 7253634
+    },
+    {
+     "code": "NCP",
+     "seats": 8,
+     "votes": 7131175
+    },
+    {
+     "code": "BJP",
+     "seats": 9,
+     "votes": 6721644
+    },
+    {
+     "code": "SHS",
+     "seats": 11,
+     "votes": 6287964
+    },
+    {
+     "code": "IND",
+     "seats": 1,
+     "votes": 2983128
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 1785643
+    },
+    {
+     "code": "MNS",
+     "seats": 0,
+     "votes": 1503863
+    },
+    {
+     "code": "BBM",
+     "seats": 0,
+     "votes": 492470
+    },
+    {
+     "code": "SWP",
+     "seats": 1,
+     "votes": 481025
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 371209
+    },
+    {
+     "code": "RPI",
+     "seats": 0,
+     "votes": 252570
+    },
+    {
+     "code": "RPIA",
+     "seats": 0,
+     "votes": 227170
+    },
+    {
+     "code": "BVA",
+     "seats": 1,
+     "votes": 223234
+    },
+    {
+     "code": "RSPS",
+     "seats": 0,
+     "votes": 202211
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 197576
+    },
+    {
+     "code": "STBP",
+     "seats": 0,
+     "votes": 188608
+    },
+    {
+     "code": "JDS",
+     "seats": 0,
+     "votes": 76205
+    },
+    {
+     "code": "PRCP",
+     "seats": 0,
+     "votes": 67862
+    },
+    {
+     "code": "KM",
+     "seats": 0,
+     "votes": 65151
+    },
+    {
+     "code": "LKSGM",
+     "seats": 0,
+     "votes": 53637
+    },
+    {
+     "code": "KKJHS",
+     "seats": 0,
+     "votes": 49525
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 42450
+    },
+    {
+     "code": "BREM",
+     "seats": 0,
+     "votes": 42386
+    },
+    {
+     "code": "DESEP",
+     "seats": 0,
+     "votes": 30532
+    },
+    {
+     "code": "PG",
+     "seats": 0,
+     "votes": 30340
+    },
+    {
+     "code": "GGP",
+     "seats": 0,
+     "votes": 26697
+    },
+    {
+     "code": "JSS",
+     "seats": 0,
+     "votes": 23925
+    },
+    {
+     "code": "RPK",
+     "seats": 0,
+     "votes": 11724
+    },
+    {
+     "code": "AUDF",
+     "seats": 0,
+     "votes": 11638
+    },
+    {
+     "code": "PRBP",
+     "seats": 0,
+     "votes": 11341
+    },
+    {
+     "code": "RPIE",
+     "seats": 0,
+     "votes": 10394
+    },
+    {
+     "code": "JMM",
+     "seats": 0,
+     "votes": 9262
+    },
+    {
+     "code": "LVKP",
+     "seats": 0,
+     "votes": 9198
+    },
+    {
+     "code": "ABHM",
+     "seats": 0,
+     "votes": 7599
+    },
+    {
+     "code": "BMSM",
+     "seats": 0,
+     "votes": 7422
+    },
+    {
+     "code": "ANC",
+     "seats": 0,
+     "votes": 7318
+    },
+    {
+     "code": "HJP",
+     "seats": 0,
+     "votes": 7054
+    },
+    {
+     "code": "ARP",
+     "seats": 0,
+     "votes": 6672
+    },
+    {
+     "code": "IUML",
+     "seats": 0,
+     "votes": 6667
+    },
+    {
+     "code": "RKSP",
+     "seats": 0,
+     "votes": 6285
+    },
+    {
+     "code": "PRPI",
+     "seats": 0,
+     "votes": 5819
+    },
+    {
+     "code": "NBNP",
+     "seats": 0,
+     "votes": 5292
+    },
+    {
+     "code": "RPID",
+     "seats": 0,
+     "votes": 5251
+    },
+    {
+     "code": "RJD",
+     "seats": 0,
+     "votes": 4025
+    },
+    {
+     "code": "RPPI",
+     "seats": 0,
+     "votes": 3894
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 3793
+    },
+    {
+     "code": "GMS",
+     "seats": 0,
+     "votes": 3595
+    },
+    {
+     "code": "RVNP",
+     "seats": 0,
+     "votes": 3401
+    },
+    {
+     "code": "JGP",
+     "seats": 0,
+     "votes": 3302
+    },
+    {
+     "code": "IJP",
+     "seats": 0,
+     "votes": 3046
+    },
+    {
+     "code": "NELU",
+     "seats": 0,
+     "votes": 3036
+    },
+    {
+     "code": "BUDM",
+     "seats": 0,
+     "votes": 2945
+    },
+    {
+     "code": "RWS",
+     "seats": 0,
+     "votes": 2520
+    },
+    {
+     "code": "IBSP",
+     "seats": 0,
+     "votes": 1780
+    },
+    {
+     "code": "SVRP",
+     "seats": 0,
+     "votes": 1704
+    },
+    {
+     "code": "THPI",
+     "seats": 0,
+     "votes": 1641
+    },
+    {
+     "code": "ABMP",
+     "seats": 0,
+     "votes": 1619
+    },
+    {
+     "code": "SWJP",
+     "seats": 0,
+     "votes": 1593
+    },
+    {
+     "code": "JP",
+     "seats": 0,
+     "votes": 1514
+    },
+    {
+     "code": "PPOI",
+     "seats": 0,
+     "votes": 1363
+    },
+    {
+     "code": "AIFB",
+     "seats": 0,
+     "votes": 1161
+    },
+    {
+     "code": "SBSP",
+     "seats": 0,
+     "votes": 1124
+    },
+    {
+     "code": "RPIKH",
+     "seats": 0,
+     "votes": 1086
+    },
+    {
+     "code": "PTSS",
+     "seats": 0,
+     "votes": 802
+    },
+    {
+     "code": "PPIS",
+     "seats": 0,
+     "votes": 578
+    },
+    {
+     "code": "NLHP",
+     "seats": 0,
+     "votes": 525
+    },
+    {
+     "code": "DPI",
+     "seats": 0,
+     "votes": 494
+    }
+   ]
+  },
+  "IN-MN": {
+   "seats": 2,
+   "electors": 1736251,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 2,
+     "votes": 575393
+    },
+    {
+     "code": "PDA",
+     "seats": 0,
+     "votes": 224719
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 199916
+    },
+    {
+     "code": "BJP",
+     "seats": 0,
+     "votes": 127146
+    },
+    {
+     "code": "MPP",
+     "seats": 0,
+     "votes": 101787
+    },
+    {
+     "code": "NCP",
+     "seats": 0,
+     "votes": 79849
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 23188
+    },
+    {
+     "code": "RJD",
+     "seats": 0,
+     "votes": 4859
+    },
+    {
+     "code": "RBCP",
+     "seats": 0,
+     "votes": 1290
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 1252
+    }
+   ]
+  },
+  "IN-ML": {
+   "seats": 2,
+   "electors": 1277739,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 368801
+    },
+    {
+     "code": "NCP",
+     "seats": 1,
+     "votes": 154476
+    },
+    {
+     "code": "UDP",
+     "seats": 0,
+     "votes": 124402
+    },
+    {
+     "code": "HSPDP",
+     "seats": 0,
+     "votes": 97613
+    },
+    {
+     "code": "ACNC",
+     "seats": 0,
+     "votes": 40204
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 21322
+    },
+    {
+     "code": "MDP",
+     "seats": 0,
+     "votes": 8946
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 6802
+    }
+   ]
+  },
+  "IN-MZ": {
+   "seats": 1,
+   "electors": 629374,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 213779
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 108913
+    },
+    {
+     "code": "NCP",
+     "seats": 0,
+     "votes": 3299
+    }
+   ]
+  },
+  "IN-NL": {
+   "seats": 1,
+   "electors": 1321878,
+   "parties": [
+    {
+     "code": "NPF",
+     "seats": 1,
+     "votes": 832224
+    },
+    {
+     "code": "INC",
+     "seats": 0,
+     "votes": 349203
+    },
+    {
+     "code": "AITC",
+     "seats": 0,
+     "votes": 8174
+    }
+   ]
+  },
+  "IN-OD": {
+   "seats": 21,
+   "electors": 27194864,
+   "parties": [
+    {
+     "code": "BJD",
+     "seats": 14,
+     "votes": 6612552
+    },
+    {
+     "code": "INC",
+     "seats": 6,
+     "votes": 5816904
+    },
+    {
+     "code": "BJP",
+     "seats": 0,
+     "votes": 2999520
+    },
+    {
+     "code": "CPI",
+     "seats": 1,
+     "votes": 457234
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 413030
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 337916
+    },
+    {
+     "code": "JMM",
+     "seats": 0,
+     "votes": 310560
+    },
+    {
+     "code": "NCP",
+     "seats": 0,
+     "votes": 274988
+    },
+    {
+     "code": "SAMO",
+     "seats": 0,
+     "votes": 131379
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 71582
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 70197
+    },
+    {
+     "code": "KS",
+     "seats": 0,
+     "votes": 53033
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 50955
+    },
+    {
+     "code": "BOP",
+     "seats": 0,
+     "votes": 47720
+    },
+    {
+     "code": "KOKD",
+     "seats": 0,
+     "votes": 42744
+    },
+    {
+     "code": "JDP",
+     "seats": 0,
+     "votes": 33729
+    },
+    {
+     "code": "JHKP",
+     "seats": 0,
+     "votes": 13313
+    },
+    {
+     "code": "RPI",
+     "seats": 0,
+     "votes": 9518
+    },
+    {
+     "code": "RSP",
+     "seats": 0,
+     "votes": 6018
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 4370
+    },
+    {
+     "code": "OMM",
+     "seats": 0,
+     "votes": 2591
+    },
+    {
+     "code": "RPIA",
+     "seats": 0,
+     "votes": 2131
+    }
+   ]
+  },
+  "IN-PB": {
+   "seats": 13,
+   "electors": 16958380,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 8,
+     "votes": 5350377
+    },
+    {
+     "code": "SAD",
+     "seats": 4,
+     "votes": 4004789
+    },
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 1190144
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 680048
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 274446
+    },
+    {
+     "code": "LBP",
+     "seats": 0,
+     "votes": 118470
+    },
+    {
+     "code": "SADM",
+     "seats": 0,
+     "votes": 43137
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 39479
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 24383
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 17494
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 17147
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 16074
+    },
+    {
+     "code": "AIDWC",
+     "seats": 0,
+     "votes": 8961
+    },
+    {
+     "code": "DBSP",
+     "seats": 0,
+     "votes": 7817
+    },
+    {
+     "code": "BGTD",
+     "seats": 0,
+     "votes": 7463
+    },
+    {
+     "code": "RSP",
+     "seats": 0,
+     "votes": 7271
+    },
+    {
+     "code": "SHS",
+     "seats": 0,
+     "votes": 4937
+    },
+    {
+     "code": "DCP",
+     "seats": 0,
+     "votes": 2497
+    },
+    {
+     "code": "RVNP",
+     "seats": 0,
+     "votes": 2079
+    },
+    {
+     "code": "RPI",
+     "seats": 0,
+     "votes": 1656
+    },
+    {
+     "code": "BVP",
+     "seats": 0,
+     "votes": 1435
+    },
+    {
+     "code": "PLP",
+     "seats": 0,
+     "votes": 1243
+    },
+    {
+     "code": "ABSR",
+     "seats": 0,
+     "votes": 1108
+    },
+    {
+     "code": "ABJP",
+     "seats": 0,
+     "votes": 1085
+    },
+    {
+     "code": "ARWP",
+     "seats": 0,
+     "votes": 969
+    },
+    {
+     "code": "MBSP",
+     "seats": 0,
+     "votes": 910
+    },
+    {
+     "code": "RWS",
+     "seats": 0,
+     "votes": 741
+    },
+    {
+     "code": "PTSS",
+     "seats": 0,
+     "votes": 697
+    },
+    {
+     "code": "RRD",
+     "seats": 0,
+     "votes": 692
+    },
+    {
+     "code": "LPSP",
+     "seats": 0,
+     "votes": 675
+    },
+    {
+     "code": "LTSD",
+     "seats": 0,
+     "votes": 603
+    },
+    {
+     "code": "JKNPP",
+     "seats": 0,
+     "votes": 477
+    }
+   ]
+  },
+  "IN-RJ": {
+   "seats": 25,
+   "electors": 37060011,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 20,
+     "votes": 8461227
+    },
+    {
+     "code": "BJP",
+     "seats": 4,
+     "votes": 6557727
+    },
+    {
+     "code": "IND",
+     "seats": 1,
+     "votes": 1669786
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 604355
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 225068
+    },
+    {
+     "code": "JDU",
+     "seats": 0,
+     "votes": 80048
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 58130
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 46918
+    },
+    {
+     "code": "JGP",
+     "seats": 0,
+     "votes": 39063
+    },
+    {
+     "code": "RJVP",
+     "seats": 0,
+     "votes": 36584
+    },
+    {
+     "code": "LSWP",
+     "seats": 0,
+     "votes": 30197
+    },
+    {
+     "code": "BHBP",
+     "seats": 0,
+     "votes": 30175
+    },
+    {
+     "code": "ABCDA",
+     "seats": 0,
+     "votes": 22861
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 17020
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 11722
+    },
+    {
+     "code": "IJP",
+     "seats": 0,
+     "votes": 9889
+    },
+    {
+     "code": "RRD",
+     "seats": 0,
+     "votes": 6056
+    },
+    {
+     "code": "KKJHS",
+     "seats": 0,
+     "votes": 4921
+    },
+    {
+     "code": "BSSPA",
+     "seats": 0,
+     "votes": 4817
+    },
+    {
+     "code": "JKNPP",
+     "seats": 0,
+     "votes": 3870
+    },
+    {
+     "code": "RBD",
+     "seats": 0,
+     "votes": 3138
+    },
+    {
+     "code": "RMGLM",
+     "seats": 0,
+     "votes": 1780
+    },
+    {
+     "code": "ABHM",
+     "seats": 0,
+     "votes": 1375
+    },
+    {
+     "code": "BCP",
+     "seats": 0,
+     "votes": 1246
+    },
+    {
+     "code": "ABMSK",
+     "seats": 0,
+     "votes": 1197
+    },
+    {
+     "code": "FCI",
+     "seats": 0,
+     "votes": 684
+    },
+    {
+     "code": "BSA",
+     "seats": 0,
+     "votes": 683
+    },
+    {
+     "code": "RND",
+     "seats": 0,
+     "votes": 572
+    },
+    {
+     "code": "RDSD",
+     "seats": 0,
+     "votes": 484
+    }
+   ]
+  },
+  "IN-SK": {
+   "seats": 1,
+   "electors": 300584,
+   "parties": [
+    {
+     "code": "SDF",
+     "seats": 1,
+     "votes": 159351
+    },
+    {
+     "code": "INC",
+     "seats": 0,
+     "votes": 74483
+    },
+    {
+     "code": "SHRP",
+     "seats": 0,
+     "votes": 4639
+    },
+    {
+     "code": "BJP",
+     "seats": 0,
+     "votes": 4458
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 3687
+    },
+    {
+     "code": "SJEP",
+     "seats": 0,
+     "votes": 2849
+    },
+    {
+     "code": "SGPP",
+     "seats": 0,
+     "votes": 2284
+    }
+   ]
+  },
+  "IN-TN": {
+   "seats": 39,
+   "electors": 41620460,
+   "parties": [
+    {
+     "code": "DMK",
+     "seats": 18,
+     "votes": 7625397
+    },
+    {
+     "code": "AIADMK",
+     "seats": 9,
+     "votes": 6953591
+    },
+    {
+     "code": "INC",
+     "seats": 8,
+     "votes": 4567799
+    },
+    {
+     "code": "DMDK",
+     "seats": 0,
+     "votes": 3073479
+    },
+    {
+     "code": "PMK",
+     "seats": 0,
+     "votes": 1736000
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 1151204
+    },
+    {
+     "code": "MDMK",
+     "seats": 1,
+     "votes": 1112908
+    },
+    {
+     "code": "CPI",
+     "seats": 1,
+     "votes": 865029
+    },
+    {
+     "code": "VCK",
+     "seats": 1,
+     "votes": 732833
+    },
+    {
+     "code": "BJP",
+     "seats": 0,
+     "votes": 711790
+    },
+    {
+     "code": "CPM",
+     "seats": 1,
+     "votes": 669058
+    },
+    {
+     "code": "KNMK",
+     "seats": 0,
+     "votes": 579703
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 232583
+    },
+    {
+     "code": "PT",
+     "seats": 0,
+     "votes": 120797
+    },
+    {
+     "code": "MAMAK",
+     "seats": 0,
+     "votes": 68346
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 32650
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 23155
+    },
+    {
+     "code": "AIVP",
+     "seats": 0,
+     "votes": 20982
+    },
+    {
+     "code": "MMKA",
+     "seats": 0,
+     "votes": 16699
+    },
+    {
+     "code": "PNK",
+     "seats": 0,
+     "votes": 15074
+    },
+    {
+     "code": "UMK",
+     "seats": 0,
+     "votes": 13193
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 11812
+    },
+    {
+     "code": "AIJMK",
+     "seats": 0,
+     "votes": 9798
+    },
+    {
+     "code": "JMM",
+     "seats": 0,
+     "votes": 6319
+    },
+    {
+     "code": "PPOI",
+     "seats": 0,
+     "votes": 5968
+    },
+    {
+     "code": "RKSP",
+     "seats": 0,
+     "votes": 5255
+    },
+    {
+     "code": "JDU",
+     "seats": 0,
+     "votes": 5225
+    },
+    {
+     "code": "SHS",
+     "seats": 0,
+     "votes": 3864
+    },
+    {
+     "code": "RPIA",
+     "seats": 0,
+     "votes": 2974
+    },
+    {
+     "code": "ABHM",
+     "seats": 0,
+     "votes": 2635
+    },
+    {
+     "code": "YSP",
+     "seats": 0,
+     "votes": 2582
+    },
+    {
+     "code": "SAP",
+     "seats": 0,
+     "votes": 2282
+    },
+    {
+     "code": "DPK",
+     "seats": 0,
+     "votes": 2154
+    },
+    {
+     "code": "CDF",
+     "seats": 0,
+     "votes": 1300
+    },
+    {
+     "code": "ADSMK",
+     "seats": 0,
+     "votes": 1189
+    },
+    {
+     "code": "NMK",
+     "seats": 0,
+     "votes": 1114
+    },
+    {
+     "code": "PKMK",
+     "seats": 0,
+     "votes": 981
+    },
+    {
+     "code": "THPI",
+     "seats": 0,
+     "votes": 834
+    },
+    {
+     "code": "KDC",
+     "seats": 0,
+     "votes": 771
+    },
+    {
+     "code": "AITC",
+     "seats": 0,
+     "votes": 755
+    },
+    {
+     "code": "JJ",
+     "seats": 0,
+     "votes": 573
+    },
+    {
+     "code": "ABKMM",
+     "seats": 0,
+     "votes": 305
+    }
+   ]
+  },
+  "IN-TR": {
+   "seats": 2,
+   "electors": 2082265,
+   "parties": [
+    {
+     "code": "CPM",
+     "seats": 2,
+     "votes": 1084883
+    },
+    {
+     "code": "INC",
+     "seats": 0,
+     "votes": 540753
+    },
+    {
+     "code": "BJP",
+     "seats": 0,
+     "votes": 59457
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 35698
+    },
+    {
+     "code": "AMB",
+     "seats": 0,
+     "votes": 13743
+    },
+    {
+     "code": "AITC",
+     "seats": 0,
+     "votes": 9695
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 9026
+    },
+    {
+     "code": "NCP",
+     "seats": 0,
+     "votes": 3118
+    },
+    {
+     "code": "RDMP",
+     "seats": 0,
+     "votes": 2128
+    }
+   ]
+  },
+  "IN-UP": {
+   "seats": 80,
+   "electors": 116006374,
+   "parties": [
+    {
+     "code": "BSP",
+     "seats": 20,
+     "votes": 15191044
+    },
+    {
+     "code": "SP",
+     "seats": 23,
+     "votes": 12884968
+    },
+    {
+     "code": "INC",
+     "seats": 21,
+     "votes": 10113521
+    },
+    {
+     "code": "BJP",
+     "seats": 10,
+     "votes": 9695904
+    },
+    {
+     "code": "IND",
+     "seats": 1,
+     "votes": 2504643
+    },
+    {
+     "code": "RLD",
+     "seats": 5,
+     "votes": 1811986
+    },
+    {
+     "code": "PECP",
+     "seats": 0,
+     "votes": 537638
+    },
+    {
+     "code": "AD",
+     "seats": 0,
+     "votes": 466871
+    },
+    {
+     "code": "SBSP",
+     "seats": 0,
+     "votes": 300697
+    },
+    {
+     "code": "JDU",
+     "seats": 0,
+     "votes": 164959
+    },
+    {
+     "code": "RSBP",
+     "seats": 0,
+     "votes": 152633
+    },
+    {
+     "code": "RSMD",
+     "seats": 0,
+     "votes": 149482
+    },
+    {
+     "code": "NCP",
+     "seats": 0,
+     "votes": 138608
+    },
+    {
+     "code": "JPS",
+     "seats": 0,
+     "votes": 110437
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 88489
+    },
+    {
+     "code": "NLHP",
+     "seats": 0,
+     "votes": 68768
+    },
+    {
+     "code": "MD",
+     "seats": 0,
+     "votes": 65398
+    },
+    {
+     "code": "IJP",
+     "seats": 0,
+     "votes": 58974
+    },
+    {
+     "code": "RTKP",
+     "seats": 0,
+     "votes": 55805
+    },
+    {
+     "code": "PMSP",
+     "seats": 0,
+     "votes": 54243
+    },
+    {
+     "code": "RPIA",
+     "seats": 0,
+     "votes": 50940
+    },
+    {
+     "code": "ASP",
+     "seats": 0,
+     "votes": 38160
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 35955
+    },
+    {
+     "code": "RCP",
+     "seats": 0,
+     "votes": 25842
+    },
+    {
+     "code": "BSPK",
+     "seats": 0,
+     "votes": 24913
+    },
+    {
+     "code": "BRPP",
+     "seats": 0,
+     "votes": 24413
+    },
+    {
+     "code": "NELU",
+     "seats": 0,
+     "votes": 22974
+    },
+    {
+     "code": "EKSP",
+     "seats": 0,
+     "votes": 22422
+    },
+    {
+     "code": "LD",
+     "seats": 0,
+     "votes": 21431
+    },
+    {
+     "code": "NBNP",
+     "seats": 0,
+     "votes": 21179
+    },
+    {
+     "code": "PDFO",
+     "seats": 0,
+     "votes": 20699
+    },
+    {
+     "code": "MADP",
+     "seats": 0,
+     "votes": 20534
+    },
+    {
+     "code": "ABHM",
+     "seats": 0,
+     "votes": 19672
+    },
+    {
+     "code": "IPP",
+     "seats": 0,
+     "votes": 18726
+    },
+    {
+     "code": "ANC",
+     "seats": 0,
+     "votes": 17326
+    },
+    {
+     "code": "VAJP",
+     "seats": 0,
+     "votes": 16751
+    },
+    {
+     "code": "RDMP",
+     "seats": 0,
+     "votes": 16190
+    },
+    {
+     "code": "BUM",
+     "seats": 0,
+     "votes": 15272
+    },
+    {
+     "code": "RASD",
+     "seats": 0,
+     "votes": 14403
+    },
+    {
+     "code": "GGP",
+     "seats": 0,
+     "votes": 13646
+    },
+    {
+     "code": "RJPK",
+     "seats": 0,
+     "votes": 12732
+    },
+    {
+     "code": "KKJHS",
+     "seats": 0,
+     "votes": 12365
+    },
+    {
+     "code": "RPI",
+     "seats": 0,
+     "votes": 11532
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 10700
+    },
+    {
+     "code": "BPD",
+     "seats": 0,
+     "votes": 9066
+    },
+    {
+     "code": "MUL",
+     "seats": 0,
+     "votes": 9006
+    },
+    {
+     "code": "RWS",
+     "seats": 0,
+     "votes": 8379
+    },
+    {
+     "code": "LPSP",
+     "seats": 0,
+     "votes": 8379
+    },
+    {
+     "code": "ABAS",
+     "seats": 0,
+     "votes": 8120
+    },
+    {
+     "code": "BEP",
+     "seats": 0,
+     "votes": 8105
+    },
+    {
+     "code": "JM",
+     "seats": 0,
+     "votes": 7826
+    },
+    {
+     "code": "BAP",
+     "seats": 0,
+     "votes": 7593
+    },
+    {
+     "code": "PRBD",
+     "seats": 0,
+     "votes": 7497
+    },
+    {
+     "code": "APRD",
+     "seats": 0,
+     "votes": 7482
+    },
+    {
+     "code": "RMSP",
+     "seats": 0,
+     "votes": 7290
+    },
+    {
+     "code": "SSD",
+     "seats": 0,
+     "votes": 7026
+    },
+    {
+     "code": "BJTP",
+     "seats": 0,
+     "votes": 6872
+    },
+    {
+     "code": "SHS",
+     "seats": 0,
+     "votes": 6836
+    },
+    {
+     "code": "BSRD",
+     "seats": 0,
+     "votes": 6250
+    },
+    {
+     "code": "RKSP",
+     "seats": 0,
+     "votes": 6079
+    },
+    {
+     "code": "VP",
+     "seats": 0,
+     "votes": 5840
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 5680
+    },
+    {
+     "code": "BSD",
+     "seats": 0,
+     "votes": 5565
+    },
+    {
+     "code": "NLP",
+     "seats": 0,
+     "votes": 5371
+    },
+    {
+     "code": "BLKD",
+     "seats": 0,
+     "votes": 5197
+    },
+    {
+     "code": "JBSP",
+     "seats": 0,
+     "votes": 4967
+    },
+    {
+     "code": "RALP",
+     "seats": 0,
+     "votes": 4945
+    },
+    {
+     "code": "JKM",
+     "seats": 0,
+     "votes": 4891
+    },
+    {
+     "code": "BSA",
+     "seats": 0,
+     "votes": 4720
+    },
+    {
+     "code": "UPRP",
+     "seats": 0,
+     "votes": 4604
+    },
+    {
+     "code": "RSP",
+     "seats": 0,
+     "votes": 4593
+    },
+    {
+     "code": "ABRS",
+     "seats": 0,
+     "votes": 4504
+    },
+    {
+     "code": "MMUP",
+     "seats": 0,
+     "votes": 4444
+    },
+    {
+     "code": "AP",
+     "seats": 0,
+     "votes": 4386
+    },
+    {
+     "code": "SJPR",
+     "seats": 0,
+     "votes": 4346
+    },
+    {
+     "code": "BJBCD",
+     "seats": 0,
+     "votes": 4307
+    },
+    {
+     "code": "RAD",
+     "seats": 0,
+     "votes": 4072
+    },
+    {
+     "code": "GMS",
+     "seats": 0,
+     "votes": 3597
+    },
+    {
+     "code": "AIMF",
+     "seats": 0,
+     "votes": 3590
+    },
+    {
+     "code": "PDF",
+     "seats": 0,
+     "votes": 3502
+    },
+    {
+     "code": "AIFB",
+     "seats": 0,
+     "votes": 3303
+    },
+    {
+     "code": "IVD",
+     "seats": 0,
+     "votes": 3244
+    },
+    {
+     "code": "BSKPB",
+     "seats": 0,
+     "votes": 2822
+    },
+    {
+     "code": "JKD",
+     "seats": 0,
+     "votes": 2787
+    },
+    {
+     "code": "MC",
+     "seats": 0,
+     "votes": 2765
+    },
+    {
+     "code": "UNLP",
+     "seats": 0,
+     "votes": 2658
+    },
+    {
+     "code": "LSVP",
+     "seats": 0,
+     "votes": 2507
+    },
+    {
+     "code": "JSP",
+     "seats": 0,
+     "votes": 2468
+    },
+    {
+     "code": "MOP",
+     "seats": 0,
+     "votes": 2285
+    },
+    {
+     "code": "NYP",
+     "seats": 0,
+     "votes": 2275
+    },
+    {
+     "code": "BDBP",
+     "seats": 0,
+     "votes": 2217
+    },
+    {
+     "code": "AITC",
+     "seats": 0,
+     "votes": 2164
+    },
+    {
+     "code": "RALOP",
+     "seats": 0,
+     "votes": 2021
+    },
+    {
+     "code": "RAJUP",
+     "seats": 0,
+     "votes": 2005
+    },
+    {
+     "code": "RVNP",
+     "seats": 0,
+     "votes": 1887
+    },
+    {
+     "code": "RMEP",
+     "seats": 0,
+     "votes": 1871
+    },
+    {
+     "code": "RLP",
+     "seats": 0,
+     "votes": 1866
+    },
+    {
+     "code": "MAP",
+     "seats": 0,
+     "votes": 1816
+    },
+    {
+     "code": "UCPI",
+     "seats": 0,
+     "votes": 1713
+    },
+    {
+     "code": "SWJP",
+     "seats": 0,
+     "votes": 1697
+    },
+    {
+     "code": "BVVP",
+     "seats": 0,
+     "votes": 1588
+    },
+    {
+     "code": "NDPF",
+     "seats": 0,
+     "votes": 1557
+    },
+    {
+     "code": "THPI",
+     "seats": 0,
+     "votes": 1553
+    },
+    {
+     "code": "RSUPR",
+     "seats": 0,
+     "votes": 1532
+    },
+    {
+     "code": "BNRP",
+     "seats": 0,
+     "votes": 1464
+    },
+    {
+     "code": "BPC",
+     "seats": 0,
+     "votes": 1426
+    },
+    {
+     "code": "MKUP",
+     "seats": 0,
+     "votes": 1341
+    },
+    {
+     "code": "SWPI",
+     "seats": 0,
+     "votes": 1230
+    },
+    {
+     "code": "RBCP",
+     "seats": 0,
+     "votes": 954
+    },
+    {
+     "code": "YVP",
+     "seats": 0,
+     "votes": 929
+    },
+    {
+     "code": "IUML",
+     "seats": 0,
+     "votes": 886
+    },
+    {
+     "code": "BRM",
+     "seats": 0,
+     "votes": 867
+    },
+    {
+     "code": "PTSS",
+     "seats": 0,
+     "votes": 858
+    },
+    {
+     "code": "BKLJP",
+     "seats": 0,
+     "votes": 790
+    },
+    {
+     "code": "BD",
+     "seats": 0,
+     "votes": 700
+    },
+    {
+     "code": "JDS",
+     "seats": 0,
+     "votes": 595
+    },
+    {
+     "code": "RVP",
+     "seats": 0,
+     "votes": 584
+    },
+    {
+     "code": "ABLTP",
+     "seats": 0,
+     "votes": 578
+    },
+    {
+     "code": "HDVP",
+     "seats": 0,
+     "votes": 532
+    },
+    {
+     "code": "BSK",
+     "seats": 0,
+     "votes": 496
+    },
+    {
+     "code": "RYS",
+     "seats": 0,
+     "votes": 482
+    },
+    {
+     "code": "RWSP",
+     "seats": 0,
+     "votes": 450
+    },
+    {
+     "code": "BGD",
+     "seats": 0,
+     "votes": 346
+    },
+    {
+     "code": "JANS",
+     "seats": 0,
+     "votes": 226
+    }
+   ]
+  },
+  "IN-WB": {
+   "seats": 42,
+   "electors": 52493168,
+   "parties": [
+    {
+     "code": "CPM",
+     "seats": 9,
+     "votes": 14144667
+    },
+    {
+     "code": "AITC",
+     "seats": 19,
+     "votes": 13321553
+    },
+    {
+     "code": "INC",
+     "seats": 6,
+     "votes": 5749051
+    },
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 2625182
+    },
+    {
+     "code": "CPI",
+     "seats": 2,
+     "votes": 1538211
+    },
+    {
+     "code": "RSP",
+     "seats": 2,
+     "votes": 1520772
+    },
+    {
+     "code": "IND",
+     "seats": 1,
+     "votes": 1314613
+    },
+    {
+     "code": "AIFB",
+     "seats": 2,
+     "votes": 1299507
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 435945
+    },
+    {
+     "code": "AUDF",
+     "seats": 0,
+     "votes": 218014
+    },
+    {
+     "code": "JMM",
+     "seats": 0,
+     "votes": 109171
+    },
+    {
+     "code": "JKPN",
+     "seats": 0,
+     "votes": 61307
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 56179
+    },
+    {
+     "code": "JDP",
+     "seats": 0,
+     "votes": 53978
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 52698
+    },
+    {
+     "code": "RDMP",
+     "seats": 0,
+     "votes": 47029
+    },
+    {
+     "code": "NCP",
+     "seats": 0,
+     "votes": 36831
+    },
+    {
+     "code": "MUL",
+     "seats": 0,
+     "votes": 29458
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 28554
+    },
+    {
+     "code": "AMB",
+     "seats": 0,
+     "votes": 18854
+    },
+    {
+     "code": "SWJP",
+     "seats": 0,
+     "votes": 16130
+    },
+    {
+     "code": "RPIA",
+     "seats": 0,
+     "votes": 13202
+    },
+    {
+     "code": "IJP",
+     "seats": 0,
+     "votes": 10827
+    },
+    {
+     "code": "JDU",
+     "seats": 0,
+     "votes": 10231
+    },
+    {
+     "code": "PDS",
+     "seats": 0,
+     "votes": 6141
+    },
+    {
+     "code": "BSPK",
+     "seats": 0,
+     "votes": 5736
+    },
+    {
+     "code": "IPFB",
+     "seats": 0,
+     "votes": 2686
+    },
+    {
+     "code": "ABP",
+     "seats": 0,
+     "votes": 2664
+    },
+    {
+     "code": "STPI",
+     "seats": 0,
+     "votes": 1357
+    }
+   ]
+  },
+  "IN-CT": {
+   "seats": 11,
+   "electors": 15476577,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 10,
+     "votes": 3851970
+    },
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 3192007
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 842855
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 386872
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 78420
+    },
+    {
+     "code": "GGP",
+     "seats": 0,
+     "votes": 60206
+    },
+    {
+     "code": "JMM",
+     "seats": 0,
+     "votes": 34881
+    },
+    {
+     "code": "CGVP",
+     "seats": 0,
+     "votes": 18394
+    },
+    {
+     "code": "CSP",
+     "seats": 0,
+     "votes": 11972
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 11667
+    },
+    {
+     "code": "EKSP",
+     "seats": 0,
+     "votes": 8307
+    },
+    {
+     "code": "RPIA",
+     "seats": 0,
+     "votes": 7890
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 7397
+    },
+    {
+     "code": "LB",
+     "seats": 0,
+     "votes": 6436
+    },
+    {
+     "code": "AD",
+     "seats": 0,
+     "votes": 5896
+    },
+    {
+     "code": "SUSP",
+     "seats": 0,
+     "votes": 5120
+    },
+    {
+     "code": "JDU",
+     "seats": 0,
+     "votes": 4261
+    },
+    {
+     "code": "GMS",
+     "seats": 0,
+     "votes": 4190
+    },
+    {
+     "code": "SSD",
+     "seats": 0,
+     "votes": 3413
+    },
+    {
+     "code": "BHPD",
+     "seats": 0,
+     "votes": 3292
+    },
+    {
+     "code": "JCGP",
+     "seats": 0,
+     "votes": 2397
+    },
+    {
+     "code": "RGOP",
+     "seats": 0,
+     "votes": 1802
+    },
+    {
+     "code": "RPI",
+     "seats": 0,
+     "votes": 1491
+    },
+    {
+     "code": "LSWP",
+     "seats": 0,
+     "votes": 932
+    },
+    {
+     "code": "ABSSP",
+     "seats": 0,
+     "votes": 786
+    },
+    {
+     "code": "PPOI",
+     "seats": 0,
+     "votes": 712
+    },
+    {
+     "code": "ABHM",
+     "seats": 0,
+     "votes": 688
+    },
+    {
+     "code": "SSBD",
+     "seats": 0,
+     "votes": 589
+    }
+   ]
+  },
+  "IN-JH": {
+   "seats": 14,
+   "electors": 17934095,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 8,
+     "votes": 2515265
+    },
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 1372639
+    },
+    {
+     "code": "JMM",
+     "seats": 2,
+     "votes": 1068935
+    },
+    {
+     "code": "IND",
+     "seats": 2,
+     "votes": 1016099
+    },
+    {
+     "code": "JVM",
+     "seats": 1,
+     "votes": 957084
+    },
+    {
+     "code": "RJD",
+     "seats": 0,
+     "votes": 486870
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 321571
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 254455
+    },
+    {
+     "code": "AJSUP",
+     "seats": 0,
+     "votes": 200523
+    },
+    {
+     "code": "JKP",
+     "seats": 0,
+     "votes": 125900
+    },
+    {
+     "code": "JDU",
+     "seats": 0,
+     "votes": 110912
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 106051
+    },
+    {
+     "code": "MCO",
+     "seats": 0,
+     "votes": 91489
+    },
+    {
+     "code": "JHJM",
+     "seats": 0,
+     "votes": 58025
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 49407
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 47046
+    },
+    {
+     "code": "JVD",
+     "seats": 0,
+     "votes": 45246
+    },
+    {
+     "code": "JKPN",
+     "seats": 0,
+     "votes": 43293
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 33270
+    },
+    {
+     "code": "JHJAM",
+     "seats": 0,
+     "votes": 32219
+    },
+    {
+     "code": "RSP",
+     "seats": 0,
+     "votes": 22984
+    },
+    {
+     "code": "RKSP",
+     "seats": 0,
+     "votes": 15586
+    },
+    {
+     "code": "SAP",
+     "seats": 0,
+     "votes": 15022
+    },
+    {
+     "code": "JDP",
+     "seats": 0,
+     "votes": 13206
+    },
+    {
+     "code": "BSA",
+     "seats": 0,
+     "votes": 12984
+    },
+    {
+     "code": "AITC",
+     "seats": 0,
+     "votes": 12563
+    },
+    {
+     "code": "AMB",
+     "seats": 0,
+     "votes": 12505
+    },
+    {
+     "code": "SHS",
+     "seats": 0,
+     "votes": 11904
+    },
+    {
+     "code": "ABMSD",
+     "seats": 0,
+     "votes": 11298
+    },
+    {
+     "code": "MMM",
+     "seats": 0,
+     "votes": 8839
+    },
+    {
+     "code": "RWS",
+     "seats": 0,
+     "votes": 8410
+    },
+    {
+     "code": "RASD",
+     "seats": 0,
+     "votes": 8050
+    },
+    {
+     "code": "SLPL",
+     "seats": 0,
+     "votes": 7586
+    },
+    {
+     "code": "BHJAP",
+     "seats": 0,
+     "votes": 7024
+    },
+    {
+     "code": "BSSPA",
+     "seats": 0,
+     "votes": 6334
+    },
+    {
+     "code": "RLD",
+     "seats": 0,
+     "votes": 5526
+    },
+    {
+     "code": "AIFB",
+     "seats": 0,
+     "votes": 5291
+    },
+    {
+     "code": "LJVM",
+     "seats": 0,
+     "votes": 3658
+    },
+    {
+     "code": "JKPP",
+     "seats": 0,
+     "votes": 2498
+    },
+    {
+     "code": "ABHM",
+     "seats": 0,
+     "votes": 2363
+    },
+    {
+     "code": "JDS",
+     "seats": 0,
+     "votes": 1999
+    },
+    {
+     "code": "NLHP",
+     "seats": 0,
+     "votes": 1955
+    },
+    {
+     "code": "IJP",
+     "seats": 0,
+     "votes": 1934
+    }
+   ]
+  },
+  "IN-UT": {
+   "seats": 5,
+   "electors": 5887724,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 5,
+     "votes": 1354468
+    },
+    {
+     "code": "BJP",
+     "seats": 0,
+     "votes": 1061358
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 478394
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 86126
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 57316
+    },
+    {
+     "code": "UKKD",
+     "seats": 0,
+     "votes": 38633
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 13427
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 7330
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 6671
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 5562
+    },
+    {
+     "code": "NCP",
+     "seats": 0,
+     "votes": 5168
+    },
+    {
+     "code": "AD",
+     "seats": 0,
+     "votes": 4037
+    },
+    {
+     "code": "ANC",
+     "seats": 0,
+     "votes": 3880
+    },
+    {
+     "code": "ABRS",
+     "seats": 0,
+     "votes": 3561
+    },
+    {
+     "code": "JKM",
+     "seats": 0,
+     "votes": 3372
+    },
+    {
+     "code": "RPIA",
+     "seats": 0,
+     "votes": 2376
+    },
+    {
+     "code": "RJSD",
+     "seats": 0,
+     "votes": 2202
+    },
+    {
+     "code": "ABHM",
+     "seats": 0,
+     "votes": 1960
+    },
+    {
+     "code": "JDS",
+     "seats": 0,
+     "votes": 1468
+    },
+    {
+     "code": "MKD",
+     "seats": 0,
+     "votes": 1106
+    },
+    {
+     "code": "VVS",
+     "seats": 0,
+     "votes": 837
+    },
+    {
+     "code": "NLHP",
+     "seats": 0,
+     "votes": 793
+    }
+   ]
+  },
+  "IN-AN": {
+   "seats": 1,
+   "electors": 265108,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 75211
+    },
+    {
+     "code": "INC",
+     "seats": 0,
+     "votes": 72221
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 7190
+    },
+    {
+     "code": "RJD",
+     "seats": 0,
+     "votes": 4916
+    },
+    {
+     "code": "NCP",
+     "seats": 0,
+     "votes": 4696
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 2561
+    },
+    {
+     "code": "JDP",
+     "seats": 0,
+     "votes": 1785
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 789
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 734
+    }
+   ]
+  },
+  "IN-CH": {
+   "seats": 1,
+   "electors": 524444,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 161042
+    },
+    {
+     "code": "BJP",
+     "seats": 0,
+     "votes": 102075
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 61434
+    },
+    {
+     "code": "RJD",
+     "seats": 0,
+     "votes": 11549
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 6433
+    },
+    {
+     "code": "JDU",
+     "seats": 0,
+     "votes": 658
+    },
+    {
+     "code": "AD",
+     "seats": 0,
+     "votes": 366
+    }
+   ]
+  },
+  "IN-DH": {
+   "seats": 2,
+   "electors": 246086,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 2,
+     "votes": 95788
+    },
+    {
+     "code": "INC",
+     "seats": 0,
+     "votes": 70332
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 8358
+    },
+    {
+     "code": "NCP",
+     "seats": 0,
+     "votes": 2144
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 1385
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 380
+    }
+   ]
+  },
+  "IN-DL": {
+   "seats": 7,
+   "electors": 11096854,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 7,
+     "votes": 3285353
+    },
+    {
+     "code": "BJP",
+     "seats": 0,
+     "votes": 2026876
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 307232
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 63817
+    },
+    {
+     "code": "SP",
+     "seats": 0,
+     "votes": 16357
+    },
+    {
+     "code": "CPI",
+     "seats": 0,
+     "votes": 5244
+    },
+    {
+     "code": "BSKRP",
+     "seats": 0,
+     "votes": 4713
+    },
+    {
+     "code": "LD",
+     "seats": 0,
+     "votes": 3157
+    },
+    {
+     "code": "RKSP",
+     "seats": 0,
+     "votes": 2887
+    },
+    {
+     "code": "ASP",
+     "seats": 0,
+     "votes": 2605
+    },
+    {
+     "code": "BSKP",
+     "seats": 0,
+     "votes": 2173
+    },
+    {
+     "code": "UWF",
+     "seats": 0,
+     "votes": 2151
+    },
+    {
+     "code": "YFE",
+     "seats": 0,
+     "votes": 2099
+    },
+    {
+     "code": "IJP",
+     "seats": 0,
+     "votes": 2074
+    },
+    {
+     "code": "RVNP",
+     "seats": 0,
+     "votes": 1950
+    },
+    {
+     "code": "ABHM",
+     "seats": 0,
+     "votes": 1850
+    },
+    {
+     "code": "AIFB",
+     "seats": 0,
+     "votes": 1682
+    },
+    {
+     "code": "BPD",
+     "seats": 0,
+     "votes": 1570
+    },
+    {
+     "code": "RKJP",
+     "seats": 0,
+     "votes": 1569
+    },
+    {
+     "code": "RPIA",
+     "seats": 0,
+     "votes": 1551
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 1439
+    },
+    {
+     "code": "BPC",
+     "seats": 0,
+     "votes": 1372
+    },
+    {
+     "code": "AIBS",
+     "seats": 0,
+     "votes": 1217
+    },
+    {
+     "code": "RPIE",
+     "seats": 0,
+     "votes": 1056
+    },
+    {
+     "code": "MBP",
+     "seats": 0,
+     "votes": 1006
+    },
+    {
+     "code": "JBP",
+     "seats": 0,
+     "votes": 836
+    },
+    {
+     "code": "NELU",
+     "seats": 0,
+     "votes": 793
+    },
+    {
+     "code": "SHS",
+     "seats": 0,
+     "votes": 649
+    },
+    {
+     "code": "AWD",
+     "seats": 0,
+     "votes": 614
+    },
+    {
+     "code": "RWS",
+     "seats": 0,
+     "votes": 609
+    },
+    {
+     "code": "YVP",
+     "seats": 0,
+     "votes": 595
+    },
+    {
+     "code": "DBP",
+     "seats": 0,
+     "votes": 531
+    },
+    {
+     "code": "RALP",
+     "seats": 0,
+     "votes": 515
+    },
+    {
+     "code": "JKNPP",
+     "seats": 0,
+     "votes": 486
+    },
+    {
+     "code": "LPSP",
+     "seats": 0,
+     "votes": 478
+    },
+    {
+     "code": "RDMP",
+     "seats": 0,
+     "votes": 454
+    },
+    {
+     "code": "RJAP",
+     "seats": 0,
+     "votes": 434
+    },
+    {
+     "code": "JMM",
+     "seats": 0,
+     "votes": 405
+    },
+    {
+     "code": "THPI",
+     "seats": 0,
+     "votes": 358
+    },
+    {
+     "code": "LKJP",
+     "seats": 0,
+     "votes": 351
+    },
+    {
+     "code": "SJPR",
+     "seats": 0,
+     "votes": 345
+    },
+    {
+     "code": "ANC",
+     "seats": 0,
+     "votes": 322
+    },
+    {
+     "code": "BGTD",
+     "seats": 0,
+     "votes": 301
+    },
+    {
+     "code": "RSP",
+     "seats": 0,
+     "votes": 289
+    },
+    {
+     "code": "JDS",
+     "seats": 0,
+     "votes": 266
+    },
+    {
+     "code": "PPOI",
+     "seats": 0,
+     "votes": 230
+    },
+    {
+     "code": "BVVP",
+     "seats": 0,
+     "votes": 186
+    }
+   ]
+  },
+  "IN-LD": {
+   "seats": 1,
+   "electors": 45983,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 20492
+    },
+    {
+     "code": "NCP",
+     "seats": 0,
+     "votes": 18294
+    },
+    {
+     "code": "CPM",
+     "seats": 0,
+     "votes": 467
+    },
+    {
+     "code": "BJP",
+     "seats": 0,
+     "votes": 245
+    }
+   ]
+  },
+  "IN-PY": {
+   "seats": 1,
+   "electors": 762440,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 300391
+    },
+    {
+     "code": "PMK",
+     "seats": 0,
+     "votes": 208619
+    },
+    {
+     "code": "DMDK",
+     "seats": 0,
+     "votes": 52638
+    },
+    {
+     "code": "IND",
+     "seats": 0,
+     "votes": 26013
+    },
+    {
+     "code": "BJP",
+     "seats": 0,
+     "votes": 13442
+    },
+    {
+     "code": "BSP",
+     "seats": 0,
+     "votes": 3697
+    },
+    {
+     "code": "CPIML",
+     "seats": 0,
+     "votes": 839
+    },
+    {
+     "code": "LJP",
+     "seats": 0,
+     "votes": 656
+    },
+    {
+     "code": "PPOI",
+     "seats": 0,
+     "votes": 627
+    },
+    {
+     "code": "KDC",
+     "seats": 0,
+     "votes": 570
+    },
+    {
+     "code": "JMM",
+     "seats": 0,
+     "votes": 456
+    }
+   ]
+  }
+ }
+}

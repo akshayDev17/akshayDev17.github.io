@@ -35,7 +35,8 @@
         "regions": 543
       },
       "note": "One national file of all 543 constituencies. Its geometry is the source the state layer above is dissolved from, so a state's outline is exactly the union of its constituencies and the two layers cannot disagree.",
-      "note_results": "SYNTHETIC as published. Each state's party seat and vote totals are distributed across that state's constituencies. The Election Commission's own constituency-wise results exist for 2019 and 2024 and are the intended replacement."
+      "note_results": "SYNTHETIC as published. Each state's party seat and vote totals are distributed across that state's constituencies. The Election Commission's own constituency-wise results exist for 2019 and 2024 and are the intended replacement.",
+      "note_detail": "Constituency-level candidate detail. For the Lok Sabha the 2019 and 2024 files are the Commission's own published counts. For the assembly, no published candidate-level source was available and the names are generated."
     },
     {
       "id": "assembly",
@@ -44,7 +45,8 @@
       "geometry": "geo/ac/{region}.json",
       "topologyObject": "constituencies",
       "geometryKey": "AC_NAME",
-      "results": "results/ac/{region}/{year}.json"
+      "results": "results/ac/{region}/{year}.json",
+      "note": "Assembly constituency boundaries and results. The boundary set covers only the states where it was validated against the current assembly size and the parliamentary nesting; the rest are absent on purpose. Candidate-level results for this level are synthetic."
     },
     {
       "id": "ward",
@@ -61,6 +63,7 @@
       "label": "Lok Sabha",
       "level": "state",
       "years": [
+        2009,
         2014,
         2019,
         2024
@@ -69,7 +72,11 @@
     "ac": {
       "label": "Legislative Assembly",
       "level": "assembly",
-      "years": []
+      "years": [
+        2014,
+        2019,
+        2024
+      ]
     },
     "ward": {
       "label": "Municipal",

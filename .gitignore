@@ -14,3 +14,7 @@ out/
 
 # vision-router artifact scratch (crops, annotated images, run manifests)
 .dsh-vision-router/
+
+# python bytecode from the atlas data-build scripts
+__pycache__/
+*.pyc
