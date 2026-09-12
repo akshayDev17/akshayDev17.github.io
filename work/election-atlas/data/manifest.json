@@ -43,7 +43,11 @@
     "ls": {
       "label": "Lok Sabha",
       "level": "state",
-      "years": []
+      "years": [
+        2014,
+        2019,
+        2024
+      ]
     },
     "ac": {
       "label": "Legislative Assembly",

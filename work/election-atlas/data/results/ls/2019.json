@@ -1,0 +1,737 @@
+{
+ "schema": 1,
+ "election": "ls",
+ "year": 2019,
+ "regions": {
+  "IN-AP": {
+   "seats": 25,
+   "parties": [
+    {
+     "code": "TDP",
+     "seats": 15,
+     "votes": 62.0
+    },
+    {
+     "code": "YSRCP",
+     "seats": 6,
+     "votes": 34.9
+    },
+    {
+     "code": "BJP",
+     "seats": 2,
+     "votes": 11.8
+    },
+    {
+     "code": "INC",
+     "seats": 2,
+     "votes": 11.0
+    }
+   ]
+  },
+  "IN-AR": {
+   "seats": 2,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 57.8
+    },
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 54.2
+    }
+   ]
+  },
+  "IN-AS": {
+   "seats": 14,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 9,
+     "votes": 62.0
+    },
+    {
+     "code": "INC",
+     "seats": 4,
+     "votes": 37.4
+    },
+    {
+     "code": "IND",
+     "seats": 1,
+     "votes": 11.6
+    }
+   ]
+  },
+  "IN-BR": {
+   "seats": 40,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 16,
+     "votes": 46.7
+    },
+    {
+     "code": "RJD",
+     "seats": 11,
+     "votes": 32.2
+    },
+    {
+     "code": "JDU",
+     "seats": 8,
+     "votes": 25.2
+    },
+    {
+     "code": "INC",
+     "seats": 3,
+     "votes": 11.1
+    },
+    {
+     "code": "IND",
+     "seats": 2,
+     "votes": 9.4
+    }
+   ]
+  },
+  "IN-CT": {
+   "seats": 11,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 6,
+     "votes": 60.5
+    },
+    {
+     "code": "INC",
+     "seats": 3,
+     "votes": 34.5
+    },
+    {
+     "code": "BSP",
+     "seats": 1,
+     "votes": 12.9
+    },
+    {
+     "code": "IND",
+     "seats": 1,
+     "votes": 15.9
+    }
+   ]
+  },
+  "IN-GA": {
+   "seats": 2,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 61.1
+    },
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 57.1
+    }
+   ]
+  },
+  "IN-GJ": {
+   "seats": 26,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 13,
+     "votes": 57.6
+    },
+    {
+     "code": "INC",
+     "seats": 8,
+     "votes": 41.5
+    },
+    {
+     "code": "IND",
+     "seats": 3,
+     "votes": 19.0
+    },
+    {
+     "code": "BSP",
+     "seats": 2,
+     "votes": 12.8
+    }
+   ]
+  },
+  "IN-HR": {
+   "seats": 10,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 5,
+     "votes": 58.8
+    },
+    {
+     "code": "INC",
+     "seats": 3,
+     "votes": 33.0
+    },
+    {
+     "code": "BSP",
+     "seats": 1,
+     "votes": 17.2
+    },
+    {
+     "code": "IND",
+     "seats": 1,
+     "votes": 15.4
+    }
+   ]
+  },
+  "IN-HP": {
+   "seats": 4,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 2,
+     "votes": 52.1
+    },
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 33.7
+    },
+    {
+     "code": "IND",
+     "seats": 1,
+     "votes": 30.2
+    }
+   ]
+  },
+  "IN-JH": {
+   "seats": 14,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 6,
+     "votes": 52.5
+    },
+    {
+     "code": "INC",
+     "seats": 4,
+     "votes": 34.0
+    },
+    {
+     "code": "JMM",
+     "seats": 3,
+     "votes": 30.2
+    },
+    {
+     "code": "IND",
+     "seats": 1,
+     "votes": 12.9
+    }
+   ]
+  },
+  "IN-KA": {
+   "seats": 28,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 13,
+     "votes": 56.0
+    },
+    {
+     "code": "INC",
+     "seats": 10,
+     "votes": 47.3
+    },
+    {
+     "code": "IND",
+     "seats": 3,
+     "votes": 14.0
+    },
+    {
+     "code": "BSP",
+     "seats": 2,
+     "votes": 10.0
+    }
+   ]
+  },
+  "IN-KL": {
+   "seats": 20,
+   "parties": [
+    {
+     "code": "CPM",
+     "seats": 7,
+     "votes": 45.5
+    },
+    {
+     "code": "INC",
+     "seats": 7,
+     "votes": 37.5
+    },
+    {
+     "code": "BJP",
+     "seats": 3,
+     "votes": 21.3
+    },
+    {
+     "code": "IND",
+     "seats": 3,
+     "votes": 21.9
+    }
+   ]
+  },
+  "IN-MP": {
+   "seats": 29,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 14,
+     "votes": 48.6
+    },
+    {
+     "code": "INC",
+     "seats": 9,
+     "votes": 37.2
+    },
+    {
+     "code": "BSP",
+     "seats": 3,
+     "votes": 16.3
+    },
+    {
+     "code": "IND",
+     "seats": 3,
+     "votes": 16.4
+    }
+   ]
+  },
+  "IN-MH": {
+   "seats": 48,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 16,
+     "votes": 45.3
+    },
+    {
+     "code": "INC",
+     "seats": 11,
+     "votes": 29.6
+    },
+    {
+     "code": "SHS",
+     "seats": 9,
+     "votes": 24.7
+    },
+    {
+     "code": "NCP",
+     "seats": 8,
+     "votes": 23.7
+    },
+    {
+     "code": "IND",
+     "seats": 4,
+     "votes": 14.6
+    }
+   ]
+  },
+  "IN-MN": {
+   "seats": 2,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 56.3
+    },
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 57.3
+    }
+   ]
+  },
+  "IN-ML": {
+   "seats": 2,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 58.1
+    },
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 56.4
+    }
+   ]
+  },
+  "IN-MZ": {
+   "seats": 1,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 62.0
+    }
+   ]
+  },
+  "IN-NL": {
+   "seats": 1,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 62.0
+    }
+   ]
+  },
+  "IN-OD": {
+   "seats": 21,
+   "parties": [
+    {
+     "code": "BJD",
+     "seats": 9,
+     "votes": 56.7
+    },
+    {
+     "code": "BJP",
+     "seats": 9,
+     "votes": 47.0
+    },
+    {
+     "code": "INC",
+     "seats": 2,
+     "votes": 15.6
+    },
+    {
+     "code": "IND",
+     "seats": 1,
+     "votes": 9.2
+    }
+   ]
+  },
+  "IN-PB": {
+   "seats": 13,
+   "parties": [
+    {
+     "code": "AAP",
+     "seats": 4,
+     "votes": 38.1
+    },
+    {
+     "code": "INC",
+     "seats": 4,
+     "votes": 33.0
+    },
+    {
+     "code": "BJP",
+     "seats": 2,
+     "votes": 24.6
+    },
+    {
+     "code": "IND",
+     "seats": 2,
+     "votes": 20.5
+    },
+    {
+     "code": "SHS",
+     "seats": 1,
+     "votes": 11.1
+    }
+   ]
+  },
+  "IN-RJ": {
+   "seats": 25,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 13,
+     "votes": 52.3
+    },
+    {
+     "code": "INC",
+     "seats": 8,
+     "votes": 42.6
+    },
+    {
+     "code": "BSP",
+     "seats": 2,
+     "votes": 14.3
+    },
+    {
+     "code": "IND",
+     "seats": 2,
+     "votes": 12.4
+    }
+   ]
+  },
+  "IN-SK": {
+   "seats": 1,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 62.0
+    }
+   ]
+  },
+  "IN-TN": {
+   "seats": 39,
+   "parties": [
+    {
+     "code": "DMK",
+     "seats": 19,
+     "votes": 50.7
+    },
+    {
+     "code": "AIADMK",
+     "seats": 10,
+     "votes": 33.2
+    },
+    {
+     "code": "INC",
+     "seats": 4,
+     "votes": 13.5
+    },
+    {
+     "code": "BJP",
+     "seats": 3,
+     "votes": 13.9
+    },
+    {
+     "code": "IND",
+     "seats": 3,
+     "votes": 11.2
+    }
+   ]
+  },
+  "IN-TG": {
+   "seats": 17,
+   "parties": [
+    {
+     "code": "INC",
+     "seats": 7,
+     "votes": 48.4
+    },
+    {
+     "code": "BRS",
+     "seats": 5,
+     "votes": 39.2
+    },
+    {
+     "code": "BJP",
+     "seats": 3,
+     "votes": 22.7
+    },
+    {
+     "code": "AIMIM",
+     "seats": 2,
+     "votes": 15.6
+    }
+   ]
+  },
+  "IN-TR": {
+   "seats": 2,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 61.3
+    },
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 51.2
+    }
+   ]
+  },
+  "IN-UP": {
+   "seats": 80,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 35,
+     "votes": 44.6
+    },
+    {
+     "code": "SP",
+     "seats": 24,
+     "votes": 35.0
+    },
+    {
+     "code": "INC",
+     "seats": 6,
+     "votes": 13.5
+    },
+    {
+     "code": "IND",
+     "seats": 6,
+     "votes": 12.2
+    },
+    {
+     "code": "BSP",
+     "seats": 5,
+     "votes": 10.5
+    },
+    {
+     "code": "RJD",
+     "seats": 4,
+     "votes": 7.7
+    }
+   ]
+  },
+  "IN-UT": {
+   "seats": 5,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 2,
+     "votes": 51.6
+    },
+    {
+     "code": "INC",
+     "seats": 2,
+     "votes": 49.3
+    },
+    {
+     "code": "IND",
+     "seats": 1,
+     "votes": 27.2
+    }
+   ]
+  },
+  "IN-WB": {
+   "seats": 42,
+   "parties": [
+    {
+     "code": "AITC",
+     "seats": 20,
+     "votes": 59.8
+    },
+    {
+     "code": "BJP",
+     "seats": 16,
+     "votes": 46.1
+    },
+    {
+     "code": "INC",
+     "seats": 3,
+     "votes": 10.6
+    },
+    {
+     "code": "CPM",
+     "seats": 2,
+     "votes": 7.6
+    },
+    {
+     "code": "IND",
+     "seats": 1,
+     "votes": 5.2
+    }
+   ]
+  },
+  "IN-AN": {
+   "seats": 1,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 62.0
+    }
+   ]
+  },
+  "IN-CH": {
+   "seats": 1,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 62.0
+    }
+   ]
+  },
+  "IN-DH": {
+   "seats": 2,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 49.0
+    },
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 53.0
+    }
+   ]
+  },
+  "IN-DL": {
+   "seats": 7,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 5,
+     "votes": 62.0
+    },
+    {
+     "code": "AAP",
+     "seats": 1,
+     "votes": 20.0
+    },
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 19.0
+    }
+   ]
+  },
+  "IN-JK": {
+   "seats": 5,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 2,
+     "votes": 50.6
+    },
+    {
+     "code": "IND",
+     "seats": 2,
+     "votes": 43.4
+    },
+    {
+     "code": "INC",
+     "seats": 1,
+     "votes": 29.7
+    }
+   ]
+  },
+  "IN-LA": {
+   "seats": 1,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 62.0
+    }
+   ]
+  },
+  "IN-LD": {
+   "seats": 1,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 62.0
+    }
+   ]
+  },
+  "IN-PY": {
+   "seats": 1,
+   "parties": [
+    {
+     "code": "BJP",
+     "seats": 1,
+     "votes": 62.0
+    }
+   ]
+  }
+ }
+}
