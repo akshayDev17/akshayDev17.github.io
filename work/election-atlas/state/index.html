@@ -103,8 +103,21 @@ h1{margin:0;font-weight:400}
 #map-ac .ac{stroke:var(--paper);stroke-width:.5;stroke-linejoin:round}
 .panels.ready .ac,.panels.ready .pc{transition:fill .22s var(--ease)}
 .panel .edge{fill:none;stroke:var(--ink);stroke-width:1.1;stroke-linejoin:round;pointer-events:none}
-.pc:focus-visible,.ac:focus-visible{outline:none}
-.marked{stroke:var(--ink);stroke-width:2.4;stroke-opacity:1}
+/* A click focuses the shape, and :focus-visible deliberately does NOT match
+   after a click — so matching only :focus-visible missed the case a reader
+   actually hits, and the browser's own 5px `auto` outline drew a rectangle
+   around the shape in the OS accent colour. This page does not draw it.
+   Removing it costs no keyboard user anything: the focused shape is marked at
+   2.4px in --ink, it is the one region the scrim does not wash, and it lifts
+   off the plane on a cast shadow.
+   A click landing between shapes focuses the <svg> root instead and draws the
+   same ring around the whole map. Neither root is a tab stop, so nothing is
+   lost there either. */
+#map-pc,#map-ac,.pc:focus,.ac:focus{outline:none}
+/* Scoped by id on purpose: `#map-pc .pc` / `#map-ac .ac` carry an id and so
+   outrank a bare `.marked`, which meant this rule never applied and the focused
+   shape kept its paper hairline instead of taking an ink outline. */
+#map-pc .pc.marked,#map-ac .ac.marked{stroke:var(--ink);stroke-width:2.4;stroke-opacity:1}
 .panels.ready .marked{transition:stroke-width .16s var(--ease)}
 .scrim,.lift{pointer-events:none}
 .panels.ready .scrim,.panels.ready .lift{transition:opacity .24s var(--ease)}
