@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lok Sabha, state by state — Election Atlas of India</title>
+<title>Election Atlas of India</title>
 <meta name="description" content="Every state and union territory coloured by the party that won the most seats there, with the 543 seats drawn against the 272 that make a majority. 2014, 2019 and 2024.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -64,20 +64,16 @@ main{padding:0 var(--pad)}
 .year:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:2px}
 .year[disabled]{opacity:.4;cursor:default}
 
-/* ── field: map beside the reading column ─────────────────────────────── */
-.field{
-  display:grid;gap:clamp(1.75rem,4vw,3.5rem);
-  grid-template-columns:1fr;
-  padding:var(--s5) 0 clamp(1.5rem,3vw,2.5rem);
-}
+/* ── the plate ────────────────────────────────────────────────────────── */
+.field{padding:clamp(1rem,3vw,2.5rem) 0 clamp(2rem,5vw,4rem)}
 .mapfig{margin:0;min-width:0}
 #map{
-  display:block;width:100%;height:auto;overflow:visible;
+  display:block;margin:0 auto;height:auto;overflow:visible;
   /* India's projected ink is 410x438. Declaring that as the intrinsic ratio, and
      capping only the WIDTH, means the height always follows from the width — the
      map can never be letterboxed inside its own box, at any breakpoint. */
   aspect-ratio:410 / 438;
-  max-width:calc(clamp(20rem,58vh,34rem) * .9361);
+  max-width:calc(clamp(20rem,74vh,46rem) * .9361);
 }
 #map path{
   stroke:var(--paper);stroke-width:.75;stroke-linejoin:round;
@@ -92,71 +88,10 @@ main{padding:0 var(--pad)}
   fill:var(--ink);paint-order:stroke fill;stroke:var(--paper);stroke-width:3px;
   stroke-linejoin:round;pointer-events:none;text-anchor:middle;
 }
-.mapnote{margin-top:var(--s3);max-width:44ch}
-
-.side{min-width:0;display:grid;gap:var(--s5);align-content:start}
-.lede{max-width:34ch;color:var(--muted);margin-top:var(--s3)}
-
-/* ── readout ──────────────────────────────────────────────────────────── */
-.readout{border-top:1px solid var(--rule-2);padding-top:var(--s4);display:grid;gap:var(--s4)}
-.ro-top{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--s4)}
-.ro-eyebrow{font-family:var(--mono);font-size:.625rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
-.ro-name{font-size:1.5rem;line-height:1.15;letter-spacing:-.012em;margin-top:2px}
-.ro-flag{flex-shrink:0;display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.75rem;letter-spacing:.04em}
-.ro-flag .sw{width:10px;height:10px;border-radius:2px;background:var(--c);box-shadow:inset 0 0 0 1px rgba(15,18,32,.18)}
-.ro-meta{font-family:var(--mono);font-size:.75rem;line-height:1.6;color:var(--muted);letter-spacing:.01em}
-
-.ro-bar{display:flex;gap:2px;height:10px}
-.ro-bar i{display:block;border-radius:1px;background:var(--c)}
-
-.ro-body{display:grid;gap:var(--s5);grid-template-columns:minmax(0,1fr)}
-.ro-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s3);margin:0}
-.ro-stats div{display:grid;gap:2px;min-width:0}
-.ro-stats dt{font-family:var(--mono);font-size:.5625rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-.ro-stats dd{margin:0;font-family:var(--mono);font-size:.9375rem;line-height:1.2}
-
-.ro-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.75rem}
-.ro-table th{
-  font-weight:400;font-size:.5625rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
-  text-align:right;padding:0 0 6px;
-}
-.ro-table th:first-child{text-align:left}
-.ro-table td{padding:5px 0;border-top:1px solid var(--rule);text-align:right;font-variant-numeric:tabular-nums}
-.ro-table td:first-child{text-align:left;display:flex;align-items:center;gap:7px}
-.ro-table .sw{width:9px;height:9px;border-radius:2px;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(15,18,32,.18)}
-.ro-table tr.is-lead td{font-weight:500}
-.ro-table .trunc{color:var(--muted)}
-
-/* ── the 543-seat strip ───────────────────────────────────────────────── */
-.stripsection{padding:clamp(1.25rem,2.6vw,2rem) 0 0}
-.strip-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s5);padding:0 var(--pad);flex-wrap:wrap}
-.runlabels{position:relative;height:15px;margin:var(--s4) 0 6px}
-.runlabels span{
-  position:absolute;top:0;font-family:var(--mono);font-size:.625rem;letter-spacing:.08em;
-  color:var(--muted);text-align:center;white-space:nowrap;transform:translateX(-50%);
-}
-.strip{position:relative;display:flex;gap:6px;height:clamp(3rem,7vw,4.5rem);align-items:stretch}
-.run{display:flex;gap:1px;min-width:0}
-.rg{
-  display:block;min-width:0;background:var(--c);
-  /* No border-radius here on purpose. A 1px radius is invisible on a 77px block
-     and destroys a 2px one: at 390px a seat is 0.68px wide, so most blocks in the
-     tail are 1-5px and rounding them turned 42% of the mobile bar into
-     anti-aliased edge. Rounded corners are for boxes that can afford them. */
-  transition:background .22s var(--ease),opacity .16s var(--ease)}
-.rg.is-active{opacity:1;box-shadow:0 0 0 1.5px var(--ink)}
-/* Seat-level hairlines only where a seat is genuinely wide enough to be seen as
-   one. Below this the texture would be a dither, so it is not drawn at all. */
-@media (min-width:2100px){
-  .rg{background-image:linear-gradient(to right,transparent calc(100% - 1px),var(--paper) 0);
-      background-size:calc(100% / var(--seats)) 100%}
-}
-.majline{position:absolute;top:-7px;bottom:-7px;width:1px;background:var(--ink);pointer-events:none}
-.majline::before{
-  content:"";position:absolute;top:0;left:-4px;width:9px;height:1px;background:var(--ink);
-}
-.axis{position:relative;height:1.15rem;margin-top:7px}
-.axis span{position:absolute;top:0;font-family:var(--mono);font-size:.625rem;color:var(--muted);white-space:nowrap}
+/* The note is a status line, not a caption: it holds the message when a year has
+   no result file, and takes no space at all the rest of the time. */
+.mapnote{margin-top:var(--s4);text-align:center}
+.mapnote:empty{display:none}
 
 /* ── footer ───────────────────────────────────────────────────────────── */
 .foot{padding:var(--s6) var(--pad) var(--s7);font-family:var(--mono);font-size:.6875rem;line-height:1.75;color:var(--muted)}
@@ -168,46 +103,15 @@ main{padding:0 var(--pad)}
 .foot-grid dt{letter-spacing:.11em;text-transform:uppercase;font-size:.5625rem;color:var(--ink);opacity:.7}
 .foot-grid dd{margin:6px 0 0}
 .foot-links{max-width:none}
-.msg{padding:var(--s6) 0;font-family:var(--mono);font-size:.8125rem;color:var(--muted)}
 
 /* ── responsive ───────────────────────────────────────────────────────── */
-@media (min-width:60rem){
-  /* 27rem is not arbitrary: India's projected ink is 410x438, so at the map's
-     450px height it is 422px wide. A wider column does not make the map
-     bigger, it only puts dead space beside it. */
-  .field{grid-template-columns:minmax(0,28.5rem) minmax(0,1fr);align-items:start}
-}
-@media (min-width:72rem){
-  /* Widen the readout rather than stretch a three-column table across it: the
-     totals go in a narrow column of their own and the table keeps a
-     comfortable measure beside them. This is also what brings the whole
-     instrument back above the fold — the stacked readout was taller than the
-     map and the strip paid for it. */
-  .ro-body{grid-template-columns:13rem minmax(0,1fr);gap:var(--s6)}
-  .ro-stats{grid-template-columns:minmax(0,1fr);gap:var(--s4)}
-}
-@media (max-width:59.99rem){
-  /* Narrow, the two-column grid collapses — and in source order that would put
-     the map above its own headline. display:contents lifts the intro and the
-     readout out of the side column so the stack can be reordered. */
-  .side{display:contents}
-  .intro{order:1}
-  .mapfig{order:2}
-  .readout{order:3}
-  .side{gap:var(--s5)}
-  /* Narrow: the state split stops being legible long before the party split
-     does, so the strip keeps the party structure and drops the subdivisions
-     rather than keeping both at a size where neither reads. */
-  .strip{gap:1px;height:3.25rem}
-  .run{gap:0}
-  .runlabels{display:none}
-}
 @media (max-width:44rem){
+  /* Below a 400px-wide map the label pass drops every label anyway, so this
+     states an intent the geometry already enforces. */
   #map text{display:none}
-  .ro-stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s2)}
 }
 @media (prefers-reduced-motion:reduce){
-  #map path,.rg,.year{transition:none}
+  #map path,.year{transition:none}
 }
 </style>
 </head>
@@ -224,31 +128,11 @@ main{padding:0 var(--pad)}
   <section class="field">
     <figure class="mapfig">
       <svg id="map" viewBox="0 0 410 438" preserveAspectRatio="xMidYMid meet"
-           role="img" aria-label="Map of India; each state and union territory filled with the colour of the party that won the most seats there."></svg>
-      <p class="lbl mapnote" id="mapnote">Point at or tab through a state to read it. Click to hold it.</p>
+           role="group" aria-label="Map of India. Each state and union territory is filled with the colour of the party that won the most seats there."></svg>
+      <p class="lbl mapnote" id="mapnote" role="status"></p>
     </figure>
-
-    <div class="side">
-      <div class="intro">
-        <h1>Lok Sabha, state by state</h1>
-        <p class="lede">Every state and union territory, coloured by the party that won the most seats there. 543 seats; 272 for a majority.</p>
-      </div>
-
-      <aside class="readout" id="readout" aria-live="polite" aria-atomic="true">
-        <p class="msg">Reading the atlas…</p>
-      </aside>
-    </div>
   </section>
 </main>
-
-<section class="stripsection">
-  <div class="strip-head">
-    <p class="lbl">All 543 seats, grouped by the party that won them and split by state</p>
-  </div>
-  <div class="runlabels" id="runlabels"></div>
-  <div class="strip" id="strip"></div>
-  <div class="axis" id="axis"></div>
-</section>
 
 <footer class="foot">
   <dl class="foot-grid">
@@ -258,28 +142,25 @@ main{padding:0 var(--pad)}
     </div>
     <div>
       <dt>Not real</dt>
-      <dd>Which party won anything. The party-level seat splits, and every vote and elector figure, are placeholders. They are internally consistent, but they are not the published result — so the map's colours and every share on this page are illustrative, not fact.</dd>
+      <dd>Which party won anything. The party-level seat splits, and every vote and elector figure, are placeholders: internally consistent, but not the published result. The colours on this map are therefore illustrative, not fact.</dd>
     </div>
     <div>
       <dt>Derived, not stored</dt>
-      <dd>Result files hold absolute counts only. Every percentage, every leading party and the position of the majority line are computed in the browser as the page loads.</dd>
+      <dd>Result files hold absolute counts only. Which party leads each state — the one thing the map is coloured by — is computed in the browser as the page loads.</dd>
     </div>
     <div>
       <dt>Boundaries</dt>
       <dd>The geometry predates the 2019 reorganisation: Ladakh has no polygon, and Dadra and Nagar Haveli and Daman and Diu are still separate regions. A post-2019 source is needed before publication.</dd>
     </div>
   </dl>
-  <p class="foot-links"><a href="/">← Akshay Prabhakant</a> · <a href="/work/election-atlas/data/manifest.json">manifest</a> · <a href="/work/election-atlas/data/parties.json">party registry</a> · vendored: d3-geo, topojson-client (ISC)</p>
+  <p class="foot-links"><a href="/">← Akshay Prabhakant</a></p>
 </footer>
 
 <script type="module">
-const MAJORITY = 272;           // 543 / 2, rounded up
 const LABEL_FROM = 15;          // seats above which a state earns a map label
 
 const $ = (s, r = document) => r.querySelector(s);
 const el = (tag, cls) => { const n = document.createElement(tag); if (cls) n.className = cls; return n; };
-const fmt = n => Math.round(n).toLocaleString('en-IN');
-const pct = n => (n * 100).toFixed(1) + '%';
 
 let geo, topojson;
 try {
@@ -288,12 +169,11 @@ try {
     import('./vendor/topojson-client.js'),
   ]);
 } catch (err) {
-  $('#readout').innerHTML = '<p class="msg">The map library could not be loaded, so the atlas cannot draw. Everything else on this page is static.</p>';
+  $('#mapnote').textContent = 'The map library could not be loaded, so the atlas cannot draw.';
   throw err;
 }
 
-const mapEl = $('#map'), stripEl = $('#strip'), readoutEl = $('#readout');
-const runLabelsEl = $('#runlabels'), axisEl = $('#axis'), yearsEl = $('#years');
+const mapEl = $('#map'), noteEl = $('#mapnote'), yearsEl = $('#years');
 
 /* ── load the fixed vocabularies and the geometry ──────────────────────── */
 const [manifest, regionsDoc, partiesDoc, topo] = await Promise.all([
@@ -319,40 +199,13 @@ const keyField = level.geometryKey;
 /* ── derive, never store ──────────────────────────────────────────────── */
 // Every number below is computed from the absolute counts in the result file.
 // The files carry no percentages and no leader, deliberately.
-function summarise(parties) {
-  const polled = parties.reduce((n, p) => n + p.votes, 0);
-  const seats = parties.reduce((n, p) => n + p.seats, 0);
-  const ranked = [...parties].sort((a, b) => b.seats - a.seats || b.votes - a.votes);
-  return {
-    polled, seats, ranked,
-    lead: ranked[0],
-    // share of the votes actually cast in this region
-    voteShare: c => polled ? (c / polled) : 0,
-  };
-}
 
-function nationalOf(year) {
-  const parties = new Map();
-  let seats = 0, electors = 0, polled = 0, regions = 0;
-  for (const r of Object.values(year.regions)) {
-    seats += r.seats; electors += r.electors; regions++;
-    for (const p of r.parties) {
-      polled += p.votes;
-      const acc = parties.get(p.code) || { code: p.code, seats: 0, votes: 0 };
-      acc.seats += p.seats; acc.votes += p.votes;
-      parties.set(p.code, acc);
-    }
-  }
-  const ranked = [...parties.values()].sort((a, b) => b.seats - a.seats || b.votes - a.votes);
-  return { seats, electors, polled, regions, ranked, turnout: electors ? polled / electors : 0 };
-}
 
 /* ── the map ──────────────────────────────────────────────────────────── */
 /* code -> [path]. An array, not a single path: two geometries can resolve to
    one region — Dadra and Nagar Haveli and Daman and Diu are still separate
    features in this pre-2019 source — and both must take IN-DH's colour. */
 const paths = new Map();
-const seatBlocks = new Map();// region code -> strip block
 
 let projection, pathGen;
 function drawMap() {
@@ -444,52 +297,12 @@ function drawLabels() {
   }
 }
 
-/* ── the strip ────────────────────────────────────────────────────────── */
-/* A seat bar, not a state bar. Every one of the 543 seats is drawn once:
-   grouped by the party that won it, and inside a party by the state it was
-   won in. That is what makes the run labels honest — "BJP 211" here is the
-   same 211 the readout reports. Grouping by the party each state *leads*
-   would let a run read "BJP 387" beside a readout saying 211, and a reader
-   has no way to tell that the two numbers count different things. */
-let stripTotal = 0;
-function buildStrip(year) {
-  const parties = new Map();
-  for (const [code, r] of Object.entries(year.regions)) {
-    for (const p of r.parties) {
-      if (p.seats <= 0) continue;
-      const g = parties.get(p.code) || { code: p.code, seats: 0, blocks: [] };
-      g.seats += p.seats;
-      g.blocks.push({ region: code, seats: p.seats });
-      parties.set(p.code, g);
-    }
-  }
-  const runs = [...parties.values()]
-    .sort((a, b) => b.seats - a.seats)
-    .map(g => ({ ...g, colour: partyColour(g.code) }));
-  stripTotal = runs.reduce((n, g) => n + g.seats, 0);
 
-  stripEl.textContent = '';
-  seatBlocks.clear();
-  for (const g of runs) {
-    const run = el('div', 'run');
-    run.dataset.party = g.code;
-    run.dataset.seats = g.seats;
-    run.style.flexGrow = g.seats;
-    for (const b of g.blocks.sort((a, b) => b.seats - a.seats)) {
-      const blk = el('div', 'rg');
-      blk.dataset.region = b.region;
-      blk.dataset.party = g.code;
-      blk.dataset.seats = b.seats;
-      blk.style.setProperty('--c', g.colour);
-      blk.style.setProperty('--seats', b.seats);
-      blk.style.flexGrow = b.seats;
-      run.appendChild(blk);
-      if (!seatBlocks.has(b.region)) seatBlocks.set(b.region, []);
-      seatBlocks.get(b.region).push(blk);
-    }
-    stripEl.appendChild(run);
-  }
-  measureStrip();
+/* The leading party is derived, never stored: result files carry absolute seat
+   and vote counts and nothing else, so "who leads here" is computed on read. */
+function leaderOf(parties) {
+  return parties.reduce((a, b) =>
+    (b.seats > a.seats || (b.seats === a.seats && b.votes > a.votes)) ? b : a);
 }
 
 /* Colour comes from the loaded year, and has to be re-applied every time the
@@ -499,7 +312,7 @@ function applyFills() {
   if (!currentYear) return;
   for (const [code, list] of paths) {
     const r = currentYear.regions[code];
-    const lead = r && summarise(r.parties).lead;
+    const lead = r && leaderOf(r.parties);
     const label = r
       ? `${regionByCode.get(code).name}, ${r.seats} seats. ${partyName(lead.code)} wins ${lead.seats}.`
       : `${(regionByCode.get(code) || {}).name || code}, no result for this year`;
@@ -512,182 +325,19 @@ function applyFills() {
   }
 }
 
-/* Position the majority line and the run labels from the measured DOM rather
-   than from arithmetic on percentages: the inter-state gaps are real width, so
-   the 272nd seat is not at 272/543 of the bar. */
-function measureStrip() {
-  const stripRect = stripEl.getBoundingClientRect();
-  const W = stripRect.width;
 
-  runLabelsEl.textContent = '';
-  for (const run of stripEl.children) {
-    const seats = +run.dataset.seats;
-    if (run.offsetWidth < 76) continue;
-    const s = el('span');
-    s.textContent = `${run.dataset.party} ${fmt(seats)}`;
-    s.style.left = (run.offsetLeft + run.offsetWidth / 2) + 'px';
-    runLabelsEl.appendChild(s);
-  }
-
-  let cum = 0, lineX = null;
-  for (const b of stripEl.querySelectorAll('.rg')) {
-    const s = +b.dataset.seats;
-    if (lineX === null && cum + s >= MAJORITY) {
-      lineX = b.offsetLeft + ((MAJORITY - cum) / s) * b.offsetWidth;
-    }
-    cum += s;
-  }
-
-  const old = stripEl.querySelector('.majline');
-  if (old) old.remove();
-  if (lineX !== null) {
-    const line = el('div', 'majline');
-    line.style.left = lineX.toFixed(2) + 'px';
-    stripEl.appendChild(line);
-  }
-
-  axisEl.textContent = '';
-  const mk = (x, text, align) => {
-    const s = el('span'); s.textContent = text; s.style.left = x + 'px';
-    if (align === 'end') s.style.transform = 'translateX(-100%)';
-    if (align === 'mid') s.style.transform = 'translateX(-50%)';
-    return s;
-  };
-  axisEl.appendChild(mk(0, '0'));
-  if (lineX !== null) axisEl.appendChild(mk(lineX, `${MAJORITY} — a majority`, 'mid'));
-  axisEl.appendChild(mk(W, fmt(stripTotal), 'end'));
-}
-
-/* ── the readout ──────────────────────────────────────────────────────── */
-function barFor(rows, total) {
-  const bar = el('div', 'ro-bar');
-  for (const r of rows) {
-    const i = el('i');
-    i.style.flexGrow = r.seats;
-    i.style.setProperty('--c', r.colour);
-    if (r.seats === 0) i.style.display = 'none';
-    bar.appendChild(i);
-  }
-  bar.setAttribute('role', 'img');
-  bar.setAttribute('aria-label', rows.map(r => `${r.code} ${r.seats}`).join(', '));
-  return bar;
-}
-
-const MAX_ROWS = 6;
-function tableFor(rows, share) {
-  const t = el('table', 'ro-table');
-  t.innerHTML = '<thead><tr><th>Party</th><th>Seats</th><th>Vote</th></tr></thead>';
-  const tb = el('tbody');
-  const shown = rows.filter(r => r.seats > 0 || r.votes > 0).slice(0, MAX_ROWS);
-  const rest = rows.slice(MAX_ROWS);
-  for (const r of shown) {
-    const tr = el('tr');
-    if (r.isLead) tr.className = 'is-lead';
-    const td = el('td');
-    const sw = el('i', 'sw'); sw.style.setProperty('--c', r.colour);
-    td.appendChild(sw);
-    td.appendChild(document.createTextNode(r.code));
-    tr.appendChild(td);
-    tr.insertAdjacentHTML('beforeend',
-      `<td>${fmt(r.seats)}</td><td>${pct(share(r.votes))}</td>`);
-    tb.appendChild(tr);
-  }
-  if (rest.length) {
-    const seats = rest.reduce((n, r) => n + r.seats, 0);
-    const votes = rest.reduce((n, r) => n + r.votes, 0);
-    tb.insertAdjacentHTML('beforeend',
-      `<tr class="trunc"><td colspan="1">+${rest.length} more</td><td>${fmt(seats)}</td><td>${pct(share(votes))}</td></tr>`);
-  }
-  t.appendChild(tb);
-  return t;
-}
-
-function statsFor(pairs) {
-  const dl = el('dl', 'ro-stats');
-  for (const [k, v] of pairs) {
-    const d = el('div');
-    d.innerHTML = `<dt>${k}</dt><dd>${v}</dd>`;
-    dl.appendChild(d);
-  }
-  return dl;
-}
-
-function renderNational(year) {
-  const n = nationalOf(year);
-  const rows = n.ranked.map(p => ({
-    code: p.code, seats: p.seats, votes: p.votes, colour: partyColour(p.code), isLead: false,
-  }));
-  const share = v => n.polled ? v / n.polled : 0;
-
-  const lead = n.ranked[0];
-  readoutEl.textContent = '';
-  readoutEl.insertAdjacentHTML('beforeend', `
-    <div class="ro-top">
-      <div>
-        <p class="ro-eyebrow">India · ${year.year}</p>
-        <p class="ro-name">${fmt(n.seats)} seats</p>
-      </div>
-      <p class="ro-flag"><span class="sw" style="--c:${partyColour(lead.code)}"></span>${lead.code} ${fmt(lead.seats)}</p>
-    </div>
-    <p class="ro-meta">${lead.seats >= MAJORITY
-      ? `${lead.code} clears the ${MAJORITY}-seat majority on its own`
-      : `${lead.code} is ${fmt(MAJORITY - lead.seats)} short of a majority`} · ${n.regions} states and union territories</p>
-  `);
-  readoutEl.appendChild(barFor(rows, n.seats));
-  const nBody = el('div', 'ro-body');
-  nBody.appendChild(statsFor([
-    ['Turnout', pct(n.turnout)],
-    ['Votes polled', fmt(n.polled)],
-    ['Electors', fmt(n.electors)],
-  ]));
-  nBody.appendChild(tableFor(rows, share));
-  readoutEl.appendChild(nBody);
-}
-
-function renderRegion(year, code) {
-  const r = year.regions[code];
-  const region = regionByCode.get(code);
-  const s = summarise(r.parties);
-  const share = v => s.polled ? v / s.polled : 0;
-  const rows = s.ranked.map(p => ({
-    code: p.code, seats: p.seats, votes: p.votes, colour: partyColour(p.code), isLead: p === s.lead,
-  }));
-  const otherSeats = r.seats - s.seats;
-
-  readoutEl.textContent = '';
-  readoutEl.insertAdjacentHTML('beforeend', `
-    <div class="ro-top">
-      <div>
-        <p class="ro-eyebrow">${region.type === 'ut' ? 'Union territory' : 'State'} · ${code.slice(3)} · ${year.year}</p>
-        <p class="ro-name">${region.name}</p>
-      </div>
-      <p class="ro-flag"><span class="sw" style="--c:${partyColour(s.lead.code)}"></span>${s.lead.code}</p>
-    </div>
-    <p class="ro-meta">${fmt(s.lead.seats)} of ${fmt(r.seats)} seats · ${pct(s.lead.seats / r.seats)} of the state${otherSeats > 0 ? ` · ${fmt(otherSeats)} seat${otherSeats === 1 ? '' : 's'} unaccounted for` : ''}</p>
-  `);
-  readoutEl.appendChild(barFor(rows, r.seats));
-  const rBody = el('div', 'ro-body');
-  rBody.appendChild(statsFor([
-    ['Turnout', pct(s.polled / r.electors)],
-    ['Votes polled', fmt(s.polled)],
-    ['Electors', fmt(r.electors)],
-  ]));
-  rBody.appendChild(tableFor(rows, share));
-  readoutEl.appendChild(rBody);
-}
 
 /* ── interaction ──────────────────────────────────────────────────────── */
 let currentYear = null, pinned = null, hovered = null;
 
 function activeCode() { return pinned || hovered; }
 
+/* Highlight only. There is no reading panel on this page: the figures a state
+   carries belong to the drill-down, and a label here would be a second, worse
+   copy of them. */
 function paintActive() {
   const code = activeCode();
   for (const [c, list] of paths) for (const p of list) p.classList.toggle('is-active', c === code);
-  for (const [c, list] of seatBlocks) for (const b of list) b.classList.toggle('is-active', c === code);
-  if (!currentYear) return;
-  if (code) renderRegion(currentYear, code);
-  else renderNational(currentYear);
 }
 
 function setHover(code) { if (hovered === code) return; hovered = code; paintActive(); }
@@ -708,18 +358,8 @@ function bindRegionEvents() {
     const c = regionOf(e);
     if (c && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); togglePin(c); }
   });
-  stripEl.addEventListener('pointerover', e => {
-    const b = e.target.closest('.rg'); if (b) setHover(b.dataset.region);
-  });
-  stripEl.addEventListener('click', e => {
-    const b = e.target.closest('.rg');
-    if (b) togglePin(b.dataset.region);
-  });
-  // Leaving either surface drops the preview. Anything you want to keep while
-  // you read the rail is what the click is for.
-  for (const surface of [mapEl, stripEl]) {
-    surface.addEventListener('pointerleave', () => setHover(null));
-  }
+  // Leaving the map drops the highlight; the click is what holds it.
+  mapEl.addEventListener('pointerleave', () => setHover(null));
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && pinned) { pinned = null; paintActive(); }
   });
@@ -744,20 +384,20 @@ async function selectYear(y) {
     const year = await loadYear(y);
     currentYear = year;
     pinned = null; hovered = null;
+    noteEl.textContent = '';
     applyFills();
     drawLabels();
-    buildStrip(year);
-    renderNational(year);
   } catch (err) {
     currentYear = null;
-    readoutEl.textContent = '';
-    readoutEl.insertAdjacentHTML('beforeend',
-      `<p class="ro-eyebrow">Not published</p><p class="ro-name">${y}</p>
-       <p class="ro-meta">No result file for this year yet. The years that are published are the ones that carry a result file.</p>`);
-    stripEl.textContent = '';
-    runLabelsEl.textContent = '';
-    axisEl.textContent = '';
-    for (const list of paths.values()) for (const p of list) { p.style.setProperty('--c', 'var(--paper-2)'); p.removeAttribute('aria-label'); }
+    pinned = null; hovered = null;
+    noteEl.textContent = `${y} has no result file yet.`;
+    for (const list of paths.values()) for (const p of list) {
+      p.style.setProperty('--c', 'var(--paper-2)');
+      p.style.cursor = 'default';
+      p.setAttribute('tabindex', '-1');
+      p.removeAttribute('aria-label');
+    }
+    paintActive();
   } finally {
     for (const b of yearsEl.children) b.disabled = false;
   }
@@ -778,9 +418,8 @@ bindRegionEvents();
 let rt;
 new ResizeObserver(() => {
   clearTimeout(rt);
-  rt = setTimeout(() => { drawMap(); if (currentYear) measureStrip(); }, 60);
+  rt = setTimeout(drawMap, 60);
 }).observe(mapEl);
-new ResizeObserver(() => measureStrip()).observe(stripEl);
 await selectYear(manifest.elections.ls.years[manifest.elections.ls.years.length - 1]);
 </script>
 </body>
