@@ -164,6 +164,60 @@
       ]
     },
     {
+      "code": "JDS",
+      "name": "Janata Dal (Secular)",
+      "colour": "#7CB342",
+      "aliases": [
+        "Janata Dal (Secular)",
+        "JD(S)"
+      ]
+    },
+    {
+      "code": "HAMS",
+      "name": "Hindustani Awam Morcha (Secular)",
+      "colour": "#8D6E63",
+      "aliases": [
+        "Hindustani Awam Morcha (Secular)",
+        "HAM (S)"
+      ]
+    },
+    {
+      "code": "LJSP",
+      "name": "Lok Janshakti Party (Ram Vilas)",
+      "colour": "#455A64",
+      "aliases": [
+        "Lok Janshakti Party (Ram Vilas)",
+        "LJSP(RV)"
+      ]
+    },
+    {
+      "code": "RLD",
+      "name": "Rashtriya Lok Dal",
+      "colour": "#33691E",
+      "aliases": [
+        "Rashtriya Lok Dal"
+      ]
+    },
+    {
+      "code": "RPIA",
+      "name": "Republican Party of India (Athawale)",
+      "colour": "#3949AB",
+      "aliases": [
+        "Republican Party of India (Athawale)",
+        "RPI (ATWL)",
+        "RPI(A)"
+      ]
+    },
+    {
+      "code": "ADS",
+      "name": "Apna Dal (Sonelal)",
+      "colour": "#8E24AA",
+      "aliases": [
+        "Apna Dal (Sonelal)",
+        "Apna Dal (S)"
+      ]
+    },
+    {
       "code": "IND",
       "name": "Independent",
       "colour": "#78909C",

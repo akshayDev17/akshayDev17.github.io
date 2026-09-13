@@ -11,7 +11,7 @@
 <style>
 :root{
   --paper:#EEF1F8; --paper-2:#E3E9F4; --ink:#0F1220; --muted:#525A6B;
-  --rule:#D3D9E6; --rule-2:#BCC4D6;
+  --rule:#D3D9E6; --rule-2:#BCC4D6; --vacant:#C7CDD9;
   --serif:"Newsreader",ui-serif,Georgia,serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
 
@@ -25,6 +25,10 @@
   /* The table's measure is fixed, not proportional: a table whose columns move
      as the window changes is a table the reader has to re-read every time. */
   --table-w:clamp(16.5rem,20vw,19rem);
+  /* The belt's two knobs: how wide each portrait card is, and how many rows
+     stack before the strip continues right. */
+  --belt-card-w:9.25rem;
+  --belt-rows:3;
   --pad:max(clamp(1.25rem,4vw,4.5rem),calc((100vw - var(--col)) / 2));
   --ease:cubic-bezier(.2,0,0,1);
 
@@ -99,6 +103,21 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 .year[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink)}
 .year:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:2px}
 .year[disabled]{opacity:.4;cursor:default}
+.mh-tools{display:flex;align-items:baseline;justify-content:flex-end;gap:var(--s5);flex-wrap:wrap}
+/* The tense is the page's mode: as counted on polling day, or as the term
+   actually ended up. It is a sibling of the year selector — same instrument
+   cluster, same idiom, one row, so it costs the map no height. */
+.tense{display:flex;align-items:baseline;gap:2px;margin-bottom:-6px;
+  border-inline-start:1px solid var(--rule-2);padding-inline-start:var(--s4);margin-inline-start:var(--s3)}
+.tense-opt{
+  appearance:none;background:none;border:0;cursor:pointer;
+  font-family:var(--mono);font-size:.75rem;letter-spacing:.05em;color:var(--muted);
+  padding:6px 8px 8px;border-bottom:2px solid transparent;
+  transition:color .18s var(--ease),border-color .18s var(--ease);
+}
+.tense-opt:hover{color:var(--ink)}
+.tense-opt[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.tense-opt:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:2px}
 
 /* ── the plate and its key ────────────────────────────────────────────── *
  * The map is height-bound: at 1440px it is 649px wide inside a 1325px column,
@@ -113,14 +132,18 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
      measured 76px at 900 wide and 421px at 1280. A fixed track keeps the table
      beside the plate, and the slack falls past both as a trailing margin, which
      is the one form of empty space a reader reads as intended. */
-  display:grid;grid-template-columns:max-content var(--table-w);
+  display:grid;grid-template-columns:max-content var(--table-w) minmax(0,1fr);
   gap:clamp(1.25rem,2.6vw,3rem);
   padding:clamp(.5rem,1.5vw,1rem) 0 clamp(.75rem,1.2vw,1.25rem);
 }
 .mapfig{
   min-height:0;margin:0;
+  position:relative;
   display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
-  gap:var(--s3);
+  /* One line is reserved below the map for the status readout, so the map's
+     height (and the width derived from it) accounts for the note instead of
+     the note overflowing the figure. */
+  padding-bottom:calc(var(--s3) + 0.875rem);
 }
 #map{
   display:block;margin:0;overflow:visible;
@@ -146,6 +169,11 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
    seats were won by different parties, which is the whole point of shading at
    this granularity. */
 #map .pc{fill:var(--c);stroke:none;transition:fill .22s var(--ease)}
+/* A by-election seat wears a dashed --ink outline — a scar, not a hue. The
+   dashed edge is the one device left over: fill is hover, the leading edge is
+   selection, the solid stroke is the state boundary. Vacant is the same dash
+   but with a grey fill, so the two never read as a party. */
+#map .pc.bye,#map .pc.vacant{stroke:var(--ink);stroke-width:.8;stroke-dasharray:2.5 2.5;stroke-opacity:.7}
 
 /* The only line the map draws. fill:none plus pointer-events:all makes the whole
    area of a state hoverable while drawing nothing inside it. */
@@ -200,7 +228,7 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 
 /* The note is a status line, not a caption: it holds the message when a year has
    no result file, and takes no space at all the rest of the time. */
-.mapnote{flex:0 0 auto;text-align:left}
+.mapnote{position:absolute;inset-inline-start:0;inset-block-end:0;text-align:left}
 .mapnote:empty{display:none}
 
 /* ── the national table ───────────────────────────────────────────────── *
@@ -259,6 +287,13 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 .ntable th:nth-child(2){width:4.25rem}
 .ntable th:nth-child(3){width:5.75rem}
 .ntable th:nth-child(4){width:3.5rem}
+/* The delta is a fifth track, present only in "as it stands" mode; its own
+   widths stop the other columns from shifting. */
+.ntable.has-delta th:nth-child(2){width:3.25rem}
+.ntable.has-delta th:nth-child(3){width:2.25rem}
+.ntable.has-delta th:nth-child(4){width:4.75rem}
+.ntable.has-delta th:nth-child(5){width:3rem}
+.ntable td.d{font-weight:500}
 .ntable th{
   font-weight:400;font-size:.5625rem;letter-spacing:.11em;text-transform:uppercase;
   color:var(--muted);text-align:right;padding:0;border-bottom:1px solid var(--rule-2);
@@ -336,6 +371,53 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 }
 
 
+/* ── the tense delta ──────────────────────────────────────────────────── */
+/* A gain or loss is a sign, not a colour — no hue may enter the table, since
+   every saturated hue is a party. It is its own right-aligned track, not a
+   footnote riding the seats cell, so the shift is a first-class figure. */
+
+/* ── the cabinet belt ─────────────────────────────────────────────────── *
+ * The field's third track is land the height-bound map can never reach. The
+ * belt fills it downward first (grid-auto-flow:column), then continues right
+ * with horizontal scroll; the fades are the only cue there is more, and they
+ * exist only where overflow does. */
+.belt{display:flex;flex-direction:column;min-width:0;min-height:0}
+.belt-head{display:flex;flex-direction:column;gap:2px;padding:0 0 var(--s2)}
+.belt-title{font-family:var(--serif);font-size:.9375rem;line-height:1.25;color:var(--ink);margin:0}
+.belt-asof{font-family:var(--mono);font-size:.625rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.belt-view{position:relative;flex:1 1 auto;min-height:0}
+.belt-scroll{
+  height:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;
+  display:grid;grid-auto-flow:column;grid-auto-columns:var(--belt-card-w);
+  grid-template-rows:repeat(var(--belt-rows),auto);align-content:start;
+  gap:var(--s3) var(--s4);overscroll-behavior-x:contain;padding:2px 2px var(--s3);
+  scroll-snap-type:x mandatory;
+}
+.belt-scroll::-webkit-scrollbar{display:none}
+/* The strip is its own keyboard control: tab to it, arrow-key scroll. */
+.belt-scroll:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:var(--r2)}
+.belt-view::before,.belt-view::after{
+  content:'';position:absolute;inset-block:0;width:var(--s6);z-index:2;
+  pointer-events:none;opacity:0;transition:opacity .2s var(--ease);
+}
+.belt-view::before{inset-inline-start:0;background:linear-gradient(to right,var(--paper) 18%,transparent)}
+.belt-view::after{inset-inline-end:0;background:linear-gradient(to left,var(--paper) 18%,transparent)}
+.belt-view.more-l::before{opacity:1}
+.belt-view.more-r::after{opacity:1}
+.belt-card{display:flex;flex-direction:column;gap:3px;min-width:0;scroll-snap-align:start}
+.belt-face{
+  aspect-ratio:4/3;background:var(--paper-2);border:1px solid var(--rule);
+  border-radius:var(--r2);display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:1.4rem;color:var(--muted);letter-spacing:.02em;
+  overflow:hidden;
+}
+.belt-face img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 18%}
+.belt-name{font-family:var(--serif);font-size:.8125rem;line-height:1.2;font-weight:500;color:var(--ink);margin:0}
+.belt-role{font-family:var(--mono);font-size:.75rem;line-height:1.4;letter-spacing:.02em;color:var(--muted);margin:0}
+.belt-seat{font-family:var(--mono);font-size:.75rem;line-height:1.35;color:var(--muted);margin:0;display:flex;align-items:center;gap:6px}
+.belt .sw{width:9px;height:9px;border-radius:2px;flex:0 0 auto;background:var(--c);box-shadow:inset 0 0 0 1px rgba(15,18,32,.2)}
+.belt-empty{font-family:var(--mono);font-size:.6875rem;line-height:1.7;color:var(--muted);max-width:30ch}
+
 /* ── responsive ───────────────────────────────────────────────────────── */
 /* Side by side until the map can no longer hold its shape in the width left
    over. Below that the table moves under the plate into a bounded region with
@@ -348,13 +430,19 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
     gap:var(--s4);
   }
   .ntable{border-top:1px solid var(--rule-2);padding-top:var(--s2)}
+  /* The belt fills width the height-bound map can never use. On a narrow screen
+     the map is width-bound, so that land does not exist and the belt would only
+     squeeze the map — it is a desktop element here. The tense, marks and delta
+     all still work. */
+  .belt{display:none}
 }
 @media (max-width:44rem){
   #card{min-width:0;max-width:calc(100vw - 20px)}
 }
 @media (prefers-reduced-motion:reduce){
   #map .pc,#map .st,#map .scrim,#map .lift,.year,#card,
-  .ntable td,.ntable tbody tr,.ntable .sw{transition:none}
+  .ntable td,.ntable tbody tr,.ntable .sw,.tense-opt,
+  .belt-view::before,.belt-view::after{transition:none}
 }
 </style>
 </head>
@@ -366,7 +454,10 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
         <a class="back" href="/">← Akshay Prabhakant</a>
         <p class="lbl">Election Atlas of India</p>
       </div>
-      <div class="years" id="years" role="group" aria-label="General election year"></div>
+      <div class="mh-tools">
+        <div class="years" id="years" role="group" aria-label="General election year"></div>
+        <div class="tense" id="tense" role="group" aria-label="Result as elected or as it stands" hidden></div>
+      </div>
     </div>
     <hr class="hair" style="margin-top:var(--s4)">
     <p class="caveat">Work in progress — the assembly figures are synthetic and none of this is verified.</p>
@@ -402,6 +493,16 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
         </div>
       </div>
     </section>
+
+    <section class="belt" id="belt" aria-label="Union council of ministers" hidden>
+      <div class="belt-head">
+        <h2 class="belt-title" id="belt-title">Union council of ministers</h2>
+        <span class="belt-asof" id="belt-asof"></span>
+      </div>
+      <div class="belt-view">
+        <div class="belt-scroll" id="belt-scroll" tabindex="0" role="region" aria-label="Council of ministers. Use the arrow keys to scroll."></div>
+      </div>
+    </section>
   </section>
 </main>
 
@@ -427,6 +528,8 @@ try {
 }
 
 const mapEl = $('#map'), noteEl = $('#mapnote'), yearsEl = $('#years'), card = $('#card');
+const tenseEl = $('#tense'), beltEl = $('#belt'), beltTitle = $('#belt-title'),
+  beltAsof = $('#belt-asof'), beltView = $('.belt-view'), beltScroll = $('#belt-scroll');
 
 /* ── fixed vocabularies and geometry ──────────────────────────────────── */
 const [manifest, regionsDoc, partiesDoc, statesTopo, pcsTopo] = await Promise.all([
@@ -574,19 +677,64 @@ function drawMap() {
    parties shows the two-party contest and its geography at a glance. */
 const selection = new Set();
 
+/* ── the tense: as elected / as it stands ──────────────────────────────── *
+ * One switch, three surfaces. resolved[] is the seat's state under the
+ * current tense — the party to fill, whether a by-election happened, whether
+ * it is now vacant. buildSeatMaps() turns that into the arithmetic: seats as
+ * elected, seats as they stand, and the delta between them. */
+function buildResolved() {
+  resolved = new Map();
+  if (!currentYear) return;
+  for (const [uid, c] of Object.entries(currentYear.constituencies)) {
+    resolved.set(uid, { p: c.p, vacant: false, byeCount: 0 });
+  }
+  if (!byeData || !byeData.seats) return;
+  for (const seat of byeData.seats) {
+    const r = resolved.get(seat.uid);
+    if (!r) continue;
+    const byes = seat.events.filter(e => e.type === 'bye');
+    r.byeCount = byes.length;
+    if (tense !== 'stands') continue;
+    const last = seat.events[seat.events.length - 1];
+    if (last && last.type === 'vacated') { r.p = null; r.vacant = true; }
+    else if (byes.length) r.p = byes[byes.length - 1].winner.p;
+  }
+}
+function buildSeatMaps() {
+  electedSeats = new Map();
+  if (currentYear) {
+    for (const c of Object.values(currentYear.constituencies)) {
+      electedSeats.set(c.p, (electedSeats.get(c.p) || 0) + 1);
+    }
+  }
+  standsSeats = new Map();
+  for (const r of resolved.values()) {
+    if (r.p) standsSeats.set(r.p, (standsSeats.get(r.p) || 0) + 1);
+  }
+  deltaByParty = new Map();
+  for (const [p, n] of standsSeats) {
+    const d = n - (electedSeats.get(p) || 0);
+    if (d) deltaByParty.set(p, d);
+  }
+  for (const [p, n] of electedSeats) {
+    if (!standsSeats.has(p)) deltaByParty.set(p, -n);
+  }
+}
+
 /* One GeoJSON collection per party, built from the constituency features that
-   party won. geoPath() renders a whole FeatureCollection to a single `d`, which
-   is what lets a party focus reuse the existing one-element scrim and lift —
-   the cost of focusing a party that won 240 seats is one `d` write, not 240. */
+   party holds under the current tense. geoPath() renders a whole FeatureCollection
+   to a single `d`, which is what lets a party focus reuse the existing one-element
+   scrim and lift — the cost of focusing a party that won 240 seats is one `d`
+   write, not 240. */
 let partyShapes = new Map();
 function buildPartyShapes() {
   partyShapes = new Map();
   if (!currentYear) return;
   for (const f of pcs.features) {
-    const c = currentYear.constituencies[f.properties.unique_id];
-    if (!c) continue;
-    let arr = partyShapes.get(c.p);
-    if (!arr) partyShapes.set(c.p, arr = []);
+    const r = resolved.get(f.properties.unique_id);
+    if (!r || !r.p) continue;
+    let arr = partyShapes.get(r.p);
+    if (!arr) partyShapes.set(r.p, arr = []);
     arr.push(f);
   }
   for (const [code, features] of partyShapes) {
@@ -598,9 +746,17 @@ function applyYear() {
   if (!currentYear) return;
   buildPartyShapes();
   for (const [uid, p] of pcPaths) {
-    const c = currentYear.constituencies[uid];
-    const leftOut = c && selection.size && !selection.has(c.p);
-    p.style.setProperty('--c', !c || leftOut ? 'var(--paper-2)' : colour(c.p));
+    const r = resolved.get(uid);
+    const showMarks = tense === 'stands';
+    p.classList.toggle('bye', showMarks && !!r && r.byeCount > 0 && !r.vacant);
+    p.classList.toggle('vacant', showMarks && !!r && r.vacant);
+    if (r && r.vacant) {
+      p.style.setProperty('--c', 'var(--vacant)');
+    } else {
+      const party = r ? r.p : null;
+      const leftOut = party && selection.size && !selection.has(party);
+      p.style.setProperty('--c', !party || leftOut ? 'var(--paper-2)' : colour(party));
+    }
   }
   for (const [code, p] of statePaths) {
     const m = agg.byRegion.get(code);
@@ -703,6 +859,7 @@ function hideCard() {
 const NAT_DEFAULT = { key: 'seats', dir: -1 };
 let natSort = { ...NAT_DEFAULT };
 const natHead = $('#ntable-head-row'), natBody = $('#ntable-body');
+const natTable = $('.ntable table');
 const natResetBtn = $('#reset-sort'), natClearBtn = $('#clear-sel');
 const natView = $('.ntable-view'), natScroll = $('.ntable-scroll');
 
@@ -725,8 +882,15 @@ function updateFades() {
 const NAT_MIN_SHARE = 0.005;
 function nationalRows() {
   const total = agg ? agg.totalVotes : 0;
+  const stands = tense === 'stands';
   return [...(agg ? agg.national : new Map())]
-    .map(([code, v]) => ({ code, seats: v.seats, votes: v.votes, share: total ? v.votes / total : 0 }))
+    .map(([code, v]) => ({
+      code,
+      seats: stands ? (standsSeats.get(code) || 0) : v.seats,
+      votes: v.votes,
+      share: total ? v.votes / total : 0,
+      delta: deltaByParty.get(code) || 0
+    }))
     .filter(r => r.seats > 0 || r.share >= NAT_MIN_SHARE)
     .sort((a, b) =>
       natSort.dir * (a[natSort.key] - b[natSort.key]) || b.seats - a.seats || b.votes - a.votes);
@@ -746,16 +910,27 @@ function paintNatHead() {
 function renderNational() {
   if (!natBody) return;
   const rows = nationalRows();
-  /* Every party, not a capped first page with a "+N more" remainder. That row
-     carried populated figures and sat under rows the reader had just learned
-     were clickable, so it read as withheld rather than summarised, and invited
-     a click it could not answer. The scroll region is the honest container. */
+  const stands = tense === 'stands';
+  natTable.classList.toggle('has-delta', stands);
+  /* The header is regenerated here so the ± column only exists when it means
+     something — a hidden column would still be a gap a reader has to parse. */
+  natHead.innerHTML =
+    `<th>Party</th>` +
+    `<th><button type="button" data-sort="seats" data-label="Seats">Seats</button></th>` +
+    (stands ? `<th><button type="button" data-sort="delta" data-label="±">±</button></th>` : '') +
+    `<th><button type="button" data-sort="votes" data-label="Votes">Votes</button></th>` +
+    `<th><button type="button" data-sort="share" data-label="Share">Share</button></th>`;
   natBody.innerHTML = rows.map(r => {
     const on = selection.has(r.code);
+    const d = r.delta;
+    const dCell = stands
+      ? `<td class="d">${d > 0 ? '+' + d : d < 0 ? '\u2212' + (-d) : ''}</td>`
+      : '';
     return `<tr data-party="${r.code}"${on ? ' class="sel"' : ''}>` +
       `<td><button type="button" class="pick" aria-pressed="${on}">` +
       `<i class="sw" style="--c:${colour(r.code)}"></i><span>${r.code}</span></button></td>` +
-      `<td>${r.seats}</td><td>${nf(r.votes)}</td><td>${pc1(r.share)}</td></tr>`;
+      `<td>${r.seats}</td>` + dCell +
+      `<td>${nf(r.votes)}</td><td>${pc1(r.share)}</td></tr>`;
   }).join('');
   // the whole tbody dims its left-out rows, so the table and the map agree
   natBody.classList.toggle('has-sel', selection.size > 0);
@@ -848,6 +1023,12 @@ function bindEvents() {
 /* ── years ────────────────────────────────────────────────────────────── */
 let currentYear = null, agg = null;
 const yearCache = new Map();
+let tense = 'elected';                 // 'elected' | 'stands'
+let byeData = null, cabinetDoc = null; // by-election + cabinet docs for the cycle
+let resolved = new Map();              // uid -> { p, vacant, byeCount }
+let electedSeats = new Map();          // party -> seats as elected
+let standsSeats = new Map();           // party -> seats under the tense
+let deltaByParty = new Map();          // party -> net change (stands - elected)
 async function loadYear(y) {
   /* manifest paths are relative to the data directory, not to the page */
   const url = 'data/' + pcLevel.results.replace('{year}', y);
@@ -858,24 +1039,140 @@ async function loadYear(y) {
   return yearCache.get(y);
 }
 
+async function loadBye(y) {
+  try { const r = await fetch('data/results/ls/byel/' + y + '.json'); return r.ok ? r.json() : null; }
+  catch { return null; }
+}
+async function loadCabinet(y) {
+  try { const r = await fetch('data/cabinet/union/' + y + '.json'); return r.ok ? r.json() : null; }
+  catch { return null; }
+}
+
 async function selectYear(y) {
   for (const b of yearsEl.children) { b.setAttribute('aria-pressed', String(+b.dataset.year === y)); b.disabled = true; }
   hideCard();
   try {
     currentYear = await loadYear(y);
+    [byeData, cabinetDoc] = await Promise.all([loadBye(y), loadCabinet(y)]);
     agg = aggregate(currentYear);
-    noteEl.textContent = '';
+    buildResolved();
+    buildSeatMaps();
     applyYear();
     renderNational();
+    renderBelt();
+    paintNote();
   } catch (err) {
-    currentYear = null; agg = null;
+    currentYear = null; agg = null; byeData = null; cabinetDoc = null;
+    resolved = new Map(); electedSeats = new Map(); standsSeats = new Map(); deltaByParty = new Map();
     noteEl.textContent = `${y} has no constituency result file yet.`;
-    for (const p of pcPaths.values()) p.style.setProperty('--c', 'var(--paper-2)');
+    for (const p of pcPaths.values()) { p.style.setProperty('--c', 'var(--paper-2)'); p.classList.remove('bye', 'vacant'); }
     for (const p of statePaths.values()) p.removeAttribute('aria-label');
     renderNational();
+    renderBelt();
   } finally {
     for (const b of yearsEl.children) b.disabled = false;
   }
+}
+
+/* ── the tense control, readout and cabinet belt ──────────────────────── */
+function buildTenseControl() {
+  tenseEl.textContent = '';
+  for (const [val, label] of [['elected', 'As elected'], ['stands', 'As it stands']]) {
+    const b = el('button', 'tense-opt');
+    b.type = 'button'; b.dataset.tense = val; b.textContent = label;
+    b.setAttribute('aria-pressed', String(val === tense));
+    b.addEventListener('click', () => { if (tense !== val) { tense = val; applyTense(); } });
+    tenseEl.appendChild(b);
+  }
+  tenseEl.hidden = false;
+}
+
+function paintNote() {
+  if (!currentYear) return;
+  if (tense === 'elected') {
+    noteEl.textContent = `As elected · ${currentYear.year}`;
+    return;
+  }
+  const seats = (byeData && byeData.seats) || [];
+  const byes = seats.reduce((n, s) => n + s.events.filter(e => e.type === 'bye').length, 0);
+  const vacant = [...resolved.values()].filter(r => r.vacant).length;
+  if (!byes && !vacant) {
+    noteEl.textContent = `As it stands · ${currentYear.year} — no by-elections on record`;
+    return;
+  }
+  const dates = seats.flatMap(s => s.events.map(e => e.date)).sort();
+  const lastDate = dates.length ? dates[dates.length - 1] : '';
+  noteEl.textContent = `As it stands · ${byes} by-election${byes === 1 ? '' : 's'} · ${vacant} vacant · as of ${lastDate}`;
+}
+
+function cabinetRoster() {
+  /* members is the fetched "as it stands" roster. The sworn-in snapshot that
+     "as elected" needs is not fetched yet, so both tenses show the same list. */
+  if (!cabinetDoc) return null;
+  return cabinetDoc.members || [];
+}
+
+function renderBelt() {
+  const members = cabinetRoster();
+  if (!cabinetDoc) { beltEl.hidden = true; return; }
+  beltEl.hidden = false;
+  beltTitle.textContent = 'Union council of ministers';
+  beltAsof.textContent = tense === 'elected'
+    ? `as elected · sworn in ${cabinetDoc.swornIn}`
+    : `as it stands · fetched ${cabinetDoc.fetchedAt}`;
+  const order = { pm: 0, cm: 0, cabinet: 1, 'mos-ic': 2, mos: 3 };
+  const sorted = [...members].sort((a, b) =>
+    (order[a.rank] ?? 9) - (order[b.rank] ?? 9) || (a.name || '').localeCompare(b.name || ''));
+  beltScroll.innerHTML = sorted.map(m => {
+    const initials = (m.name || '?').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    const roleTxt = m.portfolio || m.role || '';
+    const seatLabel = m.constituency || (m.state ? 'Rajya Sabha' : '');
+    const seat = seatLabel
+      ? `<span class="belt-seat"><i class="sw" style="--c:${colour(m.party)}"></i>${seatLabel}</span>`
+      : '';
+    const face = m.photo
+      ? `<div class="belt-face"><img src="data/photos/cabinet/${m.photo}" alt="" loading="lazy" onerror="this.parentNode.innerHTML='${initials}'"></div>`
+      : `<div class="belt-face" aria-hidden="true">${initials}</div>`;
+    return `<div class="belt-card">` +
+      face +
+      `<p class="belt-name">${m.name}</p>` +
+      `<p class="belt-role">${roleTxt}</p>` +
+      seat + `</div>`;
+  }).join('');
+  fitBeltRows();
+  updateBeltFades();
+}
+
+function updateBeltFades() {
+  const max = beltScroll.scrollWidth - beltScroll.clientWidth;
+  const hasMore = max > 2;
+  beltView.classList.toggle('more-l', hasMore && beltScroll.scrollLeft > 2);
+  beltView.classList.toggle('more-r', hasMore && beltScroll.scrollLeft < max - 2);
+}
+
+/* The row count is not a constant — it is whatever fits. A hardcoded three rows
+   clips the third one the moment the belt is shorter than three cards (a browser
+   zoom, a short window). Measure the tallest card, divide the belt's live height
+   by it, and let the cards re-flow into more columns instead of being cut. */
+function fitBeltRows() {
+  const cards = beltScroll.querySelectorAll('.belt-card');
+  if (!cards.length || !beltScroll.clientHeight) return;
+  let maxH = 0;
+  for (const c of cards) maxH = Math.max(maxH, c.getBoundingClientRect().height);
+  const gap = parseFloat(getComputedStyle(beltScroll).rowGap) || 0;
+  const rows = Math.max(1, Math.floor((beltScroll.clientHeight + gap) / (maxH + gap)));
+  beltScroll.style.setProperty('--belt-rows', rows);
+}
+
+function applyTense() {
+  buildResolved();
+  buildSeatMaps();
+  applyYear();
+  if (focused) paintFocus();
+  renderNational();
+  renderBelt();
+  paintNote();
+  for (const b of tenseEl.children) b.setAttribute('aria-pressed', String(b.dataset.tense === tense));
 }
 
 /* ── boot ─────────────────────────────────────────────────────────────── */
@@ -891,13 +1188,25 @@ for (const y of manifest.elections.ls.years) {
 drawMap();
 bindEvents();
 bindTable();
+const qp = new URLSearchParams(location.search);
+if (qp.get('t') === 'stands') tense = 'stands';
+buildTenseControl();
+beltScroll.addEventListener('scroll', updateBeltFades, { passive: true });
+let brt;
+new ResizeObserver(() => {
+  clearTimeout(brt);
+  brt = setTimeout(fitBeltRows, 60);
+}).observe(beltScroll);
 let rt;
 new ResizeObserver(() => {
   clearTimeout(rt);
   rt = setTimeout(() => { drawMap(); }, 60);
 }).observe(mapEl);
 
-await selectYear(manifest.elections.ls.years[manifest.elections.ls.years.length - 1]);
+const wantYear = Number(qp.get('y')) || 0;
+const bootYear = wantYear && manifest.elections.ls.years.includes(wantYear)
+  ? wantYear : manifest.elections.ls.years[manifest.elections.ls.years.length - 1];
+await selectYear(bootYear);
 </script>
 </body>
 </html>

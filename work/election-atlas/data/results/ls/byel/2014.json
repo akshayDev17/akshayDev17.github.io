@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "election": "ls",
+  "cycle": 2014,
+  "term": "16th Lok Sabha",
+  "note": "Dummy by-election data for testing the as-elected / as-it-stands mode. General-election winners are real 2014 names; every by-election outcome, count and date is invented. Party codes join parties.json; uid is the geometry unique_id (level 1), seat is the ls_seat_code (level 2), st is the region code.",
+  "seats": [
+    {
+      "uid": "S24_35", "seat": "35", "pc": "Lucknow", "st": "IN-UP",
+      "general": { "p": "BJP", "n": "RAJNATH SINGH" },
+      "events": [
+        { "type": "bye", "date": "2015-09-11", "reason": "Death of member",
+          "winner": { "p": "BJP", "n": "KAVITA SHARMA", "v": 430000, "o": { "SP": 400000, "INC": 48000, "IND": 9200 } },
+          "turnout": 58.4 }
+      ]
+    },
+    {
+      "uid": "S24_21", "seat": "21", "pc": "Mainpuri", "st": "IN-UP",
+      "general": { "p": "SP", "n": "MULAYAM SINGH YADAV" },
+      "events": [
+        { "type": "bye", "date": "2015-03-13", "reason": "Resignation",
+          "winner": { "p": "BJP", "n": "ANURAG PATEL", "v": 380000, "o": { "SP": 350000, "BSP": 61000, "IND": 5100 } },
+          "turnout": 55.2 }
+      ]
+    },
+    {
+      "uid": "S24_64", "seat": "64", "pc": "Gorakhpur", "st": "IN-UP",
+      "general": { "p": "BJP", "n": "YOGI ADITYANATH" },
+      "events": [
+        { "type": "vacated", "date": "2015-05-02", "reason": "Elected to assembly" },
+        { "type": "bye", "date": "2015-06-08", "reason": "By-election",
+          "winner": { "p": "SP", "n": "RAKESH VERMA", "v": 410000, "o": { "BJP": 390000, "BSP": 52000 } },
+          "turnout": 60.1 },
+        { "type": "vacated", "date": "2016-04-19", "reason": "Resignation" },
+        { "type": "bye", "date": "2016-08-22", "reason": "By-election",
+          "winner": { "p": "BSP", "n": "SUNITA DEVI", "v": 425000, "o": { "SP": 405000, "BJP": 39000, "INC": 12000 } },
+          "turnout": 61.9 }
+      ]
+    },
+    {
+      "uid": "S24_38", "seat": "38", "pc": "Sultanpur", "st": "IN-UP",
+      "general": { "p": "BJP", "n": "VARUN GANDHI" },
+      "events": [
+        { "type": "vacated", "date": "2016-01-02", "reason": "Resignation" }
+      ]
+    },
+    {
+      "uid": "S24_77", "seat": "77", "pc": "Varanasi", "st": "IN-UP",
+      "general": { "p": "BJP", "n": "NARENDRA MODI" },
+      "events": [
+        { "type": "vacated", "date": "2014-05-30", "reason": "Became Prime Minister" },
+        { "type": "bye", "date": "2014-09-15", "reason": "By-election",
+          "winner": { "p": "SP", "n": "ARIF KHAN", "v": 415000, "o": { "BJP": 398000, "BSP": 33000 } },
+          "turnout": 54.7 },
+        { "type": "vacated", "date": "2015-11-27", "reason": "Resignation" },
+        { "type": "bye", "date": "2016-02-20", "reason": "By-election",
+          "winner": { "p": "BJP", "n": "MEERA JOSHI", "v": 440000, "o": { "SP": 420000, "INC": 15000, "IND": 8100 } },
+          "turnout": 62.3 }
+      ]
+    }
+  ]
+}

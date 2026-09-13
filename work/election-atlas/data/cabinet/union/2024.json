@@ -1,0 +1,746 @@
+{
+  "schema": 2,
+  "scope": "union",
+  "cycle": 2024,
+  "term": "18th Lok Sabha",
+  "swornIn": "2024-06-09",
+  "fetchedAt": "2026-09-13",
+  "sources": [
+    {
+      "url": "https://www.pmindia.gov.in/en/news_updates/portfolios-of-the-union-council-of-ministers-2/",
+      "authority": "Prime Minister's Office, Government of India",
+      "kind": "current"
+    }
+  ],
+  "members": [
+    {
+      "name": "NARENDRA MODI",
+      "rank": "pm",
+      "portfolio": "Prime Minister",
+      "party": "BJP",
+      "state": "IN-UP",
+      "constituency": "Varanasi",
+      "_match": "NARENDRA MODI",
+      "photo": "2024/ls-4589.jpg"
+    },
+    {
+      "name": "RAJ NATH SINGH",
+      "rank": "cabinet",
+      "portfolio": "Minister of Defence",
+      "party": "BJP",
+      "state": "IN-UP",
+      "constituency": "Lucknow",
+      "_match": "RAJNATH SINGH",
+      "photo": "2024/ls-4268.jpg"
+    },
+    {
+      "name": "AMIT SHAH",
+      "rank": "cabinet",
+      "portfolio": "Minister of Home Affairs; and Minister of Cooperation",
+      "party": "BJP",
+      "state": "IN-GJ",
+      "constituency": "Gandhinagar",
+      "_match": "AMIT SHAH",
+      "photo": "2024/ls-5021.jpg"
+    },
+    {
+      "name": "NITIN JAIRAM GADKARI",
+      "rank": "cabinet",
+      "portfolio": "Minister of Road Transport and Highways",
+      "party": "BJP",
+      "state": "IN-MH",
+      "constituency": "Nagpur",
+      "_match": "NITIN JAIRAM GADKARI",
+      "photo": "2024/ls-4923.jpg"
+    },
+    {
+      "name": "JAGAT PRAKASH NADDA",
+      "rank": "cabinet",
+      "portfolio": "Minister of Health and Family Welfare; and Minister of Chemicals and Fertilizers",
+      "party": "BJP",
+      "state": "IN-GJ",
+      "constituency": null,
+      "_match": "JAGAT PRAKASH NADDA",
+      "photo": "2024/rs-2204.jpg"
+    },
+    {
+      "name": "SHIVRAJ SINGH CHOUHAN",
+      "rank": "cabinet",
+      "portfolio": "Minister of Agriculture and Farmers Welfare; and Minister of Rural Development",
+      "party": "BJP",
+      "state": "IN-MP",
+      "constituency": "Vidisha",
+      "_match": "SHIVRAJ SINGH CHOUHAN",
+      "photo": "2024/ls-96.jpg"
+    },
+    {
+      "name": "NIRMALA SITHARAMAN",
+      "rank": "cabinet",
+      "portfolio": "Minister of Finance; and Minister of Corporate Affairs",
+      "party": "BJP",
+      "state": "IN-KA",
+      "constituency": null,
+      "_match": "NIRMALA SITHARAMAN",
+      "photo": "2024/rs-2288.jpg"
+    },
+    {
+      "name": "SUBRAHMANYAM JAISHANKAR",
+      "rank": "cabinet",
+      "portfolio": "Minister of External Affairs",
+      "party": "BJP",
+      "state": "IN-GJ",
+      "constituency": null,
+      "_match": "S JAISHANKAR",
+      "photo": "2024/rs-2426.jpg"
+    },
+    {
+      "name": "MANOHAR LAL",
+      "rank": "cabinet",
+      "portfolio": "Minister of Housing and Urban Affairs; and Minister of Power",
+      "party": "BJP",
+      "state": "IN-HR",
+      "constituency": "Karnal",
+      "_match": "MANOHAR LAL",
+      "photo": "2024/ls-5792.jpg"
+    },
+    {
+      "name": "H. D. KUMARASWAMY",
+      "rank": "cabinet",
+      "portfolio": "Minister of Heavy Industries; and Minister of Steel",
+      "party": "JDS",
+      "state": "IN-KA",
+      "constituency": "Mandya",
+      "_match": "H D KUMARASWAMY",
+      "photo": "2024/ls-3711.jpg"
+    },
+    {
+      "name": "PIYUSH GOYAL",
+      "rank": "cabinet",
+      "portfolio": "Minister of Commerce and Industry",
+      "party": "BJP",
+      "state": "IN-MH",
+      "constituency": "Mumbai North",
+      "_match": "PIYUSH VEDPRAKASH GOYAL",
+      "photo": "2024/ls-5551.jpg"
+    },
+    {
+      "name": "JITAN RAM MANJHI",
+      "rank": "cabinet",
+      "portfolio": "Minister of Micro, Small and Medium Enterprises",
+      "party": "HAMS",
+      "state": "IN-BR",
+      "constituency": "Gaya",
+      "_match": "JITAN RAM MANJHI",
+      "photo": "2024/ls-5558.jpg"
+    },
+    {
+      "name": "RAJIV RANJAN SINGH ALIAS LALAN SINGH",
+      "rank": "cabinet",
+      "portfolio": "Minister of Panchayati Raj; and Minister of Fisheries, Animal Husbandry and Dairying",
+      "party": "JDU",
+      "state": "IN-BR",
+      "constituency": "Munger",
+      "_match": "RAJIV RANJAN SINGH",
+      "photo": "2024/ls-4134.jpg"
+    },
+    {
+      "name": "SARBANANDA SONOWAL",
+      "rank": "cabinet",
+      "portfolio": "Minister of Ports, Shipping and Waterways",
+      "party": "BJP",
+      "state": "IN-AS",
+      "constituency": "Dibrugarh",
+      "_match": "SARBANANDA SONOWAL",
+      "photo": "2024/ls-4163.jpg"
+    },
+    {
+      "name": "VIRENDRA KUMAR",
+      "rank": "cabinet",
+      "portfolio": "Minister of Social Justice and Empowerment",
+      "party": "BJP",
+      "state": "IN-MP",
+      "constituency": "Tikamgarh",
+      "_match": "VIRENDRA KUMAR",
+      "photo": "2024/ls-515.jpg"
+    },
+    {
+      "name": "KINJARAPU RAMMOHAN NAIDU",
+      "rank": "cabinet",
+      "portfolio": "Minister of Civil Aviation",
+      "party": "TDP",
+      "state": "IN-AP",
+      "constituency": "Srikakulam",
+      "_match": "KINJARAPU RAMMOHAN NAIDU",
+      "photo": "2024/ls-4771.jpg"
+    },
+    {
+      "name": "PRALHAD JOSHI",
+      "rank": "cabinet",
+      "portfolio": "Minister of Consumer Affairs, Food and Public Distribution; and Minister of New and Renewable Energy;and Minister of Education",
+      "party": "BJP",
+      "state": "IN-KA",
+      "constituency": "Dharwad",
+      "_match": "PRALHAD JOSHI",
+      "photo": "2024/ls-3982.jpg"
+    },
+    {
+      "name": "JUAL ORAM",
+      "rank": "cabinet",
+      "portfolio": "Minister of Tribal Affairs",
+      "party": "BJP",
+      "state": "IN-OD",
+      "constituency": "Sundargarh",
+      "_match": "JUAL ORAM",
+      "photo": "2024/ls-279.jpg"
+    },
+    {
+      "name": "GIRIRAJ SINGH",
+      "rank": "cabinet",
+      "portfolio": "Minister of Textiles",
+      "party": "BJP",
+      "state": "IN-BR",
+      "constituency": "Begusarai",
+      "_match": "GIRIRAJ SINGH",
+      "photo": "2024/ls-4641.jpg"
+    },
+    {
+      "name": "ASHWINI VAISHNAW",
+      "rank": "cabinet",
+      "portfolio": "Minister of Railways; Minister of Information and Broadcasting; and Minister of Electronics and Information Technology",
+      "party": "BJP",
+      "state": "IN-OD",
+      "constituency": null,
+      "_match": "ASHWINI VAISHNAW",
+      "photo": "2024/rs-2425.jpg"
+    },
+    {
+      "name": "JYOTIRADITYA M. SCINDIA",
+      "rank": "cabinet",
+      "portfolio": "Minister of Communications; and Minister of Development of North Eastern Region",
+      "party": "BJP",
+      "state": "IN-MP",
+      "constituency": "Guna",
+      "_match": "JYOTIRADITYA M SCINDIA",
+      "photo": "2024/ls-3958.jpg"
+    },
+    {
+      "name": "BHUPENDER YADAV",
+      "rank": "cabinet",
+      "portfolio": "Minister of Environment, Forest and Climate Change",
+      "party": "BJP",
+      "state": "IN-RJ",
+      "constituency": "Alwar",
+      "_match": "BHUPENDER YADAV",
+      "photo": "2024/ls-5541.jpg"
+    },
+    {
+      "name": "GAJENDRA SINGH SHEKHAWAT",
+      "rank": "cabinet",
+      "portfolio": "Minister of Culture; and Minister of Tourism",
+      "party": "BJP",
+      "state": "IN-RJ",
+      "constituency": "Jodhpur",
+      "_match": "GAJENDRA SINGH SHEKHAWAT",
+      "photo": "2024/ls-4670.jpg"
+    },
+    {
+      "name": "ANNPURNA DEVI",
+      "rank": "cabinet",
+      "portfolio": "Minister of Women and Child Development",
+      "party": "BJP",
+      "state": "IN-JH",
+      "constituency": "Kodarma",
+      "_match": "ANNPURNA DEVI",
+      "photo": "2024/ls-5116.jpg"
+    },
+    {
+      "name": "KIREN RIJIJU",
+      "rank": "cabinet",
+      "portfolio": "Minister of Parliamentary Affairs; and Minister of Minority Affairs",
+      "party": "BJP",
+      "state": "IN-AR",
+      "constituency": "Arunachal West",
+      "_match": "KIREN RIJIJU",
+      "photo": "2024/ls-3972.jpg"
+    },
+    {
+      "name": "HARDEEP SINGH PURI",
+      "rank": "cabinet",
+      "portfolio": "Minister of Petroleum and Natural Gas",
+      "party": "BJP",
+      "state": "IN-UP",
+      "constituency": null,
+      "_match": "HARDEEP SINGH PURI",
+      "photo": "2024/rs-2371.jpg"
+    },
+    {
+      "name": "MANSUKH MANDAVIYA",
+      "rank": "cabinet",
+      "portfolio": "Minister of Labour and Employment; and Minister of Youth Affairs and Sports",
+      "party": "BJP",
+      "state": "IN-GJ",
+      "constituency": "Porbandar",
+      "_match": "MANSUKH MANDAVIYA",
+      "photo": "2024/ls-5555.jpg"
+    },
+    {
+      "name": "G. KISHAN REDDY",
+      "rank": "cabinet",
+      "portfolio": "Minister of Coal; and Minister of Mines",
+      "party": "BJP",
+      "state": "IN-TG",
+      "constituency": "Secunderabad",
+      "_match": "G KISHAN REDDY",
+      "photo": "2024/ls-5084.jpg"
+    },
+    {
+      "name": "CHIRAG PASWAN",
+      "rank": "cabinet",
+      "portfolio": "Minister of Food Processing Industries",
+      "party": "LJSP",
+      "state": "IN-BR",
+      "constituency": "Hajipur",
+      "_match": "CHIRAG PASWAN",
+      "photo": "2024/ls-4777.jpg"
+    },
+    {
+      "name": "C R PATIL",
+      "rank": "cabinet",
+      "portfolio": "Minister of Jal Shakti",
+      "party": "BJP",
+      "state": "IN-GJ",
+      "constituency": "Navsari",
+      "_match": "CHANDRAKANT RAGHUNATH PATIL",
+      "photo": "2024/ls-4452.jpg"
+    },
+    {
+      "name": "RAO INDERJIT SINGH",
+      "rank": "mos-ic",
+      "portfolio": "Minister of State (Independent Charge) of the Ministry of Statistics and Programme Implementation; Minister of State (Independent Charge) of the Ministry of Planning; and Minister of State in the Ministry of Culture",
+      "party": "BJP",
+      "state": "IN-HR",
+      "constituency": "Gurgaon",
+      "_match": "RAO INDERJIT SINGH",
+      "photo": "2024/ls-3904.jpg"
+    },
+    {
+      "name": "JITENDRA SINGH",
+      "rank": "mos-ic",
+      "portfolio": "Minister of State (Independent Charge) of the Ministry of Science and Technology; Minister of State (Independent Charge) of the Ministry of Earth Sciences; Minister of State in the Prime Minister’s Office; Minister of State in the Ministry of Personnel, Public Grievances and Pensions; Minister of State in the Department of Atomic Energy; and Minister of State in the Department of Space",
+      "party": "BJP",
+      "state": "IN-JK",
+      "constituency": "Udhampur",
+      "_match": "JITENDRA SINGH",
+      "photo": "2024/ls-4718.jpg"
+    },
+    {
+      "name": "ARJUN RAM MEGHWAL",
+      "rank": "mos-ic",
+      "portfolio": "Minister of State (Independent Charge) of the Ministry of Law and Justice; and Minister of State in the Ministry of Parliamentary Affairs",
+      "party": "BJP",
+      "state": "IN-RJ",
+      "constituency": "Bikaner",
+      "_match": "ARJUN RAM MEGHWAL",
+      "photo": "2024/ls-4399.jpg"
+    },
+    {
+      "name": "PRATAPRAO JADHAV",
+      "rank": "mos-ic",
+      "portfolio": "Minister of State (Independent Charge) of the Ministry of Ayush; and Minister of State in the Ministry of Health and Family Welfare",
+      "party": "SHS",
+      "state": "IN-MH",
+      "constituency": "Buldhana",
+      "_match": "PRATAPRAO GANPATRAO JADHAV",
+      "photo": "2024/ls-4373.jpg"
+    },
+    {
+      "name": "JAYANT CHAUDHARY",
+      "rank": "mos-ic",
+      "portfolio": "Minister of State (Independent Charge) of the Ministry of Skill Development and Entrepreneurship; and Minister of State in the Ministry of Education",
+      "party": "RLD",
+      "state": "IN-UP",
+      "constituency": null,
+      "_match": "JAYANT CHAUDHARY",
+      "photo": "2024/rs-2551.jpg"
+    },
+    {
+      "name": "JITIN PRASADA",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Commerce and Industry; and Minister of State in the Ministry of Electronics and Information Technology",
+      "party": "BJP",
+      "state": "IN-UP",
+      "constituency": "Pilibhit",
+      "_match": "JITIN PRASADA",
+      "photo": "2024/ls-4065.jpg"
+    },
+    {
+      "name": "SHRIPAD YESSO NAIK",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Power; and Minister of State in the Ministry of New and Renewable Energy",
+      "party": "BJP",
+      "state": "IN-GA",
+      "constituency": "North Goa",
+      "_match": "PAD YESSO NAIK",
+      "photo": "2024/ls-273.jpg"
+    },
+    {
+      "name": "PANKAJ CHAUDHARY",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Finance",
+      "party": "BJP",
+      "state": "IN-UP",
+      "constituency": "Maharajganj",
+      "_match": "PANKAJ CHOUDHARY",
+      "photo": "2024/ls-3479.jpg"
+    },
+    {
+      "name": "KRISHAN PAL",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Cooperation",
+      "party": "BJP",
+      "state": "IN-HR",
+      "constituency": "Faridabad",
+      "_match": "KRISHAN PAL GURJAR",
+      "photo": "2024/ls-4629.jpg"
+    },
+    {
+      "name": "RAMDAS ATHAWALE",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Social Justice and Empowerment",
+      "party": "RPIA",
+      "state": "IN-MH",
+      "constituency": null,
+      "_match": "RAMDAS BANDU ATHAWALE",
+      "photo": "2024/rs-2248.jpg"
+    },
+    {
+      "name": "RAM NATH THAKUR",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Agriculture and Farmers Welfare",
+      "party": "JDU",
+      "state": "IN-BR",
+      "constituency": null,
+      "_match": "RAM NATH THAKUR",
+      "photo": "2024/rs-2268.jpg"
+    },
+    {
+      "name": "NITYANAND RAI",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Home Affairs",
+      "party": "BJP",
+      "state": "IN-BR",
+      "constituency": "Ujiarpur",
+      "_match": "NITYANAND RAI",
+      "photo": "2024/ls-4625.jpg"
+    },
+    {
+      "name": "ANUPRIYA PATEL",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Health and Family Welfare; and Minister of State in the Ministry of Chemicals and Fertilizers",
+      "party": "ADS",
+      "state": "IN-UP",
+      "constituency": "Mirzapur",
+      "_match": "ANUPRIYA PATEL",
+      "photo": "2024/ls-4662.jpg"
+    },
+    {
+      "name": "V. SOMANNA",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Jal Shakti; and Minister of State in the Ministry of Railways",
+      "party": "BJP",
+      "state": "IN-KA",
+      "constituency": "Tumkur",
+      "_match": "V SOMANNA",
+      "photo": "2024/ls-5625.jpg"
+    },
+    {
+      "name": "CHANDRA SEKHAR PEMMASANI",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Rural Development; and Minister of State in the Ministry of Communications",
+      "party": "TDP",
+      "state": "IN-AP",
+      "constituency": "Guntur",
+      "_match": "CHANDRA SEKHAR PEMMASANI",
+      "photo": "2024/ls-5636.jpg"
+    },
+    {
+      "name": "S. P. SINGH BAGHEL",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Fisheries, Animal Husbandry and Dairying; and Minister of State in the Ministry of Panchayati Raj",
+      "party": "BJP",
+      "state": "IN-UP",
+      "constituency": "Agra",
+      "_match": "S P SINGH BAGHEL",
+      "photo": "2024/ls-31.jpg"
+    },
+    {
+      "name": "SHOBHA KARANDLAJE",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Micro, Small and Medium Enterprises; and Minister of State in the Ministry of Labour and Employment",
+      "party": "BJP",
+      "state": "IN-KA",
+      "constituency": "Bangalore North",
+      "_match": "SHOBHA KARANDLAJE",
+      "photo": "2024/ls-4616.jpg"
+    },
+    {
+      "name": "KIRTIVARDHAN SINGH",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Environment, Forest and Climate Change; and Minister of State in the Ministry of External Affairs",
+      "party": "BJP",
+      "state": "IN-UP",
+      "constituency": "Gonda",
+      "_match": "KIRTI VARDHAN SINGH",
+      "photo": "2024/ls-3926.jpg"
+    },
+    {
+      "name": "B. L. VERMA",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Consumer Affairs, Food and Public Distribution; and Minister of State in the Ministry of Social Justice and Empowerment",
+      "party": "BJP",
+      "state": "IN-UP",
+      "constituency": null,
+      "_match": "BL VERMA",
+      "photo": "2024/rs-2491.jpg"
+    },
+    {
+      "name": "SHANTANU THAKUR",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Ports, Shipping and Waterways",
+      "party": "BJP",
+      "state": "IN-WB",
+      "constituency": "Bangaon",
+      "_match": "SHANTANU THAKUR",
+      "photo": "2024/ls-5036.jpg"
+    },
+    {
+      "name": "SURESH GOPI",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Petroleum and Natural Gas; and Minister of State in the Ministry of Tourism",
+      "party": "BJP",
+      "state": "IN-KL",
+      "constituency": "Thrissur",
+      "_match": "SURESH GOPI",
+      "photo": "2024/ls-5552.jpg"
+    },
+    {
+      "name": "L. MURUGAN",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Information and Broadcasting; and Minister of State in the Ministry of Parliamentary Affairs",
+      "party": "BJP",
+      "state": "IN-MP",
+      "constituency": null,
+      "_match": "L MURUGAN",
+      "photo": "2024/rs-2504.jpg"
+    },
+    {
+      "name": "AJAY TAMTA",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Road Transport and Highways",
+      "party": "BJP",
+      "state": "IN-UT",
+      "constituency": "Almora",
+      "_match": "AJAY TAMTA",
+      "photo": "2024/ls-4651.jpg"
+    },
+    {
+      "name": "BANDI SANJAY KUMAR",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Home Affairs",
+      "party": "BJP",
+      "state": "IN-TG",
+      "constituency": "Karimnagar",
+      "_match": "BANDI SANJAY KUMAR",
+      "photo": "2024/ls-5076.jpg"
+    },
+    {
+      "name": "KAMLESH PASWAN",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Rural Development",
+      "party": "BJP",
+      "state": "IN-UP",
+      "constituency": "Bansgaon",
+      "_match": "KAMLESH PASWAN",
+      "photo": "2024/ls-4303.jpg"
+    },
+    {
+      "name": "BHAGIRATH CHOUDHARY",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Agriculture and Farmers Welfare",
+      "party": "BJP",
+      "state": "IN-RJ",
+      "constituency": "Ajmer",
+      "_match": "BHAGIRATH CHOUDHARY",
+      "photo": "2024/ls-5203.jpg"
+    },
+    {
+      "name": "SATISH CHANDRA DUBEY",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Coal; and Minister of State in the Ministry of Mines",
+      "party": "BJP",
+      "state": "IN-BR",
+      "constituency": null,
+      "_match": "SATISH CHANDRA DUBEY",
+      "photo": "2024/rs-2435.jpg"
+    },
+    {
+      "name": "SANJAY SETH",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Defence",
+      "party": "BJP",
+      "state": "IN-JH",
+      "constituency": "Ranchi",
+      "_match": "SANJAY SETH",
+      "photo": "2024/ls-5117.jpg"
+    },
+    {
+      "name": "DURGADAS UIKEY",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Tribal Affairs",
+      "party": "BJP",
+      "state": "IN-MP",
+      "constituency": "Betul",
+      "_match": "DURGADAS D D UIKEY",
+      "photo": "2024/ls-5057.jpg"
+    },
+    {
+      "name": "RAKSHA NIKHIL KHADSE",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Youth Affairs and Sports",
+      "party": "BJP",
+      "state": "IN-MH",
+      "constituency": "Raver",
+      "_match": "RAKSHA NIKHIL KHADSE",
+      "photo": "2024/ls-4722.jpg"
+    },
+    {
+      "name": "SUKANTA MAJUMDAR",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Education; and Minister of State in the Ministry of Development of North Eastern Region",
+      "party": "BJP",
+      "state": "IN-WB",
+      "constituency": "Balurghat",
+      "_match": "SUKANTA MAJUMDAR",
+      "photo": "2024/ls-5035.jpg"
+    },
+    {
+      "name": "SAVITRI THAKUR",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Women and Child Development",
+      "party": "BJP",
+      "state": "IN-MP",
+      "constituency": "Dhar",
+      "_match": "SAVITRI THAKUR",
+      "photo": "2024/ls-4596.jpg"
+    },
+    {
+      "name": "TOKHAN SAHU",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Housing and Urban Affairs",
+      "party": "BJP",
+      "state": "IN-CT",
+      "constituency": "Bilaspur",
+      "_match": "TOKHAN SAHU",
+      "photo": "2024/ls-5700.jpg"
+    },
+    {
+      "name": "RAJ BHUSHAN CHOUDHARY",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Jal Shakti",
+      "party": "BJP",
+      "state": "IN-BR",
+      "constituency": "Muzaffarpur",
+      "_match": "RAJ BHUSHAN CHOUDHARY",
+      "photo": "2024/ls-5568.jpg"
+    },
+    {
+      "name": "BHUPATHI RAJU SRINIVASA VARMA",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Heavy Industries; and Minister of State in the Ministry of Steel",
+      "party": "BJP",
+      "state": "IN-KA",
+      "constituency": "Udupi Chikmagalur",
+      "_match": "KOTA SRINIVASA POOJARY",
+      "photo": "2024/ls-5711.jpg"
+    },
+    {
+      "name": "HARSH MALHOTRA",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Corporate Affairs; and Minister of State in the Ministry of Road Transport and Highways",
+      "party": "BJP",
+      "state": "IN-DL",
+      "constituency": "East Delhi",
+      "_match": "HARSH MALHOTRA",
+      "photo": "2024/ls-5563.jpg"
+    },
+    {
+      "name": "NIMUBEN JAYANTIBHAI BAMBHANIYA",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Consumer Affairs, Food and Public Distribution",
+      "party": "BJP",
+      "state": "IN-GJ",
+      "constituency": "Bhavnagar",
+      "_match": "NIMUBEN JAYANTIBHAI BAMBHANIYA",
+      "photo": "2024/ls-5614.jpg"
+    },
+    {
+      "name": "MURLIDHAR MOHOL",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of Cooperation; and Minister of State in the Ministry of Civil Aviation",
+      "party": "BJP",
+      "state": "IN-MH",
+      "constituency": "Pune",
+      "_match": "MURLIDHAR MOHOL",
+      "photo": "2024/ls-5705.jpg"
+    },
+    {
+      "name": "PABITRA MARGHERITA",
+      "rank": "mos",
+      "portfolio": "Minister of State in the Ministry of External Affairs; and Minister of State in the Ministry of Textiles",
+      "party": "BJP",
+      "state": "IN-AS",
+      "constituency": null,
+      "_match": "PABITRA MARGHERITA",
+      "photo": "2024/rs-2510.jpg"
+    }
+  ],
+  "changes": [
+    {
+      "kind": "resigned",
+      "name": "DHARMENDRA PRADHAN",
+      "sentence": "accepted the resignation of Shri Dharmendra Pradhan from the Union Council of Ministers"
+    },
+    {
+      "kind": "portfolio",
+      "name": "PRALHAD JOSHI",
+      "to": "Ministry of Education",
+      "sentence": "Shri Pralhad Joshi, Cabinet Minister, be assigned the charge of the Ministry of Education"
+    }
+  ],
+  "_communiques": [
+    {
+      "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2289455&reg=3&lang=1",
+      "title": "Press Release Page | Press Information Bureau",
+      "date": "25 JUL 2026 8:35PM by PIB Delhi",
+      "changes": [
+        {
+          "kind": "resigned",
+          "name": "DHARMENDRA PRADHAN",
+          "sentence": "accepted the resignation of Shri Dharmendra Pradhan from the Union Council of Ministers"
+        },
+        {
+          "kind": "portfolio",
+          "name": "PRALHAD JOSHI",
+          "to": "Ministry of Education",
+          "sentence": "Shri Pralhad Joshi, Cabinet Minister, be assigned the charge of the Ministry of Education"
+        }
+      ]
+    }
+  ],
+  "_note": "party / constituency / state / photo are null: not present in the PM India list; join from the Sansad member directory or results data.",
+  "_join": {
+    "source": "Parliament of India (Sansad) member directory",
+    "matched": 69,
+    "total": 69
+  }
+}

@@ -74,3 +74,46 @@ was already right. **Measure the claim before acting on it, however well-argued.
 5. **Verify with the real event.** `:focus-visible` does not match after a mouse click, so a
    focus-ring rule written only for keyboard leaves the clicked case broken. Dispatch real
    mouse events; do not infer from the selector.
+
+## The tense + cabinet belt (appended after that work)
+
+Direction contract: `.design/atlas-tense-direction.md`. Both levels gained a page-wide
+**tense** — `As elected` / `As it stands` — driving by-election marks on the map, a `±`
+delta column in the party table, and a cabinet belt. Dummy data only:
+`data/results/ls/byel/2014.json` (5 cases in UP: same-party, flip, two by-elections, vacant,
+PM vacates Varanasi) + `data/cabinet/{union/2014,union/2024,state/IN-UP}.json`.
+
+New tokens: `--vacant:#C7CDD9` (vacant seat fill, a neutral — never a party hue);
+`--belt-card-w` (9.25rem L1 / 9rem L2); `--belt-rows` (3 / 2).
+
+Numbers measured (chrome-headless-shell + iframe harness, DOM boxes):
+- L1 map is **626×708** at 1440×900 — the mapnote's reserved line costs 26px of height, 23px
+  of width (was 649×734). `forced=0` still holds at 1440/1280/390.
+- L1 belt track (the trailing space) is **373px** at 1440, 410 at 1280. L2 forced-scroll 776px
+  (maps+tables+belt; level 2 always scrolled).
+
+What the critic caught (pixel-decoded + partial vision), and the outcome:
+| finding | outcome |
+| --- | --- |
+| Delta was a footnote (`281−1`, no sign, no column) | **Fixed** — a dedicated right-aligned `±` column, sortable, 500 weight, `+2`/`−1` (U+2212), on both levels |
+| Level 2 had no delta at all | **Fixed** — but only after the ordering bug below was caught |
+| Belt had no scroll-snap or step controls | **Fixed** — `scroll-snap-type:x mandatory` + prev/next buttons shown only where overflow exists |
+| Belt title read "16th Lok Sabha" (confused with tense) | **Fixed** — title is "Union council of ministers", ordinal moved to the as-of line |
+| Belt mono 9px/8px too small | **Fixed** — role/seat 12px, scope/asof 10px; tense control 12px |
+| Tense toggle 15px from the years, no separator | **Fixed** — hairline + gap between them |
+| 36px map/table leading-edge offset | **Rejected** — measured map/fig/field all at x=57.6; no offset exists |
+| Restore the belt on mobile | **Rejected on purpose** — on a narrow screen the map is width-bound, so the trailing land the belt fills is gone and the belt would only shrink the height-bound map (primary constraint). Level 2 keeps its belt at every width. Contract updated. |
+
+Three bugs that were not visible until measured/probed:
+1. The permanent mapnote overflowed the map figure — `height:100%` on the map ignores the
+   note sibling. Fix: `.mapfig{padding-bottom:calc(var(--s3)+0.875rem)}` + note `position:absolute`.
+2. On mobile the belt's content height (grid `auto` row + `height:100%` scroll) ate the fr rows
+   and collapsed the map to 0. Fixed by removing the belt below 56rem on L1 (see above).
+3. Level 2 rendered its table **before** `paintPC` computed `pcDelta`, so the ± column was
+   blank. Order matters: `layout → paintPC (builds pcDelta) → renderTable`.
+
+Lessons: a percentage-height map must account for every permanent sibling; a horizontal-scroll
+region in an `auto` grid row needs a definite height or it swallows the flex track; a data
+column that is rendered before its data is computed shows nothing with no error; and a belt's
+row count is never a constant — `floor(available height ÷ tallest-card height)`, measured at
+runtime and re-fit on resize, or the last row clips under a browser zoom.

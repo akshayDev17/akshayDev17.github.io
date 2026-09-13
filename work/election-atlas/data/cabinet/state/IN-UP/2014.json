@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "scope": "state",
+  "region": "IN-UP",
+  "year": 2014,
+  "swornIn": "2014-05-20",
+  "note": "Dummy Uttar Pradesh cabinet for the atlas (assembly cycle 2014).",
+  "members": [
+    { "name": "ANIL KUMAR VERMA", "role": "Chief Minister", "rank": "cm", "party": "BJP", "constituency": "Gorakhpur Urban", "st": "IN-UP" },
+    { "name": "RAJEEV SHARMA", "role": "Deputy Chief Minister", "rank": "cabinet", "party": "BJP", "constituency": "Sirathu", "st": "IN-UP" },
+    { "name": "VIKAS PATEL", "role": "Finance", "rank": "cabinet", "party": "BJP", "constituency": "Shahjahanpur", "st": "IN-UP" },
+    { "name": "SUNITA YADAV", "role": "Agriculture", "rank": "cabinet", "party": "BJP", "constituency": "Pathardeva", "st": "IN-UP" },
+    { "name": "DINESH SINGH", "role": "Home Affairs", "rank": "cabinet", "party": "BJP", "constituency": "Lucknow Cantonment", "st": "IN-UP" },
+    { "name": "PRIYA MISHRA", "role": "Health", "rank": "cabinet", "party": "BJP", "constituency": "Obra", "st": "IN-UP" },
+    { "name": "AMIT KUMAR", "role": "Education", "rank": "cabinet", "party": "BJP", "constituency": "Allahabad South", "st": "IN-UP" },
+    { "name": "ROHAN GUPTA", "role": "Urban Development", "rank": "mos", "party": "BJP", "constituency": "Lucknow East", "st": "IN-UP" },
+    { "name": "NEHA VERMA", "role": "Rural Development", "rank": "mos", "party": "BJP", "constituency": "Jaunpur", "st": "IN-UP" }
+  ],
+  "changes": []
+}

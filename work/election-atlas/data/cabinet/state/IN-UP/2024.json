@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "scope": "state",
+  "region": "IN-UP",
+  "year": 2024,
+  "swornIn": "2024-06-05",
+  "note": "Dummy Uttar Pradesh cabinet for the atlas (assembly cycle 2024).",
+  "members": [
+    { "name": "YOGI ADITYANATH", "role": "Chief Minister", "rank": "cm", "party": "BJP", "constituency": "Gorakhpur Urban", "st": "IN-UP" },
+    { "name": "KESHAV PRASAD MAURYA", "role": "Deputy Chief Minister", "rank": "cabinet", "party": "BJP", "constituency": "Sirathu", "st": "IN-UP" },
+    { "name": "BRAJESH PATHAK", "role": "Deputy Chief Minister", "rank": "cabinet", "party": "BJP", "constituency": "Lucknow Cantonment", "st": "IN-UP" },
+    { "name": "SURESH KHANNA", "role": "Finance & Parliamentary Affairs", "rank": "cabinet", "party": "BJP", "constituency": "Shahjahanpur", "st": "IN-UP" },
+    { "name": "SURYA PRATAP SHAHI", "role": "Agriculture", "rank": "cabinet", "party": "BJP", "constituency": "Pathardeva", "st": "IN-UP" },
+    { "name": "SWATANTRA DEV SINGH", "role": "Jal Shakti", "rank": "cabinet", "party": "BJP", "constituency": "Obra", "st": "IN-UP" },
+    { "name": "DINESH SHARMA", "role": "Health & Family Welfare", "rank": "cabinet", "party": "BJP", "constituency": "Allahabad South", "st": "IN-UP" },
+    { "name": "SANJAY NISHAD", "role": "Fisheries", "rank": "cabinet", "party": "BJP", "constituency": "Bairia", "st": "IN-UP" },
+    { "name": "ASHUTOSH TANDON", "role": "Urban Development", "rank": "mos", "party": "BJP", "constituency": "Lucknow East", "st": "IN-UP" },
+    { "name": "GIRISH CHANDRA YADAV", "role": "Rural Development", "rank": "mos", "party": "BJP", "constituency": "Jaunpur", "st": "IN-UP" },
+    { "name": "ARUN SAXENA", "role": "Skill Development", "rank": "mos", "party": "BJP", "constituency": "Mehnagar", "st": "IN-UP" }
+  ],
+  "changes": []
+}

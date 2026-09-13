@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "scope": "union",
+  "cycle": 2014,
+  "term": "16th Lok Sabha",
+  "swornIn": "2014-05-26",
+  "note": "Dummy roster for the atlas. Names and portfolios follow the real 2014 ministry; Rajya Sabha members carry constituency null. The one invented element is the by-election change below, which swaps the Prime Minister to exercise the tense.",
+  "members": [
+    { "name": "NARENDRA MODI", "role": "Prime Minister", "rank": "pm", "party": "BJP", "constituency": "Varanasi", "st": "IN-UP" },
+    { "name": "RAJNATH SINGH", "role": "Home Affairs", "rank": "cabinet", "party": "BJP", "constituency": "Lucknow", "st": "IN-UP" },
+    { "name": "SUSHMA SWARAJ", "role": "External Affairs", "rank": "cabinet", "party": "BJP", "constituency": null, "st": null },
+    { "name": "ARUN JAITLEY", "role": "Finance & Corporate Affairs", "rank": "cabinet", "party": "BJP", "constituency": null, "st": null },
+    { "name": "NITIN GADKARI", "role": "Road Transport & Highways", "rank": "cabinet", "party": "BJP", "constituency": "Nagpur", "st": "IN-MH" },
+    { "name": "MANOHAR PARRIKAR", "role": "Defence", "rank": "cabinet", "party": "BJP", "constituency": null, "st": null },
+    { "name": "SURESH PRABHU", "role": "Railways", "rank": "cabinet", "party": "BJP", "constituency": null, "st": null },
+    { "name": "RAVI SHANKAR PRASAD", "role": "Law & Justice", "rank": "cabinet", "party": "BJP", "constituency": null, "st": null },
+    { "name": "UMA BHARTI", "role": "Water Resources", "rank": "cabinet", "party": "BJP", "constituency": "Jhansi", "st": "IN-UP" },
+    { "name": "VENKAIAH NAIDU", "role": "Urban Development", "rank": "cabinet", "party": "BJP", "constituency": null, "st": null },
+    { "name": "SMRITI IRANI", "role": "Human Resource Development", "rank": "cabinet", "party": "BJP", "constituency": null, "st": null },
+    { "name": "PIYUSH GOYAL", "role": "Power, Coal & Renewables", "rank": "mos-ic", "party": "BJP", "constituency": null, "st": null },
+    { "name": "DHARMENDRA PRADHAN", "role": "Petroleum & Natural Gas", "rank": "mos-ic", "party": "BJP", "constituency": "Deogarh", "st": "IN-OD" },
+    { "name": "NIRMALA SITHARAMAN", "role": "Commerce & Industry", "rank": "mos-ic", "party": "BJP", "constituency": null, "st": null },
+    { "name": "SANTOSH GANGWAR", "role": "Textiles", "rank": "mos", "party": "BJP", "constituency": "Bareilly", "st": "IN-UP" },
+    { "name": "MAHESH SHARMA", "role": "Culture & Tourism", "rank": "mos", "party": "BJP", "constituency": "Gautam Buddha Nagar", "st": "IN-UP" },
+    { "name": "MUKHTAR ABBAS NAQVI", "role": "Minority Affairs", "rank": "mos", "party": "BJP", "constituency": null, "st": null },
+    { "name": "ANANTKUMAR HEGDE", "role": "Skill Development", "rank": "mos", "party": "BJP", "constituency": "Uttara Kannada", "st": "IN-KA" }
+  ],
+  "changes": [
+    { "role": "Prime Minister", "date": "2016-02-20", "seat": "Varanasi",
+      "from": { "name": "NARENDRA MODI", "party": "BJP" },
+      "to": { "name": "MEERA JOSHI", "party": "BJP" } }
+  ]
+}

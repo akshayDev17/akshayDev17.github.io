@@ -21,6 +21,9 @@
   --ease:cubic-bezier(.2,0,0,1);
   --map-h:clamp(16rem,78vh,46rem);
   --aspect:1;
+  --vacant:#C7CDD9;
+  --belt-card-w:9rem;
+  --belt-rows:2;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -64,6 +67,19 @@ main{flex:1 1 auto;display:flex;flex-direction:column;padding:0 var(--pad)}
 .back:focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:2px}
 
 h1{margin:0;font-weight:400}
+.mh-top{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s5);flex-wrap:wrap}
+/* The tense is the page's mode: as counted on polling day, or as the term
+   actually ended up. Same idiom as the year selectors, page-wide. */
+.tense{display:flex;align-items:baseline;gap:2px}
+.tense-opt{
+  appearance:none;background:none;border:0;cursor:pointer;
+  font-family:var(--mono);font-size:.75rem;letter-spacing:.05em;color:var(--muted);
+  padding:3px 8px 5px;border-bottom:2px solid transparent;
+  transition:color .18s var(--ease),border-color .18s var(--ease);
+}
+.tense-opt:hover{color:var(--ink)}
+.tense-opt[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.tense-opt:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:2px}
 
 /* ── the two grids, split by a rule down the middle ───────────────────── */
 .panels{
@@ -169,6 +185,14 @@ h1{margin:0;font-weight:400}
 #card .sw{width:9px;height:9px;border-radius:2px;flex:0 0 auto;background:var(--c);
   box-shadow:inset 0 0 0 1px rgba(15,18,32,.2)}
 #card .more{color:var(--muted)}
+#card .bye-title{font-family:var(--mono);font-size:.5625rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin:10px 0 4px;padding-top:8px;border-top:1px solid var(--rule)}
+#card .bye table{font-family:var(--mono);font-size:.6875rem}
+#card .bye td{padding:3px 0;text-align:left}
+#card .bye td:first-child{padding-right:10px;color:var(--muted);white-space:nowrap}
+#card .bye td.name{white-space:normal;max-width:none}
+#card .bye tr.vac td{color:var(--muted)}
+#card .pcode{color:var(--muted)}
+#card .vacant-note{font-family:var(--mono);font-size:.6875rem;color:var(--muted);margin-top:10px;padding-top:8px;border-top:1px solid var(--rule)}
 
 /* ── tables ───────────────────────────────────────────────────────────── */
 .table{flex:0 0 auto}
@@ -201,6 +225,20 @@ tr:first-child td{border-top:0}
 th:first-child,td:first-child{text-align:left}
 th+th,td+td{padding-left:16px}
 td .cell{display:flex;align-items:center;gap:7px}
+td.d{font-weight:500}
+/* Page numbers under the table: quiet, the current one filled. */
+.pager{display:flex;align-items:center;justify-content:flex-end;gap:var(--s2);margin-top:var(--s3)}
+.pager button{
+  appearance:none;background:none;border:0;cursor:pointer;
+  font-family:var(--mono);font-size:.6875rem;color:var(--muted);
+  min-width:1.5rem;height:1.5rem;padding:0 6px;border-radius:var(--r2);
+  transition:color .18s var(--ease),background .14s var(--ease);
+}
+.pager button:hover{color:var(--ink);background:var(--paper-2)}
+.pager button.cur{color:var(--ink);background:var(--paper-2);font-weight:500}
+.pager button:disabled{opacity:.35;cursor:default}
+.pager button:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:var(--r2)}
+.pager-ell{color:var(--muted);padding:0 2px;font-family:var(--mono);font-size:.6875rem}
 .sw{width:9px;height:9px;border-radius:2px;flex:0 0 auto;background:var(--c);
   box-shadow:inset 0 0 0 1px rgba(15,18,32,.2)}
 .more{color:var(--muted)}
@@ -234,6 +272,47 @@ td .cell{display:flex;align-items:center;gap:7px}
 .void p{max-width:40ch;text-align:center;font-family:var(--mono);font-size:.6875rem;
   line-height:1.7;color:var(--muted)}
 
+/* ── by-election marks ────────────────────────────────────────────────── */
+#map-pc .pc.bye,#map-pc .pc.vacant{stroke:var(--ink);stroke-width:.8;stroke-dasharray:2.5 2.5;stroke-opacity:.7}
+
+/* ── the cabinet belt ─────────────────────────────────────────────────── */
+.belt{flex:0 0 auto;display:flex;flex-direction:column;min-width:0;padding:var(--s4) 0 var(--s5);border-top:1px solid var(--rule-2);margin-top:var(--s4)}
+.belt-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s4);flex-wrap:wrap;padding:0 0 var(--s3)}
+.belt-title{font-family:var(--serif);font-size:1.0625rem;line-height:1.25;color:var(--ink);margin:0;font-weight:400}
+.belt-asof{font-family:var(--mono);font-size:.5625rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.belt-view{position:relative}
+.belt-scroll{
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:none;
+  display:grid;grid-auto-flow:column;grid-auto-columns:var(--belt-card-w);
+  grid-template-rows:repeat(var(--belt-rows),auto);align-content:start;
+  gap:var(--s3) var(--s4);overscroll-behavior-x:contain;padding:2px 2px var(--s3);
+  scroll-snap-type:x mandatory;
+}
+.belt-scroll::-webkit-scrollbar{display:none}
+/* The strip is its own keyboard control: tab to it, arrow-key scroll. */
+.belt-scroll:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:var(--r2)}
+.belt-view::before,.belt-view::after{
+  content:'';position:absolute;inset-block:0;width:var(--s6);z-index:2;
+  pointer-events:none;opacity:0;transition:opacity .2s var(--ease);
+}
+.belt-view::before{inset-inline-start:0;background:linear-gradient(to right,var(--paper) 18%,transparent)}
+.belt-view::after{inset-inline-end:0;background:linear-gradient(to left,var(--paper) 18%,transparent)}
+.belt-view.more-l::before{opacity:1}
+.belt-view.more-r::after{opacity:1}
+.belt-card{display:flex;flex-direction:column;gap:3px;min-width:0;scroll-snap-align:start}
+.belt-scope{font-family:var(--mono);font-size:.625rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0}
+.belt-face{
+  aspect-ratio:4/3;background:var(--paper-2);border:1px solid var(--rule);
+  border-radius:var(--r2);display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:1.4rem;color:var(--muted);letter-spacing:.02em;
+  overflow:hidden;
+}
+.belt-face img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 18%}
+.belt-name{font-family:var(--serif);font-size:.8125rem;line-height:1.2;font-weight:500;color:var(--ink);margin:0}
+.belt-role{font-family:var(--mono);font-size:.75rem;line-height:1.4;letter-spacing:.02em;color:var(--muted);margin:0}
+.belt-seat{font-family:var(--mono);font-size:.75rem;line-height:1.35;color:var(--muted);margin:0;display:flex;align-items:center;gap:6px}
+.belt .sw{width:9px;height:9px;border-radius:2px;flex:0 0 auto;background:var(--c);box-shadow:inset 0 0 0 1px rgba(15,18,32,.2)}
+
 @media (min-width:60rem){
   .panels{grid-template-columns:1fr 1px 1fr}
   /* Apple-ish: barely there, and it dissolves before it reaches either end
@@ -246,20 +325,34 @@ td .cell{display:flex;align-items:center;gap:7px}
   .panel{padding-top:var(--s5)}
 }
 @media (prefers-reduced-motion:reduce){
-  .ac,.pc,.scrim,.lift,.year,.back,.edge,.marked,th button,#card{transition:none}
+  .ac,.pc,.scrim,.lift,.year,.back,.edge,.marked,th button,#card,
+  .tense-opt,.belt-view::before,.belt-view::after{transition:none}
 }
 </style>
 </head>
 <body>
 <main>
   <header class="masthead">
-    <div class="mh-left">
-      <a class="back" href="../">← India</a>
-      <h1 class="lbl" id="eyebrow">Election Atlas of India</h1>
+    <div class="mh-top">
+      <div class="mh-left">
+        <a class="back" href="../">← India</a>
+        <h1 class="lbl" id="eyebrow">Election Atlas of India</h1>
+      </div>
+      <div class="tense" id="tense" role="group" aria-label="Result as elected or as it stands" hidden></div>
     </div>
     <hr class="hair" style="margin-top:var(--s4)">
     <p class="caveat">Work in progress — the assembly figures are synthetic and none of this is verified.</p>
   </header>
+
+  <section class="belt" id="belt" aria-label="Council of ministers" hidden>
+    <div class="belt-head">
+      <h2 class="belt-title" id="belt-title">Council of ministers</h2>
+      <span class="belt-asof" id="belt-asof"></span>
+    </div>
+    <div class="belt-view">
+      <div class="belt-scroll" id="belt-scroll" tabindex="0" role="region" aria-label="Council of ministers. Use the arrow keys to scroll."></div>
+    </div>
+  </section>
 
   <div class="panels" id="panels">
     <section class="panel" id="panel-ac">
@@ -374,6 +467,8 @@ const ASPECT = (pb[1][0] - pb[0][0]) / Math.max(1e-6, pb[1][1] - pb[0][1]);
 $('#panels').style.setProperty('--aspect', ASPECT);
 
 const svgAC = $('#map-ac'), svgPC = $('#map-pc');
+const tenseEl = $('#tense'), beltEl = $('#belt'), beltTitle = $('#belt-title'),
+  beltAsof = $('#belt-asof'), beltView = $('.belt-view'), beltScroll = $('#belt-scroll');
 let W = 0, H = 0, pathGen = null;
 const acPaths = new Map(), pcPaths = new Map();
 const acName = new Map(), pcName = new Map();
@@ -476,13 +571,15 @@ function aggregateFrom(cs) {
   return { m, total };
 }
 
-const MAX_ROWS = 8;
+const PAGE_SIZE = 10;
 const sortState = { ac: { key: 'seats', dir: -1 }, pc: { key: 'seats', dir: -1 } };
 const DEFAULT_SORT = { key: 'seats', dir: -1 };
+const page = { ac: 0, pc: 0 };   // current page index per panel
 
 function sortedRows(agg, which) {
-  const rows = [...agg.m.entries()].map(([code, v]) => ({ code, ...v }))
-    .filter(r => r.seats > 0 || r.votes > 0);
+  const rows = [...agg.m.entries()].map(([code, v]) => ({
+    code, ...v, delta: which === 'pc' ? (pcDelta.get(code) || 0) : 0
+  })).filter(r => r.seats > 0 || r.votes > 0);
   const s = sortState[which];
   const share = r => (agg.total ? r.votes / agg.total : 0);
   return rows.sort((a, b) => {
@@ -500,8 +597,7 @@ function renderTable(el, agg, which, resetBtn, clearBtn) {
     return;
   }
   const rows = sortedRows(agg, which);
-  const total = agg.total, rest = rows.slice(MAX_ROWS);
-  const restV = rest.reduce((n, r) => n + r.votes, 0);
+  const total = agg.total;
   const s = sortState[which];
   const on = sel[which];
   const isDefault = s.key === DEFAULT_SORT.key && s.dir === DEFAULT_SORT.dir;
@@ -511,31 +607,75 @@ function renderTable(el, agg, which, resetBtn, clearBtn) {
   const th = (k, label) =>
     `<th aria-sort="${s.key === k ? (s.dir === -1 ? 'descending' : 'ascending') : 'none'}">` +
     `<button type="button" data-sort="${k}">${label}${arrow(k)}</button></th>`;
+  const showDelta = which === 'pc' && tense === 'stands';
+  const dTd = r => {
+    const d = r.delta;
+    return `<td class="d">${d > 0 ? '+' + d : d < 0 ? '\u2212' + (-d) : ''}</td>`;
+  };
+  const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  page[which] = Math.min(page[which], pageCount - 1);
+  const start = page[which] * PAGE_SIZE;
+  const slice = rows.slice(start, start + PAGE_SIZE);
   /* The rows are controls, exactly as on level one: the pick button is the tab
      stop and its click bubbles to the row, so pointer and keyboard go through
      one handler rather than two that can disagree. */
   el.innerHTML =
-    `<table><thead><tr><th>Party</th>${th('seats', 'Seats won')}${th('votes', 'Votes')}${th('share', 'Share')}</tr></thead>` +
+    `<table><thead><tr><th>Party</th>${th('seats', 'Seats won')}${showDelta ? th('delta', '±') : ''}${th('votes', 'Votes')}${th('share', 'Share')}</tr></thead>` +
     `<tbody${on.size ? ' class="has-sel"' : ''}>` +
-    rows.slice(0, MAX_ROWS).map(r => {
+    slice.map(r => {
       const picked = on.has(r.code);
       return `<tr data-party="${r.code}"${picked ? ' class="sel"' : ''}>` +
         `<td><button type="button" class="pick" aria-pressed="${picked}">` +
         `<i class="sw" style="--c:${colour(r.code)}"></i><span>${r.code}</span></button></td>` +
-        `<td>${r.seats}</td><td>${nf(r.votes)}</td><td>${pc1(total ? r.votes / total : 0)}</td></tr>`;
+        `<td>${r.seats}</td>${showDelta ? dTd(r) : ''}<td>${nf(r.votes)}</td><td>${pc1(total ? r.votes / total : 0)}</td></tr>`;
     }).join('') +
-    (rest.length ? `<tr class="more"><td><span class="cell">+${rest.length} more</span></td>` +
-      `<td>${rest.reduce((n, r) => n + r.seats, 0)}</td><td>${nf(restV)}</td>` +
-      `<td>${pc1(total ? restV / total : 0)}</td></tr>` : '') +
-    `</tbody></table>`;
+    `</tbody></table>` + pagerHTML(which, pageCount);
   for (const b of el.querySelectorAll('th button[data-sort]')) {
     b.addEventListener('click', () => {
       const k = b.dataset.sort;
       const st = sortState[which];
       if (st.key === k) st.dir = -st.dir; else { st.key = k; st.dir = -1; }
+      page[which] = 0;
       renderTable(el, agg, which, resetBtn, clearBtn);
     });
   }
+  for (const b of el.querySelectorAll('.pager button')) {
+    b.addEventListener('click', () => {
+      const t = Number(b.dataset.page);
+      if (!Number.isNaN(t)) { page[which] = t; renderTable(el, agg, which, resetBtn, clearBtn); }
+    });
+  }
+}
+
+/* Page numbers under the table. One button per page, the current one filled;
+   prev/next sit at the ends and disable at the boundary, so the reader always
+   knows where they are and never clicks a dead end. Long strips collapse to a
+   window around the current page so the numbers never wrap the panel. */
+function pagerHTML(which, pageCount) {
+  if (pageCount <= 1) return '';
+  const p = page[which];
+  let nums = '';
+  for (const item of pageList(p, pageCount)) {
+    if (item === '…') nums += `<span class="pager-ell" aria-hidden="true">…</span>`;
+    else nums += `<button type="button" data-page="${item}"${item === p ? ' class="cur" aria-current="page"' : ''}>${item + 1}</button>`;
+  }
+  return `<nav class="pager" aria-label="Table pages">` +
+    `<button type="button" data-page="${p - 1}" aria-label="Previous page"${p === 0 ? ' disabled' : ''}>‹</button>` +
+    nums +
+    `<button type="button" data-page="${p + 1}" aria-label="Next page"${p === pageCount - 1 ? ' disabled' : ''}>›</button>` +
+    `</nav>`;
+}
+
+function pageList(p, count) {
+  if (count <= 7) return [...Array(count).keys()];
+  const pages = [...new Set([0, count - 1, p - 1, p, p + 1])]
+    .filter(i => i >= 0 && i < count).sort((a, b) => a - b);
+  const out = [];
+  for (let i = 0; i < pages.length; i++) {
+    if (i > 0 && pages[i] - pages[i - 1] > 1) out.push('…');
+    out.push(pages[i]);
+  }
+  return out;
 }
 
 /* ── per-constituency detail ──────────────────────────────────────────── */
@@ -557,29 +697,52 @@ const cardRows = { ac: new Map(), pc: new Map() };
 
 function showCard(which, key, x, y) {
   const cands = (which === 'ac' ? cardRows.ac : cardRows.pc).get(key);
-  if (!cands || !cands.length) return;
-  const total = cands.reduce((n, c) => n + c.v, 0);
+  const r = which === 'pc' ? seatResolved.get(key) : null;
+  const byes = (r && r.events) || [];
+  if ((!cands || !cands.length) && !byes.length && !(r && r.vacant)) return;
   const nm = (which === 'ac' ? acName : pcName).get(key) || '';
-  const rest = cands.slice(6);
-  const restV = rest.reduce((n, c) => n + c.v, 0);
-  card.innerHTML =
-    `<div class="top"><div class="who">
+  let body = '';
+  if (cands && cands.length) {
+    const total = cands.reduce((n, c) => n + c.v, 0);
+    const rest = cands.slice(6);
+    const restV = rest.reduce((n, c) => n + c.v, 0);
+    body =
+      `<div class="top"><div class="who">
+         <p class="sub">${which === 'ac' ? 'Assembly constituency' : 'Lok Sabha constituency'}</p>
+         <h3>${nm}</h3>
+         <p class="meta"><span>${cands.length} candidates</span><span>${nf(total)} votes polled</span></p>
+       </div>${faceFor(which, key)}</div>
+       <table><thead><tr><th>Party</th><th>Candidate</th><th>Votes</th><th>Share</th></tr></thead><tbody>` +
+      cands.slice(0, 6).map(c =>
+        `<tr><td><span class="cell"><i class="sw" style="--c:${colour(c.p)}"></i>${c.p}</span></td>` +
+        `<td class="name" title="${c.n}">${c.n}</td>` +
+        `<td>${nf(c.v)}</td><td>${pc1(total ? c.v / total : 0)}</td></tr>`).join('') +
+      (rest.length ? `<tr class="more"><td>+${rest.length} more</td><td></td><td>${nf(restV)}</td>` +
+        `<td>${pc1(total ? restV / total : 0)}</td></tr>` : '') +
+      `</tbody></table>`;
+  } else {
+    body = `<div class="top"><div class="who">
        <p class="sub">${which === 'ac' ? 'Assembly constituency' : 'Lok Sabha constituency'}</p>
        <h3>${nm}</h3>
-       <p class="meta"><span>${cands.length} candidates</span><span>${nf(total)} votes polled</span></p>
-     </div>${faceFor(which, key)}</div>
-     <table><thead><tr><th>Party</th><th>Candidate</th><th>Votes</th><th>Share</th></tr></thead><tbody>` +
-    cands.slice(0, 6).map(c =>
-      `<tr><td><span class="cell"><i class="sw" style="--c:${colour(c.p)}"></i>${c.p}</span></td>` +
-      `<td class="name" title="${c.n}">${c.n}</td>` +
-      `<td>${nf(c.v)}</td><td>${pc1(total ? c.v / total : 0)}</td></tr>`).join('') +
-    (rest.length ? `<tr class="more"><td>+${rest.length} more</td><td></td><td>${nf(restV)}</td>` +
-      `<td>${pc1(total ? restV / total : 0)}</td></tr>` : '') +
-    `</tbody></table>`;
+       <p class="meta"><span>No candidate detail for this year</span></p>
+     </div></div>`;
+  }
+  if (r && r.vacant && tense === 'stands') {
+    body += `<p class="vacant-note">Seat vacant — no by-election has been held.</p>`;
+  } else if (byes.length && tense === 'stands') {
+    body += `<div class="bye"><p class="bye-title">By-elections</p><table><tbody>` +
+      byes.map(ev => {
+        if (ev.type === 'vacated') return `<tr class="vac"><td>${ev.date}</td><td class="name">Vacated — ${ev.reason}</td></tr>`;
+        const w = ev.winner;
+        return `<tr><td>${ev.date}</td><td class="name"><span class="cell"><i class="sw" style="--c:${colour(w.p)}"></i>${w.n} <span class="pcode">${w.p}</span></span></td><td>${nf(w.v)}</td><td>${ev.turnout}%</td></tr>`;
+      }).join('') +
+      `</tbody></table></div>`;
+  }
+  card.innerHTML = body;
   card.classList.add('on');
-  const r = card.getBoundingClientRect();
-  card.style.left = Math.max(8, Math.min(x + 18, innerWidth - r.width - 12)) + 'px';
-  card.style.top = Math.max(8, Math.min(y + 14, innerHeight - r.height - 12)) + 'px';
+  const rr = card.getBoundingClientRect();
+  card.style.left = Math.max(8, Math.min(x + 18, innerWidth - rr.width - 12)) + 'px';
+  card.style.top = Math.max(8, Math.min(y + 14, innerHeight - rr.height - 12)) + 'px';
 }
 function hideCard() { card.classList.remove('on'); }
 
@@ -667,14 +830,59 @@ const acNums = acs ? new Set(acs.features.map(f => String(f.properties.no))) : n
 const sel = { ac: new Set(), pc: new Set() };
 const seatParty = { ac: new Map(), pc: new Map() };   // seat key -> party code
 const partySeats = { ac: new Map(), pc: new Map() };  // party code -> [seat key]
+let tense = 'elected';                 // 'elected' | 'stands'
+let pcByeSeats = [];                   // by-election seats for this state + LS year
+let unionCabinet = null;               // union cabinet doc for the LS year
+let stateCabinet = null;               // state cabinet doc (static)
+const seatResolved = new Map();        // ls_seat_code -> { p, vacant, byeCount, events }
+let pcDelta = new Map();               // party -> net change under 'stands'
 
 function paintFills(which) {
   const bound = which === 'ac' ? acPaths : pcPaths;
   const on = sel[which];
   for (const [k, el] of bound) {
-    const party = seatParty[which].get(k);
-    const leftOut = party && on.size && !on.has(party);
-    el.style.setProperty('--c', !party || leftOut ? 'var(--paper-2)' : colour(party));
+    const r = which === 'pc' ? seatResolved.get(k) : null;
+    const vacant = !!r && r.vacant;
+    const bye = which === 'pc' && tense === 'stands' && !!r && r.byeCount > 0 && !vacant;
+    el.classList.toggle('bye', bye);
+    el.classList.toggle('vacant', vacant);
+    if (vacant) {
+      el.style.setProperty('--c', 'var(--vacant)');
+    } else {
+      const party = seatParty[which].get(k);
+      const leftOut = party && on.size && !on.has(party);
+      el.style.setProperty('--c', !party || leftOut ? 'var(--paper-2)' : colour(party));
+    }
+  }
+}
+
+function buildPCResolved(data) {
+  seatResolved.clear();
+  for (const [uid, c] of Object.entries(data.pcRows)) {
+    const seat = uidToSeat.get(uid);
+    if (!seat) continue;
+    seatResolved.set(seat, { p: c.p, vacant: false, byeCount: 0, events: [] });
+  }
+  for (const s of pcByeSeats) {
+    const r = seatResolved.get(s.seat);
+    if (!r) continue;
+    r.events = s.events;
+    r.byeCount = s.events.filter(e => e.type === 'bye').length;
+    if (tense === 'stands') {
+      const last = s.events[s.events.length - 1];
+      if (last && last.type === 'vacated') { r.p = null; r.vacant = true; }
+      else if (r.byeCount) r.p = s.events.filter(e => e.type === 'bye').pop().winner.p;
+    }
+  }
+  pcDelta = new Map();
+  for (const [uid, c] of Object.entries(data.pcRows)) {
+    const seat = uidToSeat.get(uid);
+    if (!seat) continue;
+    const r = seatResolved.get(seat);
+    const nowP = (r && r.vacant) ? null : (r ? r.p : c.p);
+    if (nowP === c.p) continue;
+    pcDelta.set(c.p, (pcDelta.get(c.p) || 0) - 1);
+    if (nowP) pcDelta.set(nowP, (pcDelta.get(nowP) || 0) + 1);
   }
 }
 
@@ -682,12 +890,13 @@ function paintPC(data) {
   const rows = new Map();
   seatParty.pc = new Map();
   partySeats.pc = new Map();
-  for (const [uid, c] of Object.entries(data.pcRows)) {
-    const seat = uidToSeat.get(uid);
-    if (!seat) continue;
-    seatParty.pc.set(seat, c.p);
-    const arr = partySeats.pc.get(c.p);
-    if (arr) arr.push(seat); else partySeats.pc.set(c.p, [seat]);
+  buildPCResolved(data);
+  for (const [seat, r] of seatResolved) {
+    seatParty.pc.set(seat, r.p);
+    if (r.p) {
+      const arr = partySeats.pc.get(r.p);
+      if (arr) arr.push(seat); else partySeats.pc.set(r.p, [seat]);
+    }
   }
   for (const [uid, d] of detail.pc) {
     const seat = uidToSeat.get(uid);
@@ -755,16 +964,102 @@ function bindPanelTable(which) {
   if (e.clear) e.clear.addEventListener('click', () => clearSel(which));
 }
 
+/* ── the tense control and the cabinet belt ───────────────────────────── */
+function buildTenseControl() {
+  tenseEl.textContent = '';
+  for (const [val, label] of [['elected', 'As elected'], ['stands', 'As it stands']]) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'tense-opt'; b.dataset.tense = val; b.textContent = label;
+    b.setAttribute('aria-pressed', String(val === tense));
+    b.addEventListener('click', () => { if (tense !== val) { tense = val; applyTense(); } });
+    tenseEl.appendChild(b);
+  }
+  tenseEl.hidden = false;
+}
+
+function beltRoster() {
+  const out = [];
+  if (stateCabinet && stateCabinet.members) {
+    for (const m of stateCabinet.members) out.push({ ...m, scope: 'State' });
+  }
+  if (unionCabinet && unionCabinet.members) {
+    for (const m of unionCabinet.members) {
+      if (m.state === stateCode) out.push({ ...m, scope: 'Union' });
+    }
+  }
+  return out;
+}
+
+function renderBelt() {
+  const members = beltRoster();
+  if (!members.length) { beltEl.hidden = true; return; }
+  beltEl.hidden = false;
+  beltTitle.textContent = `Council of ministers · ${region.name}`;
+  const byes = pcByeSeats.reduce((n, s) => n + s.events.filter(e => e.type === 'bye').length, 0);
+  beltAsof.textContent = tense === 'stands'
+    ? (byes ? `as it stands · ${byes} by-election${byes === 1 ? '' : 's'} in ${region.name}` : `as it stands · no by-elections in ${region.name}`)
+    : (stateCabinet ? `state cabinet sworn in ${stateCabinet.swornIn}` : 'as elected');
+  const order = { cm: 0, pm: 0, cabinet: 1, 'mos-ic': 2, mos: 3 };
+  const sorted = [...members].sort((a, b) =>
+    (a.scope === b.scope ? 0 : a.scope === 'State' ? -1 : 1) ||
+    (order[a.rank] ?? 9) - (order[b.rank] ?? 9) ||
+    (a.name || '').localeCompare(b.name || ''));
+  beltScroll.innerHTML = sorted.map(m => {
+    const initials = (m.name || '?').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    const roleTxt = m.portfolio || m.role || '';
+    const seatLabel = m.constituency || (m.state ? 'Rajya Sabha' : '');
+    const seat = seatLabel
+      ? `<span class="belt-seat"><i class="sw" style="--c:${colour(m.party)}"></i>${seatLabel}</span>`
+      : '';
+    const face = m.photo
+      ? `<div class="belt-face"><img src="../data/photos/cabinet/${m.photo}" alt="" loading="lazy" onerror="this.parentNode.innerHTML='${initials}'"></div>`
+      : `<div class="belt-face" aria-hidden="true">${initials}</div>`;
+    return `<div class="belt-card">` +
+      face +
+      `<span class="belt-scope">${m.scope}</span>` +
+      `<p class="belt-name">${m.name}</p>` +
+      `<p class="belt-role">${roleTxt}</p>` +
+      seat + `</div>`;
+  }).join('');
+  updateBeltFades();
+}
+
+function updateBeltFades() {
+  const max = beltScroll.scrollWidth - beltScroll.clientWidth;
+  const hasMore = max > 2;
+  beltView.classList.toggle('more-l', hasMore && beltScroll.scrollLeft > 2);
+  beltView.classList.toggle('more-r', hasMore && beltScroll.scrollLeft < max - 2);
+}
+
+function applyTense() {
+  if (lastPC) {
+    paintPC(lastPC);
+    page.pc = 0;
+    renderTable($('#table-pc'), lastPC.pcAgg, 'pc', $('#reset-pc'), $('#clear-pc'));
+  }
+  renderBelt();
+  for (const b of tenseEl.children) b.setAttribute('aria-pressed', String(b.dataset.tense === tense));
+}
+
 async function loadLS(year) {
   const all = await fetch(`../data/results/ls/pc/${year}.json`).then(r => r.json());
   const pcRows = Object.fromEntries(Object.entries(all.constituencies).filter(([, c]) => c.st === stateCode));
   await loadPCDetail(year);
+  const [bye, uCab] = await Promise.all([
+    fetch(`../data/results/ls/byel/${year}.json`).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch(`../data/cabinet/union/${year}.json`).then(r => r.ok ? r.json() : null).catch(() => null),
+  ]);
+  pcByeSeats = (bye && bye.seats ? bye.seats : []).filter(s => s.st === stateCode);
+  unionCabinet = uCab;
   return { year, pcRows, pcAgg: aggregateFrom(pcRows) };
 }
 async function loadLA(year) {
   if (!hasAC) return null;
   const doc = await fetch(`../data/results/ac/${stateCode}/${year}.json`).then(r => r.json());
   await loadACDetail(year);
+  /* The state cabinet follows the assembly timeline, not the Lok Sabha one. */
+  stateCabinet = await fetch(`../data/cabinet/state/${stateCode}/${year}.json`)
+    .then(r => r.ok ? r.json() : null).catch(() => null);
   return { year, acRows: doc.constituencies, acAgg: aggregateFrom(doc.constituencies) };
 }
 
@@ -784,8 +1079,9 @@ async function selectLS(y) {
     lastPC = data;
     const n = Object.keys(data.pcRows).length;
     $('#cap-pc').textContent = `${n} seats`;
+    layout(); paintPC(data); renderBelt();
+    page.pc = 0;
     renderTable($('#table-pc'), data.pcAgg, 'pc', $('#reset-pc'), $('#clear-pc'));
-    layout(); paintPC(data);
     await markReady();
   } finally { for (const b of $('#years-pc').children) b.disabled = false; }
 }
@@ -798,19 +1094,20 @@ async function selectLA(y) {
     lastAC = data;
     const n = Object.keys(data.acRows).length;
     $('#cap-ac').textContent = `${n} seats`;
+    page.ac = 0;
     renderTable($('#table-ac'), data.acAgg, 'ac', $('#reset-ac'), $('#clear-ac'));
-    layout(); paintAC(data);
+    layout(); paintAC(data); renderBelt();
     await markReady();
   } finally { for (const b of $('#years-ac').children) b.disabled = false; }
 }
 
 $('#reset-pc').addEventListener('click', () => {
   sortState.pc = { key: DEFAULT_SORT.key, dir: DEFAULT_SORT.dir };
-  if (lastPC) renderTable($('#table-pc'), lastPC.pcAgg, 'pc', $('#reset-pc'), $('#clear-pc'));
+  if (lastPC) { page.pc = 0; renderTable($('#table-pc'), lastPC.pcAgg, 'pc', $('#reset-pc'), $('#clear-pc')); }
 });
 $('#reset-ac').addEventListener('click', () => {
   sortState.ac = { key: DEFAULT_SORT.key, dir: DEFAULT_SORT.dir };
-  if (lastAC) renderTable($('#table-ac'), lastAC.acAgg, 'ac', $('#reset-ac'), $('#clear-ac'));
+  if (lastAC) { page.ac = 0; renderTable($('#table-ac'), lastAC.acAgg, 'ac', $('#reset-ac'), $('#clear-ac')); }
 });
 
 if (!hasAC) {
@@ -829,6 +1126,9 @@ wire(svgAC, 'ac');
 wire(svgPC, 'pc');
 bindPanelTable('ac');
 bindPanelTable('pc');
+if (qs.get('t') === 'stands') tense = 'stands';
+buildTenseControl();
+beltScroll.addEventListener('scroll', updateBeltFades, { passive: true });
 // the India map drills in carrying the year it was showing; honour it when this
 // state has that year, otherwise fall back to the latest available
 const wantsYear = Number(qs.get('y')) || 0;
