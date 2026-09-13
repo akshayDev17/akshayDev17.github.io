@@ -117,3 +117,37 @@ region in an `auto` grid row needs a definite height or it swallows the flex tra
 column that is rendered before its data is computed shows nothing with no error; and a belt's
 row count is never a constant — `floor(available height ÷ tallest-card height)`, measured at
 runtime and re-fit on resize, or the last row clips under a browser zoom.
+
+## Search (party / minister) + party symbols — Sep 13
+Added two masthead search bars (L1) and party-symbol images in the cabinet (L1+L2).
+
+- **Find party** narrows the national table AND dims the map (a seat stays bright only if it
+  passes both the click-selection and the text query). Count is "N of M" (M = table's unfiltered
+  row count). A truthful empty state distinguishes "no match" from "matched below the 0.5% cut"
+  (RLD 2019, VBA/PMK 2024 polled <0.5% — the flat "no party matches" was a lie). The mapnote is
+  query-aware: "· 2 parties showing" / "· no seat matches 'xyz'".
+- **Find minister** spotlights matching belt cards. Dimming is the map's recede idiom, NOT raw
+  opacity: `.belt-card.dim .belt-face{filter:saturate(.22)}` + name → `--muted`. Raw `opacity:.28`
+  put names at 1.68:1 (unreadable). First match is scrolled into view (`behavior:'auto'` — smooth
+  fights `scroll-snap-type:x mandatory` and freezes under headless virtual-time).
+- Party symbols: 24/24 Wikipedia infobox logos downloaded to `data/photos/parties/` +
+  `data/parties-symbols.json`. Cabinet's 9px colour square → 18px emblem (`max-width/height`,
+  no letterbox) with a colour-square fallback (incl. on image error). Map/table keep colour.
+  9 files are monochrome black line art (election symbols); mixed aspect ratios (JDU arrow 3.4:1,
+  JDS 1:1.5) — `object-fit:contain` in a fixed box letterboxes wide banners, so use
+  `max-width/max-height + width/height:auto` instead.
+- Wikimedia now rejects the `240px` thumb (HTTP 400); the allowlist is 20/40/60/120/250/330/500/960… — use 250px.
+
+**Critic method caveat (this run):** vision backends returned 429 for the whole turn, so the
+critic pixel-sampled + OCR'd + read source rather than viewing the PNGs. It still caught real
+defects (2.72:1 placeholder, 1.55:1 field boundary, the false empty state, the stale count,
+`outline:0` on the only input). Fixed: `--rule-3:#7C8598` boundary (3.28:1), placeholder to full
+`--muted` (6.12:1), input gets the page's `:focus-visible` ring, labels on a shared 6.5rem track
+so the two inputs align, row spans (`space-between`) instead of pooling 525px of dead space,
+label promoted to the `.lbl` tier (10px/.15em), concrete placeholders ("e.g. BJP, Congress, AITC").
+
+**Lesson:** a new control must inherit the page's already-written idioms — its focus ring, its
+contrast arithmetic, its recede mechanism — not re-derive its own. The three tells that a
+component was generated rather than designed: a placeholder restating its label, two count
+formats in one component, and `outline:0` with no replacement. And a search that reports a match
+it never takes you to is only half a search.

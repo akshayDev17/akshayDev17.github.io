@@ -11,7 +11,7 @@
 <style>
 :root{
   --paper:#EEF1F8; --paper-2:#E3E9F4; --ink:#0F1220; --muted:#525A6B;
-  --rule:#D3D9E6; --rule-2:#BCC4D6; --vacant:#C7CDD9;
+  --rule:#D3D9E6; --rule-2:#BCC4D6; --rule-3:#7C8598; --vacant:#C7CDD9;
   --serif:"Newsreader",ui-serif,Georgia,serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
 
@@ -118,6 +118,41 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 .tense-opt:hover{color:var(--ink)}
 .tense-opt[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink)}
 .tense-opt:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:2px}
+
+/* ── search ───────────────────────────────────────────────────────────── *
+ * A query is a fill-in line, docked to the surface it searches: party search
+ * above the national table, minister search inside the belt head. The label
+ * sits above the line so the narrow columns stay legible. No accent enters:
+ * the active edge is --ink, the same colour as the selection edge and the
+ * state outlines. */
+.find{display:flex;flex-direction:column;gap:var(--s1)}
+.find-label{font-family:var(--mono);font-size:.5625rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);cursor:pointer}
+.find-line{display:flex;align-items:baseline;gap:var(--s2);
+  border-bottom:1px solid var(--rule-3);
+  transition:border-color .18s var(--ease),box-shadow .18s var(--ease)}
+/* Focus is the underline thickening, not a rectangle: a 1px rule grows to a 2px
+   --ink line (border + shadow, so nothing shifts), the same idiom the year tabs
+   use. The caret already marks the field, so no outline is needed. */
+.find-line:focus-within{border-bottom-color:var(--ink);box-shadow:0 1px 0 0 var(--ink)}
+.find-line input{
+  appearance:none;background:none;border:0;outline:0;padding:5px 0 4px;margin:0;
+  font-family:var(--mono);font-size:.8125rem;color:var(--ink);
+  flex:1 1 auto;min-width:0;border-radius:0;
+}
+.find-line input::placeholder{color:var(--muted)}
+.search-count{font-family:var(--mono);font-size:.625rem;color:var(--muted);flex:0 0 auto;
+  white-space:nowrap;padding-bottom:5px}
+.search-clear{
+  appearance:none;background:none;border:0;cursor:pointer;padding:2px 6px 5px;min-height:24px;
+  font-family:var(--mono);font-size:.625rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);transition:color .18s var(--ease);
+}
+.search-clear:hover{color:var(--ink)}
+.search-clear:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:2px}
+.search-clear[hidden]{display:none}
+.ntable .find{margin-bottom:var(--s3)}
+.belt .find{margin-bottom:var(--s3)}
 
 /* ── the plate and its key ────────────────────────────────────────────── *
  * The map is height-bound: at 1440px it is 649px wide inside a 1325px column,
@@ -237,7 +272,7 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
  * operable. Selection is --ink on a --paper-2 surface, never a hue: every
  * saturated colour on this page belongs to a party, and a selection highlight
  * in the usual warning orange would read as BJP. */
-.ntable{display:flex;flex-direction:column;min-height:0;font-family:var(--mono)}
+.ntable{display:flex;flex-direction:column;min-height:0;font-family:var(--mono);align-self:start}
 /* The head holds only the two resets, and both are hidden until they apply, so
    the row keeps a reserved height rather than letting the table jump down the
    moment a reset appears. */
@@ -262,8 +297,10 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
    What that gives up is the position indicator and click-drag scrolling. Wheel,
    trackpad and keyboard all still scroll, and tabbing to a row button brings it
    into view, so every row stays reachable — but it is a real trade, not free. */
-.ntable-view{position:relative;flex:1 1 auto;min-height:0}
-.ntable-scroll{height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+/* With 10 rows a page, the table no longer fills the column or scrolls: it is
+   its own height, and the pager below it carries the rest of the rows. */
+.ntable-view{position:relative}
+.ntable-scroll{scrollbar-width:none}
 .ntable-scroll::-webkit-scrollbar{display:none}
 /* The fade exists only where there IS more: a container already at its end
    claims no edge it does not have. */
@@ -287,13 +324,9 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 .ntable th:nth-child(2){width:4.25rem}
 .ntable th:nth-child(3){width:5.75rem}
 .ntable th:nth-child(4){width:3.5rem}
-/* The delta is a fifth track, present only in "as it stands" mode; its own
-   widths stop the other columns from shifting. */
-.ntable.has-delta th:nth-child(2){width:3.25rem}
-.ntable.has-delta th:nth-child(3){width:2.25rem}
-.ntable.has-delta th:nth-child(4){width:4.75rem}
-.ntable.has-delta th:nth-child(5){width:3rem}
-.ntable td.d{font-weight:500}
+/* The tense delta rides the seats cell, not its own column: a dedicated track
+   squeezes the votes number out of a 288px table. Sign + weight carry it. */
+.ntable .d{font-weight:500;letter-spacing:.02em}
 .ntable th{
   font-weight:400;font-size:.5625rem;letter-spacing:.11em;text-transform:uppercase;
   color:var(--muted);text-align:right;padding:0;border-bottom:1px solid var(--rule-2);
@@ -313,7 +346,7 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
   transition:color .18s var(--ease);
 }
 .ntable tr:first-child td{border-top:0}
-.ntable th:first-child,.ntable td:first-child{text-align:left}
+.ntable th:first-child,.ntable td:first-child{text-align:left;padding-inline-start:var(--s2)}
 .ntable th+th,.ntable td+td{padding-inline-start:var(--s4)}
 .ntable .pick{
   appearance:none;background:none;border:0;padding:0;cursor:pointer;font:inherit;
@@ -332,6 +365,19 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 /* with a selection standing, the rows left out of it say so quietly */
 .ntable tbody.has-sel tr:not(.sel){color:var(--muted)}
 .ntable tbody.has-sel tr:not(.sel) .sw{opacity:.4}
+/* Page numbers under the table: quiet, the current one filled. */
+.pager{display:flex;align-items:center;justify-content:flex-end;gap:var(--s2);margin-top:var(--s3)}
+.pager button{
+  appearance:none;background:none;border:0;cursor:pointer;
+  font-family:var(--mono);font-size:.6875rem;color:var(--muted);
+  min-width:1.5rem;height:1.5rem;padding:0 6px;border-radius:var(--r2);
+  transition:color .18s var(--ease),background .14s var(--ease);
+}
+.pager button:hover{color:var(--ink);background:var(--paper-2)}
+.pager button.cur{color:var(--ink);background:var(--paper-2);font-weight:500}
+.pager button:disabled{opacity:.35;cursor:default}
+.pager button:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:var(--r2)}
+.pager-ell{color:var(--muted);padding:0 2px;font-family:var(--mono);font-size:.6875rem}
 
 /* ── the hover card ───────────────────────────────────────────────────── */
 #card{
@@ -405,18 +451,31 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 .belt-view.more-l::before{opacity:1}
 .belt-view.more-r::after{opacity:1}
 .belt-card{display:flex;flex-direction:column;gap:3px;min-width:0;scroll-snap-align:start}
+/* The minister search recedes non-matches the same way the map does: toward the
+   ground, not toward transparency. A raw opacity here put the names at 1.68:1.
+   Desaturating the face and muting the name keeps every dimmed value readable
+   while the colour is the thing that goes away. */
+.belt-card .belt-face,.belt-card .belt-name{transition:filter .22s var(--ease),color .22s var(--ease)}
+.belt-card.dim .belt-face{filter:saturate(.22) brightness(.92)}
+.belt-card.dim .belt-name{color:var(--muted)}
 .belt-face{
-  aspect-ratio:4/3;background:var(--paper-2);border:1px solid var(--rule);
+  aspect-ratio:3/4;background:var(--paper-2);border:1px solid var(--rule);
   border-radius:var(--r2);display:flex;align-items:center;justify-content:center;
   font-family:var(--serif);font-size:1.4rem;color:var(--muted);letter-spacing:.02em;
   overflow:hidden;
 }
-.belt-face img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 18%}
-.belt-name{font-family:var(--serif);font-size:.8125rem;line-height:1.2;font-weight:500;color:var(--ink);margin:0}
-.belt-role{font-family:var(--mono);font-size:.75rem;line-height:1.4;letter-spacing:.02em;color:var(--muted);margin:0}
-.belt-seat{font-family:var(--mono);font-size:.75rem;line-height:1.35;color:var(--muted);margin:0;display:flex;align-items:center;gap:6px}
+.belt-face img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 50%}
+.belt-name{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.8125rem;line-height:1.25;font-weight:500;color:#2E3440;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.belt-role{font-family:var(--mono);font-size:.75rem;line-height:1.4;letter-spacing:.02em;color:var(--muted);margin:0;display:flex;align-items:baseline;gap:4px;min-width:0}
+.belt-role-main{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.belt-plus{flex:0 0 auto;color:var(--ink);font-weight:500}
+.belt-seat{font-family:var(--mono);font-size:.75rem;line-height:1.35;color:var(--muted);margin:0;display:flex;align-items:center;gap:6px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .belt .sw{width:9px;height:9px;border-radius:2px;flex:0 0 auto;background:var(--c);box-shadow:inset 0 0 0 1px rgba(15,18,32,.2)}
+.belt .belt-sym{flex:0 0 auto;max-width:18px;max-height:18px;width:auto;height:auto;display:block}
 .belt-empty{font-family:var(--mono);font-size:.6875rem;line-height:1.7;color:var(--muted);max-width:30ch}
+#card .min-list{list-style:none;margin:10px 0 0;padding:0;font-family:var(--mono);font-size:.6875rem;line-height:1.55;color:var(--muted)}
+#card .min-list li{padding:4px 0;border-top:1px solid var(--rule)}
+#card .min-list li:first-child{border-top:0}
 
 /* ── responsive ───────────────────────────────────────────────────────── */
 /* Side by side until the map can no longer hold its shape in the width left
@@ -432,8 +491,8 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
   .ntable{border-top:1px solid var(--rule-2);padding-top:var(--s2)}
   /* The belt fills width the height-bound map can never use. On a narrow screen
      the map is width-bound, so that land does not exist and the belt would only
-     squeeze the map — it is a desktop element here. The tense, marks and delta
-     all still work. */
+     squeeze the map — it is a desktop element here. The minister search lives
+     inside it, so it disappears with the belt rather than needing its own rule. */
   .belt{display:none}
 }
 @media (max-width:44rem){
@@ -442,7 +501,8 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 @media (prefers-reduced-motion:reduce){
   #map .pc,#map .st,#map .scrim,#map .lift,.year,#card,
   .ntable td,.ntable tbody tr,.ntable .sw,.tense-opt,
-  .belt-view::before,.belt-view::after{transition:none}
+  .belt-view::before,.belt-view::after,.belt-card .belt-face,.belt-card .belt-name,
+  .find-line,.search-clear,.pager button{transition:none}
 }
 </style>
 </head>
@@ -471,6 +531,14 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
     </figure>
 
     <section class="ntable" aria-label="National result">
+      <div class="find" role="search" aria-label="Find a party">
+        <label class="find-label" for="search-party">Find party</label>
+        <div class="find-line">
+          <input id="search-party" type="text" placeholder="e.g. BJP, Congress" autocomplete="off" spellcheck="false" enterkeyhint="search">
+          <span class="search-count" id="party-count" aria-live="polite"></span>
+          <button class="search-clear" id="clear-party" type="button" hidden>Clear</button>
+        </div>
+      </div>
       <div class="ntable-head">
         <span class="ntable-actions">
           <button class="reset" id="reset-sort" type="button" hidden>default order</button>
@@ -492,12 +560,21 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
           </table>
         </div>
       </div>
+      <nav class="pager" id="ntable-pager" aria-label="Table pages"></nav>
     </section>
 
     <section class="belt" id="belt" aria-label="Union council of ministers" hidden>
       <div class="belt-head">
         <h2 class="belt-title" id="belt-title">Union council of ministers</h2>
         <span class="belt-asof" id="belt-asof"></span>
+      </div>
+      <div class="find" role="search" aria-label="Find a minister">
+        <label class="find-label" for="search-min">Find minister</label>
+        <div class="find-line">
+          <input id="search-min" type="text" placeholder="e.g. Amit Shah, Railways" autocomplete="off" spellcheck="false" enterkeyhint="search">
+          <span class="search-count" id="min-count" aria-live="polite"></span>
+          <button class="search-clear" id="clear-min" type="button" hidden>Clear</button>
+        </div>
       </div>
       <div class="belt-view">
         <div class="belt-scroll" id="belt-scroll" tabindex="0" role="region" aria-label="Council of ministers. Use the arrow keys to scroll."></div>
@@ -515,6 +592,7 @@ const $ = s => document.querySelector(s);
 const el = (t, c) => { const n = document.createElement(t); if (c) n.className = c; return n; };
 const nf = n => Math.round(n).toLocaleString('en-IN');
 const pc1 = n => (n * 100).toFixed(1) + '%';
+const titleCase = s => (s || '').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
 
 let geo, topojson;
 try {
@@ -548,6 +626,23 @@ const partyByCode = new Map(partiesDoc.parties.map(p => [p.code, p]));
 const fallback = partiesDoc.fallback;
 const colour = c => (partyByCode.get(c) || fallback).colour;
 const partyName = c => (partyByCode.get(c) || fallback).name;
+
+/* Party symbols are optional: a party with an image on file shows its emblem in
+   the cabinet instead of the colour square; one without keeps the square. The
+   manifest is fetched separately and can be absent or partially complete without
+   breaking the page. */
+let symbolsDoc = { symbols: {} };
+try { symbolsDoc = await fetch('data/parties-symbols.json').then(r => r.ok ? r.json() : { symbols: {} }); }
+catch { symbolsDoc = { symbols: {} }; }
+const symbolFor = code => {
+  const s = (symbolsDoc.symbols || {})[code];
+  return (s && s.file) ? 'data/' + s.file : null;
+};
+const partyMark = code => {
+  const sym = symbolFor(code);
+  if (!sym) return `<i class="sw" style="--c:${colour(code)}"></i>`;
+  return `<img class="belt-sym" src="${sym}" data-fallback="${colour(code)}" alt="" loading="lazy">`;
+};
 
 const level = manifest.levels.find(l => l.id === 'state');
 const pcLevel = manifest.levels.find(l => l.id === 'parliamentary');
@@ -754,7 +849,13 @@ function applyYear() {
       p.style.setProperty('--c', 'var(--vacant)');
     } else {
       const party = r ? r.p : null;
-      const leftOut = party && selection.size && !selection.has(party);
+      /* Two independent recede-to-find filters share the map: the click selection
+         (compare N parties) and the text query (find one party). A seat stays
+         bright only if it passes both — a party must be selected AND match. */
+      const leftOut = party && (
+        (selection.size && !selection.has(party)) ||
+        (partyQuery && !partyMatches(party))
+      );
       p.style.setProperty('--c', !party || leftOut ? 'var(--paper-2)' : colour(party));
     }
   }
@@ -858,10 +959,40 @@ function hideCard() {
  * filter, and clicking it again takes it out. */
 const NAT_DEFAULT = { key: 'seats', dir: -1 };
 let natSort = { ...NAT_DEFAULT };
+const PAGE_SIZE = 10;
+let natPage = 0;
 const natHead = $('#ntable-head-row'), natBody = $('#ntable-body');
 const natTable = $('.ntable table');
 const natResetBtn = $('#reset-sort'), natClearBtn = $('#clear-sel');
 const natView = $('.ntable-view'), natScroll = $('.ntable-scroll');
+const natPager = $('#ntable-pager');
+
+/* Page numbers under the table. One button per page, the current one filled;
+   prev/next sit at the ends and disable at the boundary. Long strips collapse
+   to a window around the current page so the numbers never wrap the panel. */
+function pageList(p, count) {
+  if (count <= 7) return [...Array(count).keys()];
+  const pages = [...new Set([0, count - 1, p - 1, p, p + 1])]
+    .filter(i => i >= 0 && i < count).sort((a, b) => a - b);
+  const out = [];
+  for (let i = 0; i < pages.length; i++) {
+    if (i > 0 && pages[i] - pages[i - 1] > 1) out.push('…');
+    out.push(pages[i]);
+  }
+  return out;
+}
+function natPagerHTML(pageCount) {
+  if (pageCount <= 1) return '';
+  const p = natPage;
+  let nums = '';
+  for (const item of pageList(p, pageCount)) {
+    if (item === '…') nums += `<span class="pager-ell" aria-hidden="true">…</span>`;
+    else nums += `<button type="button" data-page="${item}"${item === p ? ' class="cur" aria-current="page"' : ''}>${item + 1}</button>`;
+  }
+  return `<button type="button" data-page="${p - 1}" aria-label="Previous page"${p === 0 ? ' disabled' : ''}>‹</button>` +
+    nums +
+    `<button type="button" data-page="${p + 1}" aria-label="Next page"${p === pageCount - 1 ? ' disabled' : ''}>›</button>`;
+}
 
 /* With no scrollbar, the fade is the only cue that there is more below — so it
    has to be honest, appearing at an edge only while content is actually hidden
@@ -880,10 +1011,10 @@ function updateFades() {
    a seats-only cut would drop BSP (2.04%), BJD (1.46%) and AIADMK (1.39%),
    which polled in the millions and won nothing. 48 parties, 96.6% of the vote. */
 const NAT_MIN_SHARE = 0.005;
-function nationalRows() {
+function nationalRows(filtered = true) {
   const total = agg ? agg.totalVotes : 0;
   const stands = tense === 'stands';
-  return [...(agg ? agg.national : new Map())]
+  let rows = [...(agg ? agg.national : new Map())]
     .map(([code, v]) => ({
       code,
       seats: stands ? (standsSeats.get(code) || 0) : v.seats,
@@ -891,9 +1022,10 @@ function nationalRows() {
       share: total ? v.votes / total : 0,
       delta: deltaByParty.get(code) || 0
     }))
-    .filter(r => r.seats > 0 || r.share >= NAT_MIN_SHARE)
-    .sort((a, b) =>
-      natSort.dir * (a[natSort.key] - b[natSort.key]) || b.seats - a.seats || b.votes - a.votes);
+    .filter(r => r.seats > 0 || r.share >= NAT_MIN_SHARE);
+  if (filtered) rows = rows.filter(r => !partyQuery || partyMatches(r.code));
+  return rows.sort((a, b) =>
+    natSort.dir * (a[natSort.key] - b[natSort.key]) || b.seats - a.seats || b.votes - a.votes);
 }
 
 function paintNatHead() {
@@ -908,35 +1040,60 @@ function paintNatHead() {
 }
 
 function renderNational() {
-  if (!natBody) return;
-  const rows = nationalRows();
-  const stands = tense === 'stands';
-  natTable.classList.toggle('has-delta', stands);
-  /* The header is regenerated here so the ± column only exists when it means
-     something — a hidden column would still be a gap a reader has to parse. */
+  if (!natBody) return 0;
+  const rows = nationalRows(true);
+  const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  natPage = Math.min(natPage, pageCount - 1);
+  const start = natPage * PAGE_SIZE;
+  const slice = rows.slice(start, start + PAGE_SIZE);
   natHead.innerHTML =
     `<th>Party</th>` +
     `<th><button type="button" data-sort="seats" data-label="Seats">Seats</button></th>` +
-    (stands ? `<th><button type="button" data-sort="delta" data-label="±">±</button></th>` : '') +
     `<th><button type="button" data-sort="votes" data-label="Votes">Votes</button></th>` +
     `<th><button type="button" data-sort="share" data-label="Share">Share</button></th>`;
-  natBody.innerHTML = rows.map(r => {
-    const on = selection.has(r.code);
-    const d = r.delta;
-    const dCell = stands
-      ? `<td class="d">${d > 0 ? '+' + d : d < 0 ? '\u2212' + (-d) : ''}</td>`
-      : '';
-    return `<tr data-party="${r.code}"${on ? ' class="sel"' : ''}>` +
-      `<td><button type="button" class="pick" aria-pressed="${on}">` +
-      `<i class="sw" style="--c:${colour(r.code)}"></i><span>${r.code}</span></button></td>` +
-      `<td>${r.seats}</td>` + dCell +
-      `<td>${nf(r.votes)}</td><td>${pc1(r.share)}</td></tr>`;
-  }).join('');
+  if (!rows.length) {
+    natBody.innerHTML = `<tr><td colspan="4" style="text-align:left;color:var(--muted)">${noMatchMessage()}</td></tr>`;
+  } else {
+    natBody.innerHTML = slice.map(r => {
+      const on = selection.has(r.code);
+      const d = r.delta;
+      const dTxt = tense === 'stands' && d
+        ? (d > 0 ? ' +' + d : ' \u2212' + (-d))
+        : '';
+      return `<tr data-party="${r.code}"${on ? ' class="sel"' : ''}>` +
+        `<td><button type="button" class="pick" aria-pressed="${on}">` +
+        `<i class="sw" style="--c:${colour(r.code)}"></i><span>${r.code}</span></button></td>` +
+        `<td>${r.seats}${dTxt ? `<span class="d">${dTxt}</span>` : ''}</td>` +
+        `<td>${nf(r.votes)}</td><td>${pc1(r.share)}</td></tr>`;
+    }).join('');
+  }
   // the whole tbody dims its left-out rows, so the table and the map agree
   natBody.classList.toggle('has-sel', selection.size > 0);
   natClearBtn.hidden = selection.size === 0;
   paintNatHead();
-  updateFades();
+  natPager.innerHTML = natPagerHTML(pageCount);
+  // The count lives here so a year or tense change (which both re-run this) can
+  // never leave it stale — the same guarantee the minister count already gets.
+  if (partyQuery) {
+    const base = nationalRows(false).length;
+    partyCountEl.textContent = `${rows.length} of ${base}`;
+  } else {
+    partyCountEl.textContent = '';
+  }
+  return rows.length;
+}
+
+/* "No match" and "matched, but below this table's cut" are different facts. The
+   table shows a party only if it won a seat or polled >= 0.5%; a query can hit a
+   real party that did neither (RLD 2019, VBA/PMK 2024) and the message must not
+   claim the user's query failed. */
+function noMatchMessage() {
+  if (!partyQuery || !agg) return 'No party matches your search.';
+  const below = [...agg.national.keys()].filter(partyMatches);
+  if (!below.length) return 'No party matches your search.';
+  return below.length === 1
+    ? `${below[0]} polled below 0.5% and won no seats.`
+    : `${below.length} parties polled below 0.5% and won no seats.`;
 }
 
 function toggleParty(code) {
@@ -967,14 +1124,101 @@ function bindTable() {
     const k = b.dataset.sort;
     if (natSort.key === k) natSort.dir = -natSort.dir;
     else { natSort.key = k; natSort.dir = -1; }
+    natPage = 0;
     renderNational();
   });
-  natResetBtn.addEventListener('click', () => { natSort = { ...NAT_DEFAULT }; renderNational(); });
+  natResetBtn.addEventListener('click', () => { natSort = { ...NAT_DEFAULT }; natPage = 0; renderNational(); });
   natClearBtn.addEventListener('click', () => {
     selection.clear();
     applyYear();
     renderNational();
   });
+  natPager.addEventListener('click', e => {
+    const b = e.target.closest('button[data-page]');
+    if (!b || b.disabled) return;
+    const t = Number(b.dataset.page);
+    if (!Number.isNaN(t)) { natPage = t; renderNational(); }
+  });
+}
+
+/* ── search ───────────────────────────────────────────────────────────── *
+ * Two queries, two surfaces, one recede-to-find idiom the page already uses for
+ * hover. A party query narrows the table to matching rows AND dims every seat on
+ * the map that is not one of those parties. A minister query spotlights the
+ * matching cabinet cards and lets the rest fall back — the belt keeps its shape
+ * so the reader still sees where the match sits among its peers. */
+let partyQuery = '';
+let minQuery = '';
+const norm = s => (s || '').toLowerCase();
+const partyMatches = code => {
+  if (!partyQuery) return true;
+  const q = norm(partyQuery);
+  const p = partyByCode.get(code);
+  if (p) return [p.code, p.name, ...(p.aliases || [])].some(t => norm(t).includes(q));
+  return norm(code).includes(q);          // a party outside the vocabulary: match its code
+};
+const memberMatches = m => {
+  if (!minQuery) return true;
+  const q = norm(minQuery);
+  return [m.name, m.portfolio, m.role, m.constituency].filter(Boolean)
+    .map(norm).join(' ').includes(q);
+};
+
+const searchPartyEl = $('#search-party'), clearPartyEl = $('#clear-party'), partyCountEl = $('#party-count');
+const searchMinEl = $('#search-min'), clearMinEl = $('#clear-min'), minCountEl = $('#min-count');
+
+function applyPartyQuery() {
+  const on = !!partyQuery;
+  clearPartyEl.hidden = !on;
+  natPage = 0;                             // a new query reopens on the first page
+  applyYear();                            // dim the map to the matching parties
+  renderNational();                       // narrow the table and refresh its count
+  paintNote();                            // the map's status line reflects the query
+}
+
+function applyBeltQuery() {
+  const on = !!minQuery;
+  clearMinEl.hidden = !on;
+  let n = 0;
+  beltSorted.forEach((m, i) => {
+    const cardEl = beltScroll.children[i];
+    if (!cardEl) return;
+    const hit = memberMatches(m);
+    if (hit) n++;
+    cardEl.classList.toggle('dim', on && !hit);
+  });
+  minCountEl.textContent = on ? `${n} of ${beltSorted.length}` : '';
+  updateBeltFades();
+}
+
+/* A match can sit off the right edge of a scrollbar-less strip, so the query
+   takes the reader to the first one rather than only reporting it. The scroll
+   is horizontal only — beltScroll, never the page — and instant, so it neither
+   fights the snap points nor animates under reduced-motion. */
+function scrollToFirstMatch() {
+  const first = beltScroll.querySelector('.belt-card:not(.dim)');
+  if (!first) return;
+  const sc = beltScroll.getBoundingClientRect();
+  const c = first.getBoundingClientRect();
+  if (c.left < sc.left + 4) beltScroll.scrollBy({ left: c.left - sc.left - 8, behavior: 'auto' });
+  else if (c.right > sc.right - 4) beltScroll.scrollBy({ left: c.right - sc.right + 8, behavior: 'auto' });
+}
+
+function bindSearch() {
+  searchPartyEl.addEventListener('input', () => { partyQuery = searchPartyEl.value.trim(); applyPartyQuery(); });
+  clearPartyEl.addEventListener('click', () => { searchPartyEl.value = ''; partyQuery = ''; applyPartyQuery(); searchPartyEl.focus(); });
+  searchMinEl.addEventListener('input', () => { minQuery = searchMinEl.value.trim(); applyBeltQuery(); scrollToFirstMatch(); });
+  clearMinEl.addEventListener('click', () => { searchMinEl.value = ''; minQuery = ''; applyBeltQuery(); searchMinEl.focus(); });
+  for (const [inp, clearFn] of [[searchPartyEl, () => { partyQuery = ''; applyPartyQuery(); }],
+                                [searchMinEl, () => { minQuery = ''; applyBeltQuery(); }]]) {
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();              // Escape clears the field, not the map focus
+        inp.value = '';
+        clearFn();
+      }
+    });
+  }
 }
 
 /* Delegated, so a redraw on resize cannot strand the handlers on detached paths. */
@@ -1057,6 +1301,7 @@ async function selectYear(y) {
     agg = aggregate(currentYear);
     buildResolved();
     buildSeatMaps();
+    natPage = 0;
     applyYear();
     renderNational();
     renderBelt();
@@ -1089,20 +1334,30 @@ function buildTenseControl() {
 
 function paintNote() {
   if (!currentYear) return;
+  let txt;
   if (tense === 'elected') {
-    noteEl.textContent = `As elected · ${currentYear.year}`;
-    return;
+    txt = `As elected · ${currentYear.year}`;
+  } else {
+    const seats = (byeData && byeData.seats) || [];
+    const byes = seats.reduce((n, s) => n + s.events.filter(e => e.type === 'bye').length, 0);
+    const vacant = [...resolved.values()].filter(r => r.vacant).length;
+    if (!byes && !vacant) {
+      txt = `As it stands · ${currentYear.year} — no by-elections on record`;
+    } else {
+      const dates = seats.flatMap(s => s.events.map(e => e.date)).sort();
+      const lastDate = dates.length ? dates[dates.length - 1] : '';
+      txt = `As it stands · ${byes} by-election${byes === 1 ? '' : 's'} · ${vacant} vacant · as of ${lastDate}`;
+    }
   }
-  const seats = (byeData && byeData.seats) || [];
-  const byes = seats.reduce((n, s) => n + s.events.filter(e => e.type === 'bye').length, 0);
-  const vacant = [...resolved.values()].filter(r => r.vacant).length;
-  if (!byes && !vacant) {
-    noteEl.textContent = `As it stands · ${currentYear.year} — no by-elections on record`;
-    return;
+  /* A query that dims every seat must say so — a fully washed map under a line
+     still reading "As elected · 2024" is a false status. */
+  if (partyQuery && agg) {
+    const matches = [...agg.national.keys()].filter(partyMatches);
+    txt += matches.length
+      ? ` · ${matches.length} ${matches.length === 1 ? 'party' : 'parties'} showing`
+      : ` · no seat matches “${partyQuery}”`;
   }
-  const dates = seats.flatMap(s => s.events.map(e => e.date)).sort();
-  const lastDate = dates.length ? dates[dates.length - 1] : '';
-  noteEl.textContent = `As it stands · ${byes} by-election${byes === 1 ? '' : 's'} · ${vacant} vacant · as of ${lastDate}`;
+  noteEl.textContent = txt;
 }
 
 function cabinetRoster() {
@@ -1110,6 +1365,36 @@ function cabinetRoster() {
      "as elected" needs is not fetched yet, so both tenses show the same list. */
   if (!cabinetDoc) return null;
   return cabinetDoc.members || [];
+}
+
+/* Ministries are long and stackable ("Minister of X; and Minister of Y; and
+   Minister of Z"), so the card shows a compacted first ministry + a "+N" count
+   and the full list is revealed on hover. Splitting on ';' and stripping the
+   leading "and" normalises the two spellings the source prints. */
+let beltSorted = [];
+const portfolioList = p => (p || '').split(';').map(s => s.trim().replace(/^and\s+/i, '')).filter(Boolean);
+const shortMinistry = m => (m || '')
+  .replace(/^Minister of State \(Independent Charge\) of the Ministry of\s*/i, '')
+  .replace(/^Minister of State in the Ministry of\s*/i, '')
+  .replace(/^Minister of State in the\s*/i, '')
+  .replace(/^Minister of\s*/i, '')
+  .split(',')[0].trim();
+const compactPortfolio = p => {
+  const list = portfolioList(p);
+  if (!list.length) return { main: '', plus: 0 };
+  return { main: shortMinistry(list[0]), plus: list.length - 1 };
+};
+const RANK_LABEL = { pm: 'Prime Minister', cabinet: 'Cabinet Minister', 'mos-ic': 'Minister of State (Independent Charge)', mos: 'Minister of State' };
+
+function showCabCard(m, x, y) {
+  const list = portfolioList(m.portfolio || m.role || '');
+  const seatLabel = m.constituency || (m.state ? 'Rajya Sabha' : '');
+  card.innerHTML =
+    (RANK_LABEL[m.rank] ? `<p class="sub">${RANK_LABEL[m.rank]}</p>` : '') +
+    `<h2>${titleCase(m.name)}</h2>` +
+    (seatLabel ? `<p class="meta">${seatLabel}${m.party ? ' · ' + m.party : ''}</p>` : '') +
+    (list.length ? `<ul class="min-list">${list.map(min => `<li>${min}</li>`).join('')}</ul>` : '');
+  placeCard(x, y);
 }
 
 function renderBelt() {
@@ -1123,24 +1408,29 @@ function renderBelt() {
   const order = { pm: 0, cm: 0, cabinet: 1, 'mos-ic': 2, mos: 3 };
   const sorted = [...members].sort((a, b) =>
     (order[a.rank] ?? 9) - (order[b.rank] ?? 9) || (a.name || '').localeCompare(b.name || ''));
-  beltScroll.innerHTML = sorted.map(m => {
+  beltSorted = sorted;
+  beltScroll.innerHTML = sorted.map((m, i) => {
     const initials = (m.name || '?').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
-    const roleTxt = m.portfolio || m.role || '';
+    const cp = compactPortfolio(m.portfolio || m.role || '');
     const seatLabel = m.constituency || (m.state ? 'Rajya Sabha' : '');
     const seat = seatLabel
-      ? `<span class="belt-seat"><i class="sw" style="--c:${colour(m.party)}"></i>${seatLabel}</span>`
+      ? `<span class="belt-seat">${partyMark(m.party)}${seatLabel}</span>`
       : '';
     const face = m.photo
       ? `<div class="belt-face"><img src="data/photos/cabinet/${m.photo}" alt="" loading="lazy" onerror="this.parentNode.innerHTML='${initials}'"></div>`
       : `<div class="belt-face" aria-hidden="true">${initials}</div>`;
-    return `<div class="belt-card">` +
+    const role = cp.main
+      ? `<p class="belt-role"><span class="belt-role-main">${cp.main}</span>${cp.plus ? `<span class="belt-plus" aria-hidden="true">+${cp.plus}</span>` : ''}</p>`
+      : '';
+    return `<div class="belt-card" data-idx="${i}">` +
       face +
-      `<p class="belt-name">${m.name}</p>` +
-      `<p class="belt-role">${roleTxt}</p>` +
+      `<p class="belt-name" title="${titleCase(m.name)}">${titleCase(m.name)}</p>` +
+      role +
       seat + `</div>`;
   }).join('');
   fitBeltRows();
   updateBeltFades();
+  applyBeltQuery();
 }
 
 function updateBeltFades() {
@@ -1188,10 +1478,32 @@ for (const y of manifest.elections.ls.years) {
 drawMap();
 bindEvents();
 bindTable();
+bindSearch();
 const qp = new URLSearchParams(location.search);
 if (qp.get('t') === 'stands') tense = 'stands';
 buildTenseControl();
 beltScroll.addEventListener('scroll', updateBeltFades, { passive: true });
+/* A symbol image that fails to load (a moved file, a bad thumbnail) falls back to
+   the party colour square it replaced. Image error events do not bubble, so the
+   listener is on the capture phase. */
+beltScroll.addEventListener('error', e => {
+  const img = e.target;
+  if (!(img instanceof HTMLImageElement) || !img.classList.contains('belt-sym')) return;
+  const sw = el('i', 'sw');
+  sw.style.setProperty('--c', img.dataset.fallback || 'var(--muted)');
+  img.replaceWith(sw);
+}, true);
+beltScroll.addEventListener('pointerover', e => {
+  const c = e.target.closest('.belt-card');
+  if (!c) return;
+  /* The float card is a readout of the *text* (name, ministry, seat), not a
+     reaction to the portrait. Hovering the photo would otherwise fire it on
+     every pass across the strip, which is noise. Over the face, hide it. */
+  if (e.target.closest('.belt-face')) { card.classList.remove('on'); return; }
+  const m = beltSorted[+c.dataset.idx];
+  if (m) showCabCard(m, e.clientX, e.clientY);
+});
+beltScroll.addEventListener('pointerleave', () => card.classList.remove('on'));
 let brt;
 new ResizeObserver(() => {
   clearTimeout(brt);

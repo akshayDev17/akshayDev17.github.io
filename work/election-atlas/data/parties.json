@@ -10,7 +10,8 @@
         "Bharatiya Janata Party",
         "Bharatiya Janta Party",
         "B.J.P."
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Bharatiya_Janata_Party"
     },
     {
       "code": "INC",
@@ -21,7 +22,8 @@
         "Congress",
         "I.N.C.",
         "INC(I)"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Indian_National_Congress"
     },
     {
       "code": "SP",
@@ -30,7 +32,8 @@
       "aliases": [
         "Samajwadi Party",
         "Samajwadi Janta Party"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Samajwadi_Party"
     },
     {
       "code": "BSP",
@@ -38,7 +41,8 @@
       "colour": "#1F3C88",
       "aliases": [
         "Bahujan Samaj Party"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Bahujan_Samaj_Party"
     },
     {
       "code": "AITC",
@@ -49,7 +53,8 @@
         "Trinamool Congress",
         "TMC",
         "AITC"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Trinamool_Congress"
     },
     {
       "code": "CPM",
@@ -59,7 +64,8 @@
         "Communist Party of India (Marxist)",
         "CPI(M)",
         "CPI-M"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Communist_Party_of_India_(Marxist)"
     },
     {
       "code": "CPI",
@@ -67,7 +73,8 @@
       "colour": "#F0645A",
       "aliases": [
         "Communist Party of India"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Communist_Party_of_India"
     },
     {
       "code": "DMK",
@@ -75,7 +82,8 @@
       "colour": "#C62828",
       "aliases": [
         "Dravida Munnetra Kazhagam"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Dravida_Munnetra_Kazhagam"
     },
     {
       "code": "AIADMK",
@@ -85,7 +93,8 @@
         "All India Anna Dravida Munnetra Kazhagam",
         "Anna Dravida Munnetra Kazhagam",
         "ADMK"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/All_India_Anna_Dravida_Munnetra_Kazhagam"
     },
     {
       "code": "YSRCP",
@@ -94,7 +103,8 @@
       "aliases": [
         "Yuvajana Sramika Rythu Congress Party",
         "YSR Congress Party"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/YSR_Congress_Party"
     },
     {
       "code": "TDP",
@@ -102,7 +112,8 @@
       "colour": "#FFC300",
       "aliases": [
         "Telugu Desam Party"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Telugu_Desam_Party"
     },
     {
       "code": "BRS",
@@ -112,7 +123,8 @@
         "Bharat Rashtra Samithi",
         "Telangana Rashtra Samithi",
         "TRS"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Bharat_Rashtra_Samithi"
     },
     {
       "code": "JDU",
@@ -121,7 +133,8 @@
       "aliases": [
         "Janata Dal (United)",
         "JD(U)"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Janata_Dal_(United)"
     },
     {
       "code": "RJD",
@@ -129,7 +142,8 @@
       "colour": "#2E7D5B",
       "aliases": [
         "Rashtriya Janata Dal"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Rashtriya_Janata_Dal"
     },
     {
       "code": "SHS",
@@ -137,7 +151,8 @@
       "colour": "#FF9500",
       "aliases": [
         "Shiv Sena"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Shiv_Sena"
     },
     {
       "code": "NCP",
@@ -145,7 +160,8 @@
       "colour": "#00838F",
       "aliases": [
         "Nationalist Congress Party"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Nationalist_Congress_Party"
     },
     {
       "code": "AAP",
@@ -153,7 +169,8 @@
       "colour": "#0B72B8",
       "aliases": [
         "Aam Aadmi Party"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Aam_Aadmi_Party"
     },
     {
       "code": "BJD",
@@ -161,7 +178,8 @@
       "colour": "#00695C",
       "aliases": [
         "Biju Janata Dal"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Biju_Janata_Dal"
     },
     {
       "code": "JDS",
@@ -170,7 +188,8 @@
       "aliases": [
         "Janata Dal (Secular)",
         "JD(S)"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Janata_Dal_(Secular)"
     },
     {
       "code": "HAMS",
@@ -179,7 +198,8 @@
       "aliases": [
         "Hindustani Awam Morcha (Secular)",
         "HAM (S)"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Hindustani_Awam_Morcha_(Secular)"
     },
     {
       "code": "LJSP",
@@ -188,7 +208,8 @@
       "aliases": [
         "Lok Janshakti Party (Ram Vilas)",
         "LJSP(RV)"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Lok_Janshakti_Party_(Ram_Vilas)"
     },
     {
       "code": "RLD",
@@ -196,7 +217,8 @@
       "colour": "#33691E",
       "aliases": [
         "Rashtriya Lok Dal"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Rashtriya_Lok_Dal"
     },
     {
       "code": "RPIA",
@@ -206,7 +228,8 @@
         "Republican Party of India (Athawale)",
         "RPI (ATWL)",
         "RPI(A)"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Republican_Party_of_India_(Athawale)"
     },
     {
       "code": "ADS",
@@ -215,7 +238,8 @@
       "aliases": [
         "Apna Dal (Sonelal)",
         "Apna Dal (S)"
-      ]
+      ],
+      "wikipedia_link": "https://en.wikipedia.org/wiki/Apna_Dal_(Soneylal)"
     },
     {
       "code": "IND",
@@ -224,7 +248,8 @@
       "aliases": [
         "Independent",
         "Independents"
-      ]
+      ],
+      "wikipedia_link": ""
     },
     {
       "code": "NOTA",
@@ -233,7 +258,8 @@
       "aliases": [
         "None of the Above",
         "NOTA"
-      ]
+      ],
+      "wikipedia_link": ""
     }
   ],
   "fallback": {

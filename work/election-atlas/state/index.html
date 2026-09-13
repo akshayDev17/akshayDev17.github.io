@@ -11,7 +11,7 @@
 <style>
 :root{
   --paper:#EEF1F8; --paper-2:#E3E9F4; --ink:#0F1220; --muted:#525A6B;
-  --rule:#D3D9E6; --rule-2:#BCC4D6;
+  --rule:#D3D9E6; --rule-2:#BCC4D6; --rule-3:#7C8598;
   --serif:"Newsreader",ui-serif,Georgia,serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px;
@@ -223,9 +223,10 @@ th:first-child button{text-align:left;cursor:default}
 td{padding:4px 0;text-align:right;border-top:1px solid var(--rule)}
 tr:first-child td{border-top:0}
 th:first-child,td:first-child{text-align:left}
+.table th:first-child,.table td:first-child{padding-inline-start:var(--s2)}
 th+th,td+td{padding-left:16px}
 td .cell{display:flex;align-items:center;gap:7px}
-td.d{font-weight:500}
+td .d{font-weight:500;letter-spacing:.02em}
 /* Page numbers under the table: quiet, the current one filled. */
 .pager{display:flex;align-items:center;justify-content:flex-end;gap:var(--s2);margin-top:var(--s3)}
 .pager button{
@@ -276,10 +277,34 @@ td.d{font-weight:500}
 #map-pc .pc.bye,#map-pc .pc.vacant{stroke:var(--ink);stroke-width:.8;stroke-dasharray:2.5 2.5;stroke-opacity:.7}
 
 /* ── the cabinet belt ─────────────────────────────────────────────────── */
-.belt{flex:0 0 auto;display:flex;flex-direction:column;min-width:0;padding:var(--s4) 0 var(--s5);border-top:1px solid var(--rule-2);margin-top:var(--s4)}
+.belt{display:flex;flex-direction:column;min-width:0;padding:var(--s3) 0 0;border-top:1px solid var(--rule-2)}
 .belt-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s4);flex-wrap:wrap;padding:0 0 var(--s3)}
 .belt-title{font-family:var(--serif);font-size:1.0625rem;line-height:1.25;color:var(--ink);margin:0;font-weight:400}
 .belt-asof{font-family:var(--mono);font-size:.5625rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+/* ── search (docked to the belt it filters) ───────────────────────────── */
+.find{display:flex;flex-direction:column;gap:var(--s1);margin-bottom:var(--s3)}
+.find-label{font-family:var(--mono);font-size:.5625rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);cursor:pointer}
+.find-line{display:flex;align-items:baseline;gap:var(--s2);
+  border-bottom:1px solid var(--rule-3);
+  transition:border-color .18s var(--ease),box-shadow .18s var(--ease)}
+.find-line:focus-within{border-bottom-color:var(--ink);box-shadow:0 1px 0 0 var(--ink)}
+.find-line input{
+  appearance:none;background:none;border:0;outline:0;padding:5px 0 4px;margin:0;
+  font-family:var(--mono);font-size:.8125rem;color:var(--ink);
+  flex:1 1 auto;min-width:0;border-radius:0;
+}
+.find-line input::placeholder{color:var(--muted)}
+.search-count{font-family:var(--mono);font-size:.625rem;color:var(--muted);flex:0 0 auto;
+  white-space:nowrap;padding-bottom:5px}
+.search-clear{
+  appearance:none;background:none;border:0;cursor:pointer;padding:2px 6px 5px;min-height:24px;
+  font-family:var(--mono);font-size:.625rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);transition:color .18s var(--ease);
+}
+.search-clear:hover{color:var(--ink)}
+.search-clear:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:2px}
+.search-clear[hidden]{display:none}
 .belt-view{position:relative}
 .belt-scroll{
   overflow-x:auto;overflow-y:hidden;scrollbar-width:none;
@@ -300,18 +325,23 @@ td.d{font-weight:500}
 .belt-view.more-l::before{opacity:1}
 .belt-view.more-r::after{opacity:1}
 .belt-card{display:flex;flex-direction:column;gap:3px;min-width:0;scroll-snap-align:start}
-.belt-scope{font-family:var(--mono);font-size:.625rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0}
+/* The minister search recedes non-matches toward the ground, not transparency:
+   a raw opacity here would drop the names below readable contrast. */
+.belt-card .belt-face,.belt-card .belt-name{transition:filter .22s var(--ease),color .22s var(--ease)}
+.belt-card.dim .belt-face{filter:saturate(.22) brightness(.92)}
+.belt-card.dim .belt-name{color:var(--muted)}
 .belt-face{
-  aspect-ratio:4/3;background:var(--paper-2);border:1px solid var(--rule);
+  aspect-ratio:3/4;background:var(--paper-2);border:1px solid var(--rule);
   border-radius:var(--r2);display:flex;align-items:center;justify-content:center;
   font-family:var(--serif);font-size:1.4rem;color:var(--muted);letter-spacing:.02em;
   overflow:hidden;
 }
-.belt-face img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 18%}
-.belt-name{font-family:var(--serif);font-size:.8125rem;line-height:1.2;font-weight:500;color:var(--ink);margin:0}
+.belt-face img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 50%}
+.belt-name{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.8125rem;line-height:1.25;font-weight:500;color:#2E3440;margin:0}
 .belt-role{font-family:var(--mono);font-size:.75rem;line-height:1.4;letter-spacing:.02em;color:var(--muted);margin:0}
 .belt-seat{font-family:var(--mono);font-size:.75rem;line-height:1.35;color:var(--muted);margin:0;display:flex;align-items:center;gap:6px}
 .belt .sw{width:9px;height:9px;border-radius:2px;flex:0 0 auto;background:var(--c);box-shadow:inset 0 0 0 1px rgba(15,18,32,.2)}
+.belt .belt-sym{flex:0 0 auto;max-width:18px;max-height:18px;width:auto;height:auto;display:block}
 
 @media (min-width:60rem){
   .panels{grid-template-columns:1fr 1px 1fr}
@@ -326,7 +356,8 @@ td.d{font-weight:500}
 }
 @media (prefers-reduced-motion:reduce){
   .ac,.pc,.scrim,.lift,.year,.back,.edge,.marked,th button,#card,
-  .tense-opt,.belt-view::before,.belt-view::after{transition:none}
+  .tense-opt,.belt-view::before,.belt-view::after,
+  .belt-card .belt-face,.belt-card .belt-name,.find-line,.search-clear,.pager button{transition:none}
 }
 </style>
 </head>
@@ -343,16 +374,6 @@ td.d{font-weight:500}
     <hr class="hair" style="margin-top:var(--s4)">
     <p class="caveat">Work in progress — the assembly figures are synthetic and none of this is verified.</p>
   </header>
-
-  <section class="belt" id="belt" aria-label="Council of ministers" hidden>
-    <div class="belt-head">
-      <h2 class="belt-title" id="belt-title">Council of ministers</h2>
-      <span class="belt-asof" id="belt-asof"></span>
-    </div>
-    <div class="belt-view">
-      <div class="belt-scroll" id="belt-scroll" tabindex="0" role="region" aria-label="Council of ministers. Use the arrow keys to scroll."></div>
-    </div>
-  </section>
 
   <div class="panels" id="panels">
     <section class="panel" id="panel-ac">
@@ -375,6 +396,24 @@ td.d{font-weight:500}
         </div>
         <div id="table-ac"></div>
       </div>
+
+      <section class="belt" id="belt" aria-label="Council of ministers" hidden>
+        <div class="belt-head">
+          <h2 class="belt-title" id="belt-title">Council of ministers</h2>
+          <span class="belt-asof" id="belt-asof"></span>
+        </div>
+        <div class="find" role="search" aria-label="Find a minister">
+          <label class="find-label" for="search-min">Find minister</label>
+          <div class="find-line">
+            <input id="search-min" type="text" placeholder="e.g. name or ministry" autocomplete="off" spellcheck="false" enterkeyhint="search">
+            <span class="search-count" id="min-count" aria-live="polite"></span>
+            <button class="search-clear" id="clear-min" type="button" hidden>Clear</button>
+          </div>
+        </div>
+        <div class="belt-view">
+          <div class="belt-scroll" id="belt-scroll" tabindex="0" role="region" aria-label="Council of ministers. Use the arrow keys to scroll."></div>
+        </div>
+      </section>
     </section>
 
     <div class="split" aria-hidden="true"></div>
@@ -410,6 +449,7 @@ const NS = 'http://www.w3.org/2000/svg';
 const $ = s => document.querySelector(s);
 const nf = n => Math.round(n).toLocaleString('en-IN');
 const pc1 = n => (n * 100).toFixed(1) + '%';
+const titleCase = s => (s || '').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
 
 let geo, topojson;
 try {
@@ -436,6 +476,21 @@ for (const r of regionsDoc.regions) for (const s of r.sourceNames) regionBySourc
 const partyByCode = new Map(partiesDoc.parties.map(p => [p.code, p]));
 const fallback = partiesDoc.fallback;
 const colour = c => (partyByCode.get(c) || fallback).colour;
+
+/* Party symbols (optional): an emblem image replaces the colour square in the
+   cabinet when on file; a party without one keeps the square. */
+let symbolsDoc = { symbols: {} };
+try { symbolsDoc = await fetch('../data/parties-symbols.json').then(r => r.ok ? r.json() : { symbols: {} }); }
+catch { symbolsDoc = { symbols: {} }; }
+const symbolFor = code => {
+  const s = (symbolsDoc.symbols || {})[code];
+  return (s && s.file) ? '../data/' + s.file : null;
+};
+const partyMark = code => {
+  const sym = symbolFor(code);
+  if (!sym) return `<i class="sw" style="--c:${colour(code)}"></i>`;
+  return `<img class="belt-sym" src="${sym}" data-fallback="${colour(code)}" alt="" loading="lazy">`;
+};
 
 if (!regionByCode.has(stateCode)) stateCode = 'IN-UP';
 const region = regionByCode.get(stateCode);
@@ -607,10 +662,11 @@ function renderTable(el, agg, which, resetBtn, clearBtn) {
   const th = (k, label) =>
     `<th aria-sort="${s.key === k ? (s.dir === -1 ? 'descending' : 'ascending') : 'none'}">` +
     `<button type="button" data-sort="${k}">${label}${arrow(k)}</button></th>`;
-  const showDelta = which === 'pc' && tense === 'stands';
-  const dTd = r => {
+  const dSuffix = r => {
     const d = r.delta;
-    return `<td class="d">${d > 0 ? '+' + d : d < 0 ? '\u2212' + (-d) : ''}</td>`;
+    return (which === 'pc' && tense === 'stands' && d)
+      ? `<span class="d">${d > 0 ? ' +' + d : ' \u2212' + (-d)}</span>`
+      : '';
   };
   const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   page[which] = Math.min(page[which], pageCount - 1);
@@ -620,14 +676,14 @@ function renderTable(el, agg, which, resetBtn, clearBtn) {
      stop and its click bubbles to the row, so pointer and keyboard go through
      one handler rather than two that can disagree. */
   el.innerHTML =
-    `<table><thead><tr><th>Party</th>${th('seats', 'Seats won')}${showDelta ? th('delta', '±') : ''}${th('votes', 'Votes')}${th('share', 'Share')}</tr></thead>` +
+    `<table><thead><tr><th>Party</th>${th('seats', 'Seats won')}${th('votes', 'Votes')}${th('share', 'Share')}</tr></thead>` +
     `<tbody${on.size ? ' class="has-sel"' : ''}>` +
     slice.map(r => {
       const picked = on.has(r.code);
       return `<tr data-party="${r.code}"${picked ? ' class="sel"' : ''}>` +
         `<td><button type="button" class="pick" aria-pressed="${picked}">` +
         `<i class="sw" style="--c:${colour(r.code)}"></i><span>${r.code}</span></button></td>` +
-        `<td>${r.seats}</td>${showDelta ? dTd(r) : ''}<td>${nf(r.votes)}</td><td>${pc1(total ? r.votes / total : 0)}</td></tr>`;
+        `<td>${r.seats}${dSuffix(r)}</td><td>${nf(r.votes)}</td><td>${pc1(total ? r.votes / total : 0)}</td></tr>`;
     }).join('') +
     `</tbody></table>` + pagerHTML(which, pageCount);
   for (const b of el.querySelectorAll('th button[data-sort]')) {
@@ -832,7 +888,6 @@ const seatParty = { ac: new Map(), pc: new Map() };   // seat key -> party code
 const partySeats = { ac: new Map(), pc: new Map() };  // party code -> [seat key]
 let tense = 'elected';                 // 'elected' | 'stands'
 let pcByeSeats = [];                   // by-election seats for this state + LS year
-let unionCabinet = null;               // union cabinet doc for the LS year
 let stateCabinet = null;               // state cabinet doc (static)
 const seatResolved = new Map();        // ls_seat_code -> { p, vacant, byeCount, events }
 let pcDelta = new Map();               // party -> net change under 'stands'
@@ -978,16 +1033,56 @@ function buildTenseControl() {
 }
 
 function beltRoster() {
-  const out = [];
-  if (stateCabinet && stateCabinet.members) {
-    for (const m of stateCabinet.members) out.push({ ...m, scope: 'State' });
-  }
-  if (unionCabinet && unionCabinet.members) {
-    for (const m of unionCabinet.members) {
-      if (m.state === stateCode) out.push({ ...m, scope: 'Union' });
-    }
-  }
-  return out;
+  return (stateCabinet && stateCabinet.members) || [];
+}
+
+/* ── find minister ─────────────────────────────────────────────────────── *
+ * One query, one surface: matching cabinet cards stay bright, the rest recede
+ * toward the ground (desaturated face, muted name) so the reader keeps the
+ * roster's shape while the match stands out. The first match is scrolled into
+ * view — a reported match that sits off the edge of a scrollbar-less strip is
+ * only half a search. */
+let minQuery = '';
+let beltSorted = [];
+const norm = s => (s || '').toLowerCase();
+const memberMatches = m => {
+  if (!minQuery) return true;
+  const q = norm(minQuery);
+  return [m.name, m.portfolio, m.role, m.constituency].filter(Boolean)
+    .map(norm).join(' ').includes(q);
+};
+const searchMinEl = $('#search-min'), clearMinEl = $('#clear-min'), minCountEl = $('#min-count');
+
+function applyBeltQuery() {
+  const on = !!minQuery;
+  clearMinEl.hidden = !on;
+  let n = 0;
+  beltSorted.forEach((m, i) => {
+    const cardEl = beltScroll.children[i];
+    if (!cardEl) return;
+    const hit = memberMatches(m);
+    if (hit) n++;
+    cardEl.classList.toggle('dim', on && !hit);
+  });
+  minCountEl.textContent = on ? `${n} of ${beltSorted.length}` : '';
+  updateBeltFades();
+}
+
+function scrollToFirstMatch() {
+  const first = beltScroll.querySelector('.belt-card:not(.dim)');
+  if (!first) return;
+  const sc = beltScroll.getBoundingClientRect();
+  const c = first.getBoundingClientRect();
+  if (c.left < sc.left + 4) beltScroll.scrollBy({ left: c.left - sc.left - 8, behavior: 'auto' });
+  else if (c.right > sc.right - 4) beltScroll.scrollBy({ left: c.right - sc.right + 8, behavior: 'auto' });
+}
+
+function bindSearch() {
+  searchMinEl.addEventListener('input', () => { minQuery = searchMinEl.value.trim(); applyBeltQuery(); scrollToFirstMatch(); });
+  clearMinEl.addEventListener('click', () => { searchMinEl.value = ''; minQuery = ''; applyBeltQuery(); searchMinEl.focus(); });
+  searchMinEl.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { e.stopPropagation(); searchMinEl.value = ''; minQuery = ''; applyBeltQuery(); }
+  });
 }
 
 function renderBelt() {
@@ -999,29 +1094,29 @@ function renderBelt() {
   beltAsof.textContent = tense === 'stands'
     ? (byes ? `as it stands · ${byes} by-election${byes === 1 ? '' : 's'} in ${region.name}` : `as it stands · no by-elections in ${region.name}`)
     : (stateCabinet ? `state cabinet sworn in ${stateCabinet.swornIn}` : 'as elected');
-  const order = { cm: 0, pm: 0, cabinet: 1, 'mos-ic': 2, mos: 3 };
+  const order = { cm: 0, cabinet: 1, 'mos-ic': 2, mos: 3 };
   const sorted = [...members].sort((a, b) =>
-    (a.scope === b.scope ? 0 : a.scope === 'State' ? -1 : 1) ||
     (order[a.rank] ?? 9) - (order[b.rank] ?? 9) ||
     (a.name || '').localeCompare(b.name || ''));
+  beltSorted = sorted;
   beltScroll.innerHTML = sorted.map(m => {
     const initials = (m.name || '?').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
     const roleTxt = m.portfolio || m.role || '';
     const seatLabel = m.constituency || (m.state ? 'Rajya Sabha' : '');
     const seat = seatLabel
-      ? `<span class="belt-seat"><i class="sw" style="--c:${colour(m.party)}"></i>${seatLabel}</span>`
+      ? `<span class="belt-seat">${partyMark(m.party)}${seatLabel}</span>`
       : '';
     const face = m.photo
       ? `<div class="belt-face"><img src="../data/photos/cabinet/${m.photo}" alt="" loading="lazy" onerror="this.parentNode.innerHTML='${initials}'"></div>`
       : `<div class="belt-face" aria-hidden="true">${initials}</div>`;
     return `<div class="belt-card">` +
       face +
-      `<span class="belt-scope">${m.scope}</span>` +
-      `<p class="belt-name">${m.name}</p>` +
+      `<p class="belt-name">${titleCase(m.name)}</p>` +
       `<p class="belt-role">${roleTxt}</p>` +
       seat + `</div>`;
   }).join('');
   updateBeltFades();
+  applyBeltQuery();
 }
 
 function updateBeltFades() {
@@ -1045,12 +1140,8 @@ async function loadLS(year) {
   const all = await fetch(`../data/results/ls/pc/${year}.json`).then(r => r.json());
   const pcRows = Object.fromEntries(Object.entries(all.constituencies).filter(([, c]) => c.st === stateCode));
   await loadPCDetail(year);
-  const [bye, uCab] = await Promise.all([
-    fetch(`../data/results/ls/byel/${year}.json`).then(r => r.ok ? r.json() : null).catch(() => null),
-    fetch(`../data/cabinet/union/${year}.json`).then(r => r.ok ? r.json() : null).catch(() => null),
-  ]);
+  const bye = await fetch(`../data/results/ls/byel/${year}.json`).then(r => r.ok ? r.json() : null).catch(() => null);
   pcByeSeats = (bye && bye.seats ? bye.seats : []).filter(s => s.st === stateCode);
-  unionCabinet = uCab;
   return { year, pcRows, pcAgg: aggregateFrom(pcRows) };
 }
 async function loadLA(year) {
@@ -1128,7 +1219,16 @@ bindPanelTable('ac');
 bindPanelTable('pc');
 if (qs.get('t') === 'stands') tense = 'stands';
 buildTenseControl();
+bindSearch();
 beltScroll.addEventListener('scroll', updateBeltFades, { passive: true });
+beltScroll.addEventListener('error', e => {
+  const img = e.target;
+  if (!(img instanceof HTMLImageElement) || !img.classList.contains('belt-sym')) return;
+  const sw = document.createElement('i');
+  sw.className = 'sw';
+  sw.style.setProperty('--c', img.dataset.fallback || 'var(--muted)');
+  img.replaceWith(sw);
+}, true);
 // the India map drills in carrying the year it was showing; honour it when this
 // state has that year, otherwise fall back to the latest available
 const wantsYear = Number(qs.get('y')) || 0;
