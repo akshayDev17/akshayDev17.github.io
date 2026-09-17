@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Member of Legislative Assembly — Election Atlas of India</title>
+<meta name="description" content="One member of a state legislative assembly: their seat, their result, and (soon) their development fund and assembly record.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EEF1F8; --paper-2:#E3E9F4; --ink:#0F1220; --muted:#525A6B;
+  --rule:#D3D9E6; --rule-2:#BCC4D6;
+  --serif:"Newsreader",ui-serif,Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px;
+  --r2:6px;
+  --good:#16A34A; --warn:#F59E0B; --bad:#DC2626;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:var(--serif);font-optical-sizing:auto;font-size:1.0625rem;line-height:1.6;
+  font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;
+  padding:var(--s6) clamp(var(--s4),4vw,var(--s6)) var(--s7);
+}
+.lbl{font-family:var(--mono);font-size:.625rem;line-height:1.4;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin:0}
+a{color:var(--ink)}
+
+.page{max-width:52rem;margin:0 auto;display:flex;flex-direction:column;gap:var(--s4)}
+.mh{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s4);flex-wrap:wrap}
+.back{font-family:var(--mono);font-size:.625rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--ink)}
+.hair{height:1px;background:var(--rule);border:0;margin:var(--s3) 0 0}
+
+.title{margin:0;font-size:2.25rem;font-weight:400;line-height:1.1;letter-spacing:-.02em}
+.sub{font-family:var(--mono);font-size:.6875rem;letter-spacing:.06em;color:var(--muted);margin:4px 0 0}
+
+.caveat{font-family:var(--mono);font-size:.6875rem;line-height:1.5;color:var(--ink);
+  background:var(--paper-2);border-inline-start:3px solid var(--ink);
+  padding:var(--s3) var(--s4);border-radius:var(--r2)}
+
+/* hero */
+.hero{display:flex;gap:var(--s5);align-items:flex-start}
+.face{flex:0 0 9rem;aspect-ratio:3/4;background:var(--paper-2);border:1px solid var(--rule);
+  border-radius:var(--r2);display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:2.4rem;color:var(--muted);letter-spacing:.02em}
+.ident{min-width:0;flex:1 1 auto;padding-top:var(--s2)}
+.who{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.psym{width:auto;height:auto;max-width:20px;max-height:20px;flex:0 0 auto;object-fit:contain;display:block}
+.name{margin:0;font-size:1.7rem;font-weight:400;line-height:1.15;letter-spacing:-.01em}
+.role{font-family:var(--mono);font-size:.6875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:4px 0 0}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,auto));gap:var(--s3) var(--s5);margin-top:var(--s5)}
+.fact .k{font-family:var(--mono);font-size:.5625rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.fact .v{font-family:var(--mono);font-size:.875rem;margin-top:2px}
+
+/* cross-link band */
+.cross{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);
+  padding:var(--s3) var(--s4);border:1px solid var(--rule-2);border-radius:var(--r2);background:var(--paper-2);
+  font-family:var(--mono);font-size:.6875rem}
+.cross a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+
+/* section + empty state */
+.block{border-top:1px solid var(--rule);padding-top:var(--s4)}
+.block h3{margin:0;font-family:var(--mono);font-size:.625rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.void{min-height:7rem;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--rule);border-radius:var(--r2);padding:var(--s5);margin-top:var(--s4)}
+.void p{max-width:44ch;text-align:center;font-family:var(--mono);font-size:.6875rem;
+  line-height:1.7;color:var(--muted);margin:0}
+
+@media (max-width:48rem){
+  .hero{flex-direction:column}
+  .face{width:100%;max-width:12rem;aspect-ratio:3/4}
+  .facts{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <header class="mh">
+    <a class="back" id="back" href="../state/">← State</a>
+    <p class="lbl">Election Atlas of India</p>
+  </header>
+  <hr class="hair">
+
+  <div>
+    <h1 class="title" id="p-const">—</h1>
+    <p class="sub" id="p-sub">Assembly constituency</p>
+  </div>
+
+  <div class="hero">
+    <div class="face" id="p-face">?</div>
+    <div class="ident">
+      <div class="who"><span id="p-sym"></span><span class="lbl" id="p-party">—</span></div>
+      <p class="name" id="p-name">—</p>
+      <p class="role" id="p-role">—</p>
+      <div class="facts" id="p-facts"></div>
+    </div>
+  </div>
+
+  <p class="caveat">Assembly figures are synthetic and unverified (per the state page caveat). The development fund and Vidhan Sabha record are not yet fetched.</p>
+
+  <div class="cross" id="pc-cross"></div>
+
+  <section class="block">
+    <h3>Development fund · Vidhayak Nidhi</h3>
+    <div class="void"><p>Not yet fetched — the MLA local-area development fund (MLALAD) fetcher doesn't exist yet.</p></div>
+  </section>
+
+  <section class="block">
+    <h3>In the Vidhan Sabha</h3>
+    <div class="void"><p>Not yet fetched — attendance, questions and bills from the state assembly don't exist yet.</p></div>
+  </section>
+
+  <section class="block">
+    <h3>In the news</h3>
+    <div class="void"><p>No news yet — the news fetcher isn't built.</p></div>
+  </section>
+</div>
+
+<script type="module">
+const $ = s => document.querySelector(s);
+const nf = n => Math.round(n).toLocaleString('en-IN');
+const tc = s => (s || '').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+const esc = s => (s == null ? '' : String(s)).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const keyify = s => String(s || '').toLowerCase().replace(/\(sc\)|\(st\)/g, '').replace(/[^a-z0-9]/g, '');
+
+const qs = new URLSearchParams(location.search);
+const S = (qs.get('s') || 'IN-UP').toUpperCase();
+const C = (qs.get('c') || '').toLowerCase();
+
+const [acTopo, results, partiesDoc, symDoc, manifest] = await Promise.all([
+  fetch(`../data/geo/ac/${S}.json`).then(r => r.json()).catch(() => null),
+  fetch(`../data/results/ac/${S}/2024-detail.json`).then(r => r.json()).catch(() => null),
+  fetch('../data/parties.json').then(r => r.json()),
+  fetch('../data/parties-symbols.json').then(r => r.json()).catch(() => ({ symbols: {} })),
+  fetch('../data/manifest.json').then(r => r.json()).catch(() => null),
+]);
+
+const partyColour = new Map(partiesDoc.parties.map(p => [p.code, p.colour]));
+const colour = c => partyColour.get(c) || partiesDoc.fallback?.colour || '#888';
+const symFor = code => {
+  const s = (symDoc.symbols || {})[code];
+  return (s && s.file) ? '../data/' + s.file : null;
+};
+
+/* resolve the AC: geo/ac has { ac (name), no, pc (parent PC name), dist } */
+const geoms = (acTopo && acTopo.objects && acTopo.objects.acs && acTopo.objects.acs.geometries) || [];
+const acGeom = geoms.find(g => keyify(g.properties.ac) === C);
+const acName = acGeom ? acGeom.properties.ac : C;
+const acNo = acGeom ? String(acGeom.properties.no) : '';
+const pcName = acGeom ? acGeom.properties.pc : '';
+
+document.title = `${acName} — Election Atlas of India`;
+$('#p-const').textContent = acName;
+$('#p-sub').textContent = `Assembly constituency · ${(acTopo && acTopo.objects) ? 'State Legislative Assembly' : ''}`;
+$('#back').href = `../state/?s=${S}`;
+
+/* winner + margin from the (synthetic) assembly result */
+const cands = (results && results.constituencies && results.constituencies[acNo] && results.constituencies[acNo].c) || [];
+const sorted = [...cands].sort((a, b) => (b.v || 0) - (a.v || 0));
+const winner = sorted[0];
+const runner = sorted[1];
+const totalV = sorted.reduce((n, c) => n + (c.v || 0), 0);
+
+if (winner) {
+  const margin = runner && totalV ? ((winner.v - runner.v) / totalV) * 100 : 0;
+  const sym = symFor(winner.p);
+  $('#p-sym').innerHTML = sym
+    ? `<img class="psym" src="${sym}" alt="${esc(winner.p)} symbol">`
+    : `<span class="psym" style="width:11px;height:11px;border-radius:2px;background:${colour(winner.p)};display:inline-block"></span>`;
+  $('#p-party').textContent = (partiesDoc.parties.find(p => p.code === winner.p) || {}).name || winner.p;
+  $('#p-name').textContent = tc(winner.n);
+  $('#p-role').textContent = 'MLA · State Legislative Assembly';
+  $('#p-face').textContent = (winner.n || '?')[0];
+  $('#p-facts').innerHTML =
+    `<div class="fact"><div class="k">Margin</div><div class="v">+${margin.toFixed(1)}%</div></div>` +
+    `<div class="fact"><div class="k">Votes</div><div class="v">${nf(winner.v)}</div></div>` +
+    `<div class="fact"><div class="k">Candidates</div><div class="v">${sorted.length}</div></div>`;
+} else {
+  $('#p-name').textContent = 'No result on record';
+  $('#p-role').textContent = 'MLA · State Legislative Assembly';
+}
+
+/* cross-link up to the containing MP */
+if (pcName) {
+  $('#pc-cross').innerHTML = `<span>↑ this seat sits inside <b>PC — ${esc(tc(pcName))}</b></span>` +
+    `<span>MP: <a href="../mp/?s=${S}&c=${keyify(pcName)}">${esc(tc(pcName))} →</a></span>`;
+} else {
+  $('#pc-cross').textContent = 'Parent Lok Sabha seat unknown.';
+}
+</script>
+</body>
+</html>

@@ -496,6 +496,23 @@ if (!regionByCode.has(stateCode)) stateCode = 'IN-UP';
 const region = regionByCode.get(stateCode);
 const hasAC = !!coverage.checked[stateCode];
 
+/* Seat → constituency_key join, for the Level-3 MP click-through. Mirrors the
+   fetcher's keyify: lowercase, drop "(SC)"/"(ST)", then the trailing state
+   abbreviation the MPLADS portal appends to seats shared across states
+   (e.g. "HAMIRPURUP" → "hamirpur"). */
+const STATE_ABBR = stateCode.split('-')[1] || '';
+const keyify = name => {
+  let s = String(name || '').toLowerCase().replace(/\(sc\)|\(st\)/g, '');
+  s = s.replace(/[^a-z0-9]/g, '');
+  if (STATE_ABBR && s.endsWith(STATE_ABBR.toLowerCase())) s = s.slice(0, -STATE_ABBR.length);
+  return s;
+};
+const mpKeyByName = new Map();
+try {
+  const midx = await fetch(`../data/mplads/${stateCode}/index.json`).then(r => r.json());
+  for (const m of (midx.mps || [])) mpKeyByName.set(keyify(m.constituency), m.constituency_key);
+} catch { /* no MPLADS index — PC clicks just won't navigate */ }
+
 /* the page is about one state, and says so */
 document.title = `Election Atlas of ${region.name}`;
 $('#eyebrow').textContent = `Election Atlas of ${region.name}`;
@@ -846,6 +863,18 @@ function wire(svg, which) {
     showCard(which, k, r.left + r.width / 2, r.top + r.height / 2);
   });
   svg.addEventListener('focusout', () => { hideCard(); clearPanel(which); });
+  if (which === 'pc') {
+    const open = k => {
+      const key = mpKeyByName.get(keyify(pcName.get(k) || ''));
+      if (key) location.href = `../mp/?s=${stateCode}&c=${key}`;
+    };
+    svg.addEventListener('click', e => { const k = keyOf(e); if (k) open(k); });
+    svg.addEventListener('keydown', e => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const k = keyOf(e); if (!k) return;
+      e.preventDefault(); open(k);
+    });
+  }
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { hideCard(); clearPanel('ac'); clearPanel('pc'); } });
 
