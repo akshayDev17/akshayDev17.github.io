@@ -18,3 +18,8 @@ out/
 # python bytecode from the atlas data-build scripts
 __pycache__/
 *.pyc
+
+# Bill PDFs ARE committed — the MLA bill page serves them straight from the repo.
+# GitHub hard-rejects individual files over 100 MB; this AP scan is 167 MB, so it
+# is held back until it can be compressed or split.
+work/election-atlas/data/state-legislation/IN-AP/bills/documents/74118318fe-bills.pdf
