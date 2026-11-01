@@ -811,13 +811,14 @@ function buildSeatMaps() {
     if (r.p) standsSeats.set(r.p, (standsSeats.get(r.p) || 0) + 1);
   }
   deltaByParty = new Map();
-  for (const [p, n] of standsSeats) {
-    const d = n - (electedSeats.get(p) || 0);
-    if (d) deltaByParty.set(p, d);
+  if (!currentYear) return;
+  for (const [uid, c] of Object.entries(currentYear.constituencies)) {
+    const r = resolved.get(uid);
+    if (!r || r.unknown || r.p === c.p) continue;
+    deltaByParty.set(c.p, (deltaByParty.get(c.p) || 0) - 1);
+    if (r.p) deltaByParty.set(r.p, (deltaByParty.get(r.p) || 0) + 1);
   }
-  for (const [p, n] of electedSeats) {
-    if (!standsSeats.has(p)) deltaByParty.set(p, -n);
-  }
+  for (const [p, d] of deltaByParty) if (!d) deltaByParty.delete(p);
 }
 
 /* One GeoJSON collection per party, built from the constituency features that
@@ -1018,7 +1019,9 @@ const NAT_MIN_SHARE = 0.005;
 function nationalRows(filtered = true) {
   const total = agg ? agg.totalVotes : 0;
   const stands = tense === 'stands';
-  let rows = [...(agg ? agg.national : new Map())]
+  const parties = new Map(agg ? agg.national : []);
+  if (stands) for (const code of standsSeats.keys()) if (!parties.has(code)) parties.set(code, { seats: 0, votes: 0 });
+  let rows = [...parties]
     .map(([code, v]) => ({
       code,
       seats: stands ? (standsSeats.get(code) || 0) : v.seats,
@@ -1070,6 +1073,10 @@ function renderNational() {
         `<td>${r.seats}${dTxt ? `<span class="d">${dTxt}</span>` : ''}</td>` +
         `<td>${nf(r.votes)}</td><td>${pc1(r.share)}</td></tr>`;
     }).join('');
+    const unknown = [...resolved.values()].filter(r => r.unknown).length;
+    if (unknown && natPage === pageCount - 1) {
+      natBody.innerHTML += `<tr><td colspan="4" style="text-align:left;color:var(--muted)">${unknown} seat${unknown === 1 ? '' : 's'}: by-election result not available yet</td></tr>`;
+    }
   }
   // the whole tbody dims its left-out rows, so the table and the map agree
   natBody.classList.toggle('has-sel', selection.size > 0);
