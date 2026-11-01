@@ -30,6 +30,8 @@ Each stops with an error on a source shape it does not expect.
   published, names a publisher or host off the allow-list, has a sha256 that does
   not match the cached source, or has synthetic/dummy wording in its metadata.
   `python3 tools/test_validate_records.py` shows it failing on such records.
+- `node --test tools/test_stands.mjs`: the state page's "as it stands" seat tally
+  (`state/stands.js`) adds up to each state's seat count.
 
 ## Succession
 

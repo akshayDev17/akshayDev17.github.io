@@ -446,6 +446,7 @@ td .d{font-weight:500;letter-spacing:.02em}
 <div id="card" role="status" aria-live="polite"></div>
 
 <script type="module">
+import { resolveSeat, tallyStands } from './stands.js';
 const NS = 'http://www.w3.org/2000/svg';
 const $ = s => document.querySelector(s);
 const nf = n => Math.round(n).toLocaleString('en-IN');
@@ -650,11 +651,14 @@ const DEFAULT_SORT = { key: 'seats', dir: -1 };
 const page = { ac: 0, pc: 0 };   // current page index per panel
 
 function sortedRows(agg, which) {
+  const stands = which === 'pc' ? pcStands : null;
   const parties = new Map(agg.m);
-  if (which === 'pc') for (const code of pcDelta.keys()) if (!parties.has(code)) parties.set(code, { seats: 0, votes: 0 });
+  if (stands) for (const code of stands.seats.keys()) if (!parties.has(code)) parties.set(code, { seats: 0, votes: 0 });
   const rows = [...parties].map(([code, v]) => ({
-    code, ...v, delta: which === 'pc' ? (pcDelta.get(code) || 0) : 0
-  })).filter(r => r.seats > 0 || r.votes > 0 || r.delta > 0);
+    code, votes: v.votes,
+    seats: stands ? (stands.seats.get(code) || 0) : v.seats,
+    delta: stands ? (stands.delta.get(code) || 0) : 0
+  })).filter(r => r.seats > 0 || r.votes > 0);
   const s = sortState[which];
   const share = r => (agg.total ? r.votes / agg.total : 0);
   return rows.sort((a, b) => {
@@ -692,7 +696,7 @@ function renderTable(el, agg, which, resetBtn, clearBtn) {
   page[which] = Math.min(page[which], pageCount - 1);
   const start = page[which] * PAGE_SIZE;
   const slice = rows.slice(start, start + PAGE_SIZE);
-  const unknown = which === 'pc' ? [...seatResolved.values()].filter(r => r.unknown).length : 0;
+  const unknown = which === 'pc' && pcStands ? pcStands.unknown : 0;
   const unknownRow = unknown && page[which] === pageCount - 1
     ? `<tr><td colspan="4" style="text-align:left;color:var(--muted)">${unknown} seat${unknown === 1 ? '' : 's'}: by-election result not available yet</td></tr>`
     : '';
@@ -926,8 +930,8 @@ const partySeats = { ac: new Map(), pc: new Map() };  // party code -> [seat key
 let tense = 'elected';                 // 'elected' | 'stands'
 let pcByeSeats = [];                   // by-election seats for this state + LS year
 let stateCabinet = null;               // state cabinet doc (static)
-const seatResolved = new Map();        // ls_seat_code -> { p, vacant, unknown, byeCount, events }
-let pcDelta = new Map();               // party -> net change under 'stands'
+const seatResolved = new Map();        // ls_seat_code -> { p, vacant, byeCount, events }
+let pcStands = null;                   // tallyStands() under 'stands', else null
 
 function paintFills(which) {
   const bound = which === 'ac' ? acPaths : pcPaths;
@@ -953,34 +957,16 @@ function buildPCResolved(data) {
   for (const [uid, c] of Object.entries(data.pcRows)) {
     const seat = uidToSeat.get(uid);
     if (!seat) continue;
-    seatResolved.set(seat, { p: c.p, vacant: false, unknown: false, byeCount: 0, events: [] });
+    seatResolved.set(seat, { p: c.p, vacant: false, byeCount: 0, events: [] });
   }
   for (const s of pcByeSeats) {
     const r = seatResolved.get(s.seat);
     if (!r) continue;
     r.events = s.events;
     r.byeCount = s.events.filter(e => e.type === 'bye').length;
-    if (tense === 'stands') {
-      const last = s.events[s.events.length - 1];
-      if (last && last.type === 'vacated') { r.p = null; r.vacant = true; }
-      else if (r.byeCount) {
-        const w = s.events.filter(e => e.type === 'bye').pop().winner;
-        r.p = w ? w.p : null;
-        r.unknown = !w;
-      }
-    }
+    if (tense === 'stands') Object.assign(r, resolveSeat(r.p, s.events));
   }
-  pcDelta = new Map();
-  for (const [uid, c] of Object.entries(data.pcRows)) {
-    const seat = uidToSeat.get(uid);
-    if (!seat) continue;
-    const r = seatResolved.get(seat);
-    if (r && r.unknown) continue;
-    const nowP = (r && r.vacant) ? null : (r ? r.p : c.p);
-    if (nowP === c.p) continue;
-    pcDelta.set(c.p, (pcDelta.get(c.p) || 0) - 1);
-    if (nowP) pcDelta.set(nowP, (pcDelta.get(nowP) || 0) + 1);
-  }
+  pcStands = tense === 'stands' ? tallyStands(data.pcRows, pcByeSeats) : null;
 }
 
 function paintPC(data) {
