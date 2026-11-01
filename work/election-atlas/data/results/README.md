@@ -45,7 +45,7 @@ only place the registered electorate is recorded.
 
 ```json
 {
-  "schema": 2, "election": "ls", "year": 2024,
+  "schema": 2, "provenance": "published", "election": "ls", "year": 2024,
   "regions": {
     "IN-UP": {
       "seats": 80,
