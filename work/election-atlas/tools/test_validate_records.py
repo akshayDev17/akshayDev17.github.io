@@ -3,11 +3,14 @@
 
     python3 tools/test_validate_records.py
 """
+import contextlib
+import io
 import json
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from harvest_common import cache_path, sha256_bytes  # noqa: E402
@@ -78,6 +81,28 @@ class Gate(unittest.TestCase):
         good.write_text(json.dumps(record()))
         self.assertEqual(main([str(good), "--cache", str(self.cache)]), 0)
         self.assertEqual(main([str(bad), "--cache", str(self.cache)]), 1)
+
+    def run_cli(self, *args):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = main(list(args))
+        return code, out.getvalue()
+
+    def test_command_line_checks_sha256_against_the_harvest_cache_by_default(self):
+        bad = self.cache / "bad-sha.json"
+        bad.write_text(json.dumps(record(source=dict(record()["source"], sha256="0" * 64))))
+        with mock.patch("validate_records.DEFAULT_CACHE", self.cache):
+            code, out = self.run_cli(str(bad))
+        self.assertEqual(code, 1)
+        self.assertIn("sha256 does not match", out)
+
+    def test_command_line_says_when_sha256_was_not_checked(self):
+        good = self.cache / "good.json"
+        good.write_text(json.dumps(record()))
+        with mock.patch("validate_records.DEFAULT_CACHE", self.cache / "absent"):
+            code, out = self.run_cli(str(good))
+        self.assertEqual(code, 0)
+        self.assertIn("sha256 NOT checked", out)
 
 
 if __name__ == "__main__":

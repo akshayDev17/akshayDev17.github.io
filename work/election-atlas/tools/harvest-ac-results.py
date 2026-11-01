@@ -75,7 +75,8 @@ CYCLES = [
     {"region": "IN-CT", "year": 2023, "direct": {
         "detail": CT_2023 + "Detailed_Results.xlsx",
         "perf": CT_2023 + "Performance_of_Political_Parties.xlsx",
-        "cand": CT_2023 + "Candidate_Data_Summary.xlsx"}},
+        "cand": CT_2023 + "Candidate_Data_Summary.xlsx",
+        "parties": CT_2023 + "List_Of_Political_Parties_Participated.xlsx"}},
     {"region": "IN-HR", "year": 2019, "old": (11697, "haryana-legislative-assembly-election-2019")},
     {"region": "IN-HR", "year": 2024, "api": r"Haryana Legislative Assembly Election.*2024"},
 ]
@@ -266,22 +267,31 @@ def parse_detail(body: bytes, state_name: str, cycle_id: str):
 
 
 def parse_party_names(body: bytes):
-    """'List of Political Parties Participated' -> {normalised full name: abbreviation}."""
+    """'List of Political Parties Participated' -> {normalised full name: abbreviation},
+    from either layout of table 3 (2016-17: PARTY NAME / PARTY ABBREVIATION; later:
+    ABBREVIATION / PARTY)."""
     rows = next(iter(sheets(body).values()))
-    h, col = header_index(rows, ("PARTY NAME", "PARTY ABBREVIATION"))
+    try:
+        h, col = header_index(rows, ("PARTY NAME", "PARTY ABBREVIATION"))
+        name_col, abbr_col = col["PARTY NAME"], col["PARTY ABBREVIATION"]
+    except SourceShapeError:
+        h, col = header_index(rows, ("ABBREVIATION", "PARTY"))
+        name_col, abbr_col = col["PARTY"], col["ABBREVIATION"]
     out = {"independent": "IND", "none of the above": "NOTA"}
     for row in rows[h + 1:]:
-        name, abbr = cell(row[col["PARTY NAME"]]), cell(row[col["PARTY ABBREVIATION"]])
+        if max(name_col, abbr_col) >= len(row):
+            continue
+        name, abbr = cell(row[name_col]), cell(row[abbr_col])
         if name and abbr:
             out[name.lower()] = abbr
     return out
 
 
-def parse_perf(body: bytes, load_party_names, cycle_id: str):
+def parse_perf(body: bytes, party_names: dict, cycle_id: str):
     """-> {ECI abbreviation: seats won}, from either layout of table 5.
 
-    The 2016-17 layout names parties in full; load_party_names() then supplies
-    table 3's full name -> abbreviation map."""
+    The 2016-17 layout names parties in full; party_names (table 3's full name ->
+    abbreviation map) turns them into abbreviations."""
     rows = next(iter(sheets(body).values()))
     try:
         h, col = header_index(rows, ("ABBREVIATION", "WON"))
@@ -289,7 +299,6 @@ def parse_perf(body: bytes, load_party_names, cycle_id: str):
     except SourceShapeError:
         h, col = header_index(rows, ("PARTY NAME", "WON"))
         key_col, by_name = col["PARTY NAME"], True
-    party_names = load_party_names() if by_name else {}
     won = {}
     for row in rows[h + 1:]:
         if key_col >= len(row) or col["WON"] >= len(row):
@@ -356,12 +365,25 @@ def norm(s) -> str:
 
 
 def party_code_map(parties_doc):
-    """ECI abbreviation -> atlas code where parties.json covers it (code or alias)."""
+    """(ECI abbreviation, table 3 {abbreviation: full name}) -> atlas code, as the Lok Sabha
+    files carry it: parties.json where it covers the party by abbreviation or full name,
+    otherwise the abbreviation reduced to its letters and digits (CPI(ML)(L) -> CPIMLL)."""
     by_norm = {}
     for p in parties_doc["parties"]:
-        for key in [p["code"], *p.get("aliases", [])]:
+        for key in [p["code"], p["name"], *p.get("aliases", [])]:
             by_norm.setdefault(norm(key), p["code"])
-    return lambda abbr: abbr if abbr in ("NOTA", "IND") else by_norm.get(norm(abbr), abbr)
+
+    def code_for(abbr, full_names):
+        if abbr in ("NOTA", "IND"):
+            return abbr
+        for key in (abbr, full_names.get(abbr)):
+            if key and norm(key) in by_norm:
+                return by_norm[norm(key)]
+        code = re.sub(r"[^A-Za-z0-9]", "", abbr)[:14]
+        if not code:
+            raise SourceShapeError(f"party abbreviation {abbr!r} has no letters or digits")
+        return code
+    return code_for
 
 
 def geo_ac_numbers(region: str):
@@ -388,11 +410,10 @@ def harvest(cycle, cache, code_for):
             f"{cid}: AC numbers in the report do not match the boundary set "
             f"(missing {sorted(absent)[:10]}, extra {sorted(extra)[:10]})")
 
-    def load_party_names():
-        p_url, _ = pick(found, "parties", cid)
-        return parse_party_names(fetch(p_url, cache)["bytes"])
-
-    published_won = parse_perf(fetch(perf_url, cache)["bytes"], load_party_names, cid)
+    parties_url, _ = pick(found, "parties", cid)
+    party_names = parse_party_names(fetch(parties_url, cache)["bytes"])
+    full_names = {abbr: name for name, abbr in party_names.items()}
+    published_won = parse_perf(fetch(perf_url, cache)["bytes"], party_names, cid)
     published_cands = parse_cand(fetch(cand_url, cache)["bytes"], cand_ext, cid)
 
     seats, colour, detail = collections.Counter(), {}, {}
@@ -409,9 +430,9 @@ def harvest(cycle, cache, code_for):
         if len(field) > 1 and field[0]["v"] == field[1]["v"]:
             raise SourceShapeError(f"{cid} AC {no}: tie at the top ({field[0]['n']} / {field[1]['n']})")
         seats[field[0]["p"]] += 1
-        colour[str(no)] = {"p": code_for(field[0]["p"]), "v": field[0]["v"]}
+        colour[str(no)] = {"p": code_for(field[0]["p"], full_names), "v": field[0]["v"]}
         detail[str(no)] = {"ac": acs[no]["ac"],
-                           "c": [{"n": c["n"], "p": code_for(c["p"]), "v": c["v"]} for c in cands]}
+                           "c": [{"n": c["n"], "p": code_for(c["p"], full_names), "v": c["v"]} for c in cands]}
 
     counted_cands = sum(1 for a in acs.values() if a["polled"] for c in a["c"] if c["p"] != "NOTA")
     published_won = {k: v for k, v in published_won.items() if v}
@@ -439,7 +460,8 @@ def harvest(cycle, cache, code_for):
         meta["no_result"] = no_result
     colour_doc = {**meta, "note": (
         "Published Election Commission of India result. `p` is the winning party code "
-        "(data/parties.json where it covers the party, otherwise the ECI abbreviation) and "
+        "(data/parties.json where it covers the party by abbreviation or by its full name in the "
+        "report's table 3, otherwise the ECI abbreviation's letters and digits) and "
         "`v` its total votes (general + postal). Keys are AC numbers as the boundary set carries them. "
         "`no_result` lists ACs this report carries no result for."),
         "constituencies": colour}

@@ -304,6 +304,13 @@ def read_new_card(rows, where):
     return electors, voted, valid, nota, contested, poll, declared, reason, cands
 
 
+def strip_elected_mark(name: str) -> str:
+    """ECI marks the winner's name as elected: "(E)", "'E'", a trailing E after a space,
+    or an E with diaeresis/acute or a euro sign from a lost encoding. It is an
+    annotation, not the name; an E that ends the name itself (SULE) is kept."""
+    return re.sub(r"""(?:\s+|\s*[("'])\s*['"]?(?:[EËÉ]|€)\s*['"]?\s*\)?\s*["']?$""", "", name).strip()
+
+
 def read_card(rows, where):
     """-> card dict, or None when the sheet is not a parliamentary index card."""
     head = " ".join(t for r in rows[:6] for t in texts(r) if t)
@@ -321,10 +328,7 @@ def read_card(rows, where):
     if sum(c["v"] for c in cands) != valid:
         raise SourceShapeError(f"{where}: candidate votes sum {sum(c['v'] for c in cands)} != valid votes {valid}")
     cands.sort(key=lambda c: -c["v"])
-    # ECI marks the winner's name as elected: "(E)", "'E'", a bare trailing E, or an
-    # E with diaeresis/acute or a euro sign from a lost encoding. It is an annotation,
-    # not the name.
-    cands[0]["n"] = re.sub(r"""\s*\(?\s*['"]?\s*(?:[EËÉ]|€)\s*['"]?\s*\)?\s*["']?$""", "", cands[0]["n"]).strip()
+    cands[0]["n"] = strip_elected_mark(cands[0]["n"])
     if len(cands) > 1 and cands[0]["v"] == cands[1]["v"]:
         raise SourceShapeError(f"{where}: tie at the top")
     return {"state": state, "pc_no": pc_no, "pc_name": pc_name, "poll": poll, "declared": declared,

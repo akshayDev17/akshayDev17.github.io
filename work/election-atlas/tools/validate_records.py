@@ -12,9 +12,10 @@ A document passes only if:
   - it has a `source` object, and every source block (`source` and each entry of
     `sources`) names a publisher on the allow-list and a https URL whose host
     belongs to that publisher;
-  - every source block carries a 64-hex `sha256` and a `fetched_at`; with
-    --cache (always, inside a harvester) the sha256 must equal the hash of the
-    cached file that URL was fetched into;
+  - every source block carries a 64-hex `sha256` and a `fetched_at`; the sha256
+    must equal the hash of the cached file that URL was fetched into (always
+    inside a harvester; from the command line --cache defaults to the harvest
+    cache when it exists, and the output says so when no cache is available);
   - no metadata value (keys `note*`, `source*`, `_note`, `caveat*`, `provenance`)
     contains synthetic, dummy, invented, placeholder, fake or mock.
 
@@ -31,7 +32,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from harvest_common import cache_path, sha256_bytes  # noqa: E402
+from harvest_common import DEFAULT_CACHE, cache_path, sha256_bytes  # noqa: E402
 
 # publisher id -> hosts it publishes from (a host matches itself or any subdomain)
 PUBLISHER_HOSTS = {
@@ -147,8 +148,11 @@ def iter_json(paths):
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("paths", nargs="+", help="JSON files or directories to check")
-    ap.add_argument("--cache", help="harvest cache directory; enables the sha256 check")
+    ap.add_argument("--cache", default=str(DEFAULT_CACHE) if DEFAULT_CACHE.is_dir() else None,
+                    help="harvest cache directory for the sha256 check (default: the harvest cache, if present)")
     args = ap.parse_args(argv)
+    if args.cache is None:
+        print("validate_records: sha256 NOT checked: no harvest cache (pass --cache DIR)")
     failed = 0
     checked = 0
     for path in iter_json(args.paths):

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""A by-election whose ECI card cannot be used must still be an event in its seat.
+"""By-election term files: unusable cards stay events in their seat, and only
+the elected marker (never a name's own last letter) is stripped from a winner.
 
     python3 tools/test_harvest_ls_byel.py
 """
@@ -59,6 +60,18 @@ class HeldCards(unittest.TestCase):
         self.assertEqual([e["date"] for e in events], ["2016-11-22", "2018-03-14"])
         self.assertIsNone(events[0]["winner"])
         self.assertEqual(events[-1]["winner"]["p"], "SP")
+
+
+class ElectedMark(unittest.TestCase):
+    def test_marker_is_stripped(self):
+        for printed in ["RAVI KISHAN (E)", "RAVI KISHAN(E)", "RAVI KISHAN 'E'", "RAVI KISHAN E",
+                        "RAVI KISHAN ('E')", "RAVI KISHAN Ë", "RAVI KISHAN (€)"]:
+            self.assertEqual(byel.strip_elected_mark(printed), "RAVI KISHAN", printed)
+
+    def test_name_ending_in_e_is_kept(self):
+        for name in ["SUPRIYA SULE", "SHRIMANT CHH. UDAYANRAJE PRATAPSINHMAHARAJ BHONSLE"]:
+            self.assertEqual(byel.strip_elected_mark(name), name)
+        self.assertEqual(byel.strip_elected_mark("SUPRIYA SULE (E)"), "SUPRIYA SULE")
 
 
 if __name__ == "__main__":
