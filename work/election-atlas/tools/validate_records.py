@@ -14,8 +14,9 @@ A document passes only if:
     belongs to that publisher;
   - every source block carries a 64-hex `sha256` and a `fetched_at`; the sha256
     must equal the hash of the cached file that URL was fetched into (always
-    inside a harvester; from the command line --cache defaults to the harvest
-    cache when it exists, and the output says so when no cache is available);
+    inside a harvester and with an explicit --cache; without --cache the harvest
+    cache is used when it exists, and a source it does not hold, or a missing
+    cache, is reported as "sha256 NOT checked" rather than failed);
   - no metadata value (keys `note*`, `source*`, `_note`, `caveat*`, `provenance`)
     contains synthetic, dummy, invented, placeholder, fake or mock.
 
@@ -68,7 +69,7 @@ def source_blocks(doc: dict):
         yield f"sources[{i}]", block
 
 
-def check_source(where: str, block, cache) -> list:
+def check_source(where: str, block, cache, unchecked=None) -> list:
     if not isinstance(block, dict):
         return [f"{where}: must be an object with publisher, url, sha256 and fetched_at"]
     problems = []
@@ -87,7 +88,8 @@ def check_source(where: str, block, cache) -> list:
     if cache is not None and url and SHA256.match(sha):
         cached = cache_path(Path(cache), url)
         if not cached.exists():
-            problems.append(f"{where}: no cached copy of {url} to verify sha256 against")
+            missing = f"{where}: no cached copy of {url} to verify sha256 against"
+            (problems if unchecked is None else unchecked).append(missing)
         elif sha256_bytes(cached.read_bytes()) != sha:
             problems.append(f"{where}.sha256 does not match the cached copy of {url}")
     return problems
@@ -113,8 +115,11 @@ def scan_metadata(node, path="") -> list:
     return problems
 
 
-def validate(doc, cache=None) -> list:
-    """Return the list of problems with one document (empty when it passes)."""
+def validate(doc, cache=None, unchecked=None) -> list:
+    """Return the list of problems with one document (empty when it passes).
+
+    A source with no cached copy is a problem, unless `unchecked` is a list: then it
+    is recorded there instead (its sha256 was not checked)."""
     if not isinstance(doc, dict):
         return ["document is not a JSON object"]
     problems = []
@@ -123,7 +128,7 @@ def validate(doc, cache=None) -> list:
     if "source" not in doc:
         problems.append("no top-level source")
     for where, block in source_blocks(doc):
-        problems += check_source(where, block, cache)
+        problems += check_source(where, block, cache, unchecked)
     problems += [p for p in scan_metadata(doc) if not p.startswith("provenance is ")]
     return problems
 
@@ -148,10 +153,12 @@ def iter_json(paths):
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("paths", nargs="+", help="JSON files or directories to check")
-    ap.add_argument("--cache", default=str(DEFAULT_CACHE) if DEFAULT_CACHE.is_dir() else None,
-                    help="harvest cache directory for the sha256 check (default: the harvest cache, if present)")
+    ap.add_argument("--cache", help="harvest cache directory for the sha256 check; every source must be "
+                    "in it (default: the harvest cache, if present, checking only what it holds)")
     args = ap.parse_args(argv)
-    if args.cache is None:
+    strict = args.cache is not None
+    cache = args.cache or (str(DEFAULT_CACHE) if DEFAULT_CACHE.is_dir() else None)
+    if cache is None:
         print("validate_records: sha256 NOT checked: no harvest cache (pass --cache DIR)")
     failed = 0
     checked = 0
@@ -163,7 +170,10 @@ def main(argv=None) -> int:
             print(f"{path}: unreadable JSON ({e})")
             failed += 1
             continue
-        problems = validate(doc, args.cache)
+        unchecked = None if strict else []
+        problems = validate(doc, cache, unchecked)
+        for u in unchecked or []:
+            print(f"{path}: sha256 NOT checked: {u}")
         if problems:
             failed += 1
             for p in problems:

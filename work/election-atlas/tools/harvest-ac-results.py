@@ -366,8 +366,10 @@ def norm(s) -> str:
 
 def party_code_map(parties_doc):
     """(ECI abbreviation, table 3 {abbreviation: full name}) -> atlas code, as the Lok Sabha
-    files carry it: parties.json where it covers the party by abbreviation or full name,
-    otherwise the abbreviation reduced to its letters and digits (CPI(ML)(L) -> CPIMLL)."""
+    files carry it: parties.json where it covers the party by table 3's full name, or by the
+    abbreviation when table 3 gives no full name (an abbreviation never overrides the full
+    name: TN 2026's TMC is not Trinamool), otherwise the abbreviation reduced to its letters
+    and digits (CPI(ML)(L) -> CPIMLL)."""
     by_norm = {}
     for p in parties_doc["parties"]:
         for key in [p["code"], p["name"], *p.get("aliases", [])]:
@@ -376,9 +378,9 @@ def party_code_map(parties_doc):
     def code_for(abbr, full_names):
         if abbr in ("NOTA", "IND"):
             return abbr
-        for key in (abbr, full_names.get(abbr)):
-            if key and norm(key) in by_norm:
-                return by_norm[norm(key)]
+        key = full_names.get(abbr) or abbr
+        if norm(key) in by_norm:
+            return by_norm[norm(key)]
         code = re.sub(r"[^A-Za-z0-9]", "", abbr)[:14]
         if not code:
             raise SourceShapeError(f"party abbreviation {abbr!r} has no letters or digits")

@@ -32,6 +32,10 @@ class PartyCodes(unittest.TestCase):
         self.assertEqual(code_for("CPI(ML)(L)", TABLE_3), "CPIMLL")
         self.assertEqual(code_for("﻿AIFB", {}), "AIFB")
 
+    def test_abbreviation_never_overrides_its_table_3_name(self):
+        self.assertEqual(code_for("TMC", {"TMC": "Thamizhaga Munnetra Congress"}), "TMC")
+        self.assertEqual(code_for("TMC", {}), "AITC")
+
     def test_independent_and_nota_are_kept(self):
         self.assertEqual(code_for("IND", {}), "IND")
         self.assertEqual(code_for("NOTA", {}), "NOTA")

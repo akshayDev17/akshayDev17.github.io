@@ -104,6 +104,18 @@ class Gate(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertIn("sha256 NOT checked", out)
 
+    def test_default_cache_reports_a_source_it_does_not_hold_as_not_checked(self):
+        other = record(source=dict(record()["source"], url="https://www.eci.gov.in/not-fetched.xlsx"))
+        path = self.cache / "other.json"
+        path.write_text(json.dumps(other))
+        with mock.patch("validate_records.DEFAULT_CACHE", self.cache):
+            code, out = self.run_cli(str(path))
+        self.assertEqual(code, 0)
+        self.assertIn("sha256 NOT checked", out)
+        code, out = self.run_cli(str(path), "--cache", str(self.cache))
+        self.assertEqual(code, 1)
+        self.assertIn("no cached copy", out)
+
 
 if __name__ == "__main__":
     unittest.main()

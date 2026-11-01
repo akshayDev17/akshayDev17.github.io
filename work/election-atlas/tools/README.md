@@ -31,7 +31,8 @@ Each stops with an error on a source shape it does not expect.
   not match the cached source, or has synthetic/dummy wording in its metadata.
   `python3 tools/test_validate_records.py` shows it failing on such records.
   Without `--cache` it checks sha256 against `_research/harvest/` when that exists,
-  and prints `sha256 NOT checked` when no cache is available.
+  and prints `sha256 NOT checked` for any source that cache does not hold (or when
+  there is no cache); with `--cache` every source must be in it.
 - `python3 tools/test_harvest_ac_results.py` and `python3 tools/test_harvest_ls_byel.py`:
   party codes and by-election term assembly.
 - `node --test tools/test_stands.mjs`: the state page's "as it stands" seat tally
