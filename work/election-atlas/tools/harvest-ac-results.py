@@ -38,8 +38,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from harvest_common import (DATA, DEFAULT_CACHE, SourceShapeError, fetch,  # noqa: E402
-                            source_block, write_json)
+from harvest_common import (DATA, DEFAULT_CACHE, SourceShapeError, cell, fetch,  # noqa: E402
+                            num, sheets, source_block, write_json)
 from validate_records import require_valid  # noqa: E402
 
 API = "https://www.eci.gov.in/eci-backend/public/api/election-result?category_id={}"
@@ -189,39 +189,6 @@ def locate(cycle, cache):
 
 
 # ── spreadsheet reading ──────────────────────────────────────────────────────
-def sheets(body: bytes):
-    """{sheet name: rows} for a .xls or .xlsx body, judged by its magic bytes."""
-    if body[:4] == b"\xd0\xcf\x11\xe0":
-        import xlrd
-        wb = xlrd.open_workbook(file_contents=body, ignore_workbook_corruption=True)
-        return {sh.name: [sh.row_values(r) for r in range(sh.nrows)] for sh in wb.sheets()}
-    if body[:2] == b"PK":
-        import openpyxl
-        wb = openpyxl.load_workbook(io.BytesIO(body), read_only=True, data_only=True)
-        out = {name: [list(r) for r in wb[name].iter_rows(values_only=True)] for name in wb.sheetnames}
-        wb.close()
-        return out
-    raise SourceShapeError(f"not a spreadsheet (starts {body[:16]!r})")
-
-
-def cell(v) -> str:
-    return "" if v is None else " ".join(str(v).split())
-
-
-def num(v):
-    """A count cell -> int; '' or a lone '-' (ECI's nil) -> None. Anything else is a shape error."""
-    if v is None or (isinstance(v, str) and v.strip() in ("", "-")):
-        return None
-    if isinstance(v, (int, float)):
-        if float(v) != int(v):
-            raise SourceShapeError(f"expected a whole count, got {v!r}")
-        return int(v)
-    s = str(v).strip().replace(",", "")
-    if re.fullmatch(r"\d+(\.0+)?", s):
-        return int(float(s))
-    raise SourceShapeError(f"expected a count, got {v!r}")
-
-
 def header_index(rows, required):
     """Find the header row containing every required label; return (row index, {label: col})."""
     for i, row in enumerate(rows[:12]):
