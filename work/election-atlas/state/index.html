@@ -354,7 +354,7 @@ td .d{font-weight:500;letter-spacing:.02em}
 .tense-opt[aria-disabled="true"]:hover{color:var(--rule-3)}
 .table .void{min-height:7rem;margin-top:var(--s2)}
 .belt .void{min-height:7rem}
-.void[hidden],.find[hidden],.belt-view[hidden]{display:none}
+.void[hidden],.find[hidden],.belt-view[hidden],.belt[hidden]{display:none}
 .monogram{display:flex;align-items:center;justify-content:center;width:100%;height:100%;
   background:var(--paper-2);color:var(--muted);font-family:var(--serif);letter-spacing:.02em}
 #card .face .monogram{font-size:1.4rem}
@@ -1382,6 +1382,14 @@ async function selectLA(y) {
     await markReady();
   } finally { for (const b of $('#years-ac').children) b.disabled = false; }
 }
+/* A mapped state with no assembly cycle listed (or an unreadable availability
+   index): draw the boundaries unfilled and say the results are not available. */
+function showNoCycles() {
+  lastAC = { year: null, missing: true, acRows: {}, acAgg: null };
+  $('#cap-ac').textContent = `${acs.features.length} seats · not available yet`;
+  $('#table-ac').innerHTML = voidHTML(`${region.name} assembly results`, ECI, 'have');
+  paintAC(lastAC);
+}
 
 $('#reset-pc').addEventListener('click', () => {
   sortState.pc = { key: DEFAULT_SORT.key, dir: DEFAULT_SORT.dir };
@@ -1435,6 +1443,7 @@ await Promise.all([
   selectLS(firstLS),
   hasAC && hasCycles ? selectLA(latestLA) : Promise.resolve(),
 ]);
+if (hasAC && !hasCycles) showNoCycles();
 if (syncTenseAvailability()) applyTense();
 </script>
 </body>
