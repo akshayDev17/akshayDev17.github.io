@@ -13,8 +13,8 @@ and state pages read for the "as it stands" tense:
                                        "o": {"BJP": 434788, "NOTA": 8331}}}]}]}
 
 `date` is the date the result was declared (when the seat changed hands);
-`poll` is polling day. `turnout` is votes polled / electors, both as printed on
-the index card. `src` indexes the document's `sources`.
+`poll` is polling day. `turnout` is `polled` / `electors` (percent), both counts
+as printed on the index card. `src` indexes the document's `sources`.
 
 Every by-election in a term is read from ECI's own index cards. Each card is
 checked before use: candidate votes must add up to the card's valid-votes
@@ -516,6 +516,7 @@ def term_doc(year, cards, held, code_for):
         event = {"type": "bye", "date": card["declared"], "poll": card["poll"], "reason": card["reason"],
                  "winner": {"n": win["n"], "p": code_for(win["party"], year), "v": win["v"], "o": others},
                  "turnout": round(100 * card["voted"] / card["electors"], 2),
+                 "electors": card["electors"], "polled": card["voted"],
                  "src": src_index[got["url"]]}
         if seat["uid"] not in by_seat:
             g = general.get(seat["uid"])

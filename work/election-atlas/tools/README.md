@@ -3,6 +3,34 @@
 Build scripts for the election atlas.
 Run from `work/election-atlas/` (paths below are relative to it).
 
+## Setup
+
+- Python dependencies are pinned in `requirements.txt`:
+  `python3 -m venv .venv && .venv/bin/pip install -r requirements.txt`,
+  then run the scripts with `.venv/bin/python`.
+
+## Published-data harvesters
+
+Every file these write carries `"provenance": "published"` and a `source`
+(`publisher`, `url`, `sha256`, `fetched_at`) for each file it was read from.
+Downloads are kept in `_research/harvest/` (gitignored; move it with `--cache`),
+and each harvester runs `validate_records.py` over its output before writing.
+Each stops with an error on a source shape it does not expect.
+
+| script | writes | source |
+| --- | --- | --- |
+| `harvest-ac-results.py` | `data/results/ac/{STATE}/{cycle}.json` + `-detail.json` | ECI statistical reports, table 10 (cross-checked against tables 5 and 9) |
+| `harvest-ls-byel.py` | `data/results/ls/byel/{2014,2019,2024}.json` | ECI by-election index cards |
+| `harvest-union-cabinet.py` | `data/cabinet/union/{2014,2024}.json` | President's Secretariat releases, PM India, Sansad |
+| `harvest-up-cabinet.py` | `data/cabinet/state/IN-UP/2022.json` | Chief Minister's Office, Uttar Pradesh |
+
+- run: `.venv/bin/python tools/harvest-ac-results.py` (each takes `--dry-run`)
+- `validate_records.py`: the provenance gate. `python3 tools/validate_records.py
+  [--cache DIR] <files or dirs>` exits non-zero and lists every record that is not
+  published, names a publisher or host off the allow-list, has a sha256 that does
+  not match the cached source, or has synthetic/dummy wording in its metadata.
+  `python3 tools/test_validate_records.py` shows it failing on such records.
+
 ## Succession
 
 1. `build-ls-results.py`

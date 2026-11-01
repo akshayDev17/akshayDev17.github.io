@@ -4,8 +4,10 @@
 Writes data/cabinet/union/2014.json and adds the sworn-in roster to
 data/cabinet/union/2024.json. Each file carries both tenses:
 
-    "sworn_in":     {"date", "allocated", "src", "members": [...]}
-    "as_it_stands": {"as_of", "src", "members": [...]}
+    "swornIn", "allocated":  oath and portfolio-allocation dates
+    "sworn_in":     [members] as sworn in
+    "asOf":         the date the as-it-stands roster describes
+    "as_it_stands": [members] as it stands on asOf
     "members":      the as-it-stands list again (what the page reads today)
 
 Sources (President's Secretariat and the Prime Minister's Office):
@@ -312,13 +314,14 @@ def main(argv=None) -> int:
         "provenance": "published", "source": sources[0], "sources": sources,
         "note": ("Union Council of Ministers from President's Secretariat releases. `sworn_in` is the "
                  "allocation of 27.05.2014 (oath 26.05.2014). `as_it_stands` is the council at the end of "
-                 "the 16th Lok Sabha: the full re-allocation of 03.09.2017 with every later change applied "
+                 "the 16th Lok Sabha (`asOf`): the full re-allocation of 03.09.2017 with every later change applied "
                  "(`changes`, each with its release's own sentence). Reshuffles between 2014 and 2017 are "
                  "contained in the 2017 re-allocation and are not itemised. Party, state and constituency "
                  "come from exact name matches in the Sansad 16th Lok Sabha directory."),
-        "sworn_in": {"date": "2014-05-26", "allocated": "2014-05-27", "src": 0, "members": sworn},
-        "as_it_stands": {"as_of": "2019-05-24", "from": "2017-09-03", "src": [1, src_of[END_2014]],
-                         "members": stands},
+        "allocated": "2014-05-27", "fetchedAt": sworn_got["fetched_at"][:10],
+        "sworn_in": sworn,
+        "asOf": "2019-05-24",
+        "as_it_stands": stands,
         "members": stands,
         "changes": log,
     }
@@ -360,8 +363,10 @@ def main(argv=None) -> int:
         "note": ("Union Council of Ministers. `as_it_stands` (and `members`) is PM India's current "
                  "portfolio list, joined to the Sansad directory for party, state, constituency and photo. "
                  "`sworn_in` is the President's press communique of 10.06.2024 (oath 09.06.2024)."),
-        "sworn_in": {"date": "2024-06-09", "allocated": "2024-06-10", "src": 1, "members": sworn24},
-        "as_it_stands": {"as_of": pmi_got["fetched_at"][:10], "src": 0, "members": doc24["members"]},
+        "allocated": "2024-06-10",
+        "sworn_in": sworn24,
+        "asOf": pmi_got["fetched_at"][:10],
+        "as_it_stands": doc24["members"],
         "members": doc24["members"],
         "changes": doc24.get("changes", []),
     }
