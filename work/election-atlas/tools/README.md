@@ -34,7 +34,8 @@ Each stops with an error on a source shape it does not expect.
   and prints `sha256 NOT checked` for any source that cache does not hold (or when
   there is no cache); with `--cache` every source must be in it.
 - `python3 tools/test_harvest_ac_results.py` and `python3 tools/test_harvest_ls_byel.py`:
-  party codes and by-election term assembly.
+  party codes, assembly colour entries (winner plus other parties' votes), and
+  by-election term assembly.
 - `node --test tools/test_stands.mjs`: the state page's "as it stands" seat tally
   (`state/stands.js`) adds up to each state's seat count.
 

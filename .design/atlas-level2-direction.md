@@ -171,7 +171,7 @@ A photograph of a state would be decoration on a page whose job is measurement.
 - **The nesting must be real.** The AC→PC mapping shown must come from the data,
   never inferred from proximity. A segment lights the seat it is *declared* to
   belong to.
-- **Synthetic results stay labelled.** Assembly results are placeholders until
-  the Commission's own figures are ingested, and the page must not imply
-  otherwise.
+- **Published results only.** Assembly results are the Commission's own
+  figures (`provenance: "published"`); a cycle not yet harvested shows that its
+  data is not available yet, never placeholder numbers.
 - Rendered at 1440 and 390 and critiqued before this is called done.
