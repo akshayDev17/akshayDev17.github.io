@@ -956,6 +956,8 @@ const seatToUid = new Map();
 for (const [uid, seat] of uidToSeat) if (!seatToUid.has(seat)) seatToUid.set(seat, uid);
 // portraits are filed per seat for the term a member currently sits in, so 2024 only
 const PHOTO_YEAR = 2024;
+const creditsRes = await fetchOptional(`../data/photos/ls/${PHOTO_YEAR}/credits.json`);
+const photoCredits = (creditsRes.ok && creditsRes.doc.credits) || {};
 function faceFor(which, key, winner) {
   if (which !== 'pc' || !lastPC || lastPC.year !== PHOTO_YEAR) return '';
   const uid = seatToUid.get(key);
@@ -964,7 +966,7 @@ function faceFor(which, key, winner) {
     ? portraitHTML(`../data/photos/ls/${PHOTO_YEAR}/${uid}.jpg`, winner)
     : monogramHTML(winner);
   return `<div class="portrait"><div class="face">${face}</div>` +
-    (hasPhoto(avail, String(PHOTO_YEAR), uid) ? photoCreditHTML('ls', '') : '') + `</div>`;
+    (hasPhoto(avail, String(PHOTO_YEAR), uid) ? photoCreditHTML('ls', (photoCredits[uid] || {}).mpsno || '') : '') + `</div>`;
 }
 const acNums = acs ? new Set(acs.features.map(f => String(f.properties.no))) : new Set();
 
