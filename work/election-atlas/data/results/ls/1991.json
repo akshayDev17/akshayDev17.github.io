@@ -1,10 +1,12 @@
 {
  "schema": 2,
+ "provenance": "published",
  "election": "ls",
  "year": 1991,
  "note": "PUBLISHED RESULT. Every value here is an ABSOLUTE COUNT. No percentage is stored anywhere: the page derives every share from these numbers. `electors` is the registered electorate. state totals are the exact sum of every constituency in this election's published detailed result. No constituency file is written for this year: its boundaries predate the atlas geometry. Election Commission of India, General Election 1991 — statistical report (published as PDF only). State-level totals. The constituency boundaries of this election predate the atlas geometry, so no per-constituency file is produced for it.",
  "source": {
   "publisher": "Election Commission of India",
+  "url": "https://www.eci.gov.in/statistical-reports",
   "table": null,
   "detail_table": null,
   "derivation": "constituency"

@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
 <title>Member of Legislative Assembly — Election Atlas of India</title>
 <meta name="description" content="One member of a state legislative assembly: their seat, their result, and (soon) their development fund and assembly record.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,6 +71,13 @@ a{color:var(--ink)}
 .void p{max-width:44ch;text-align:center;font-family:var(--mono);font-size:.6875rem;
   line-height:1.7;color:var(--muted);margin:0}
 
+.face .monogram{display:flex;align-items:center;justify-content:center;width:100%;height:100%;
+  color:var(--muted);font-family:var(--serif);letter-spacing:.02em}
+.credits{max-width:52rem;margin:var(--s6) auto 0;padding-top:var(--s3);border-top:1px solid var(--rule);
+  font-family:var(--mono);font-size:.5625rem;line-height:1.5;letter-spacing:.04em;color:var(--muted)}
+.credits p{margin:0}
+.credits a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+
 @media (max-width:48rem){
   .hero{flex-direction:column}
   .face{width:100%;max-width:12rem;aspect-ratio:3/4}
@@ -92,16 +100,18 @@ a{color:var(--ink)}
   </div>
 
   <div class="hero">
-    <div class="face" id="p-face">?</div>
+    <div class="face" id="p-face" hidden></div>
     <div class="ident">
-      <div class="who"><span id="p-sym"></span><span class="lbl" id="p-party">—</span></div>
+      <div class="who" id="p-who" hidden><span id="p-sym"></span><span class="lbl" id="p-party"></span></div>
       <p class="name" id="p-name">—</p>
       <p class="role" id="p-role">—</p>
       <div class="facts" id="p-facts"></div>
     </div>
   </div>
 
-  <p class="caveat">Assembly figures are synthetic and unverified (per the state page caveat). The development fund and Vidhan Sabha record are not yet fetched.</p>
+  <p class="caveat">Results: Election Commission of India statistical reports. Where a view says “not available yet”, that data has not been added. The development fund and Vidhan Sabha record are not yet fetched.</p>
+
+  <div id="result-void" hidden></div>
 
   <div class="cross" id="pc-cross"></div>
 
@@ -120,28 +130,45 @@ a{color:var(--ink)}
     <div class="void"><p>No news yet — the news fetcher isn't built.</p></div>
   </section>
 </div>
+<footer class="credits"><p>Portraits: Parliament of India (sansad.in). Party symbols: Wikimedia Commons contributors (<a href="../data/parties-symbols.json">licences listed</a>).</p></footer>
 
 <script type="module">
+import { fetchOptional, loadAvailability, acCycles, voidHTML, ECI, monogramHTML } from '../lib/atlas.js';
 const $ = s => document.querySelector(s);
 const nf = n => Math.round(n).toLocaleString('en-IN');
 const tc = s => (s || '').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
 const esc = s => (s == null ? '' : String(s)).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const keyify = s => String(s || '').toLowerCase().replace(/\(sc\)|\(st\)/g, '').replace(/[^a-z0-9]/g, '');
+const docOr = (res, fallback) => (res.ok ? res.doc : fallback);
 
 const qs = new URLSearchParams(location.search);
 const S = (qs.get('s') || 'IN-UP').toUpperCase();
 const C = (qs.get('c') || '').toLowerCase();
 
-const [acTopo, results, partiesDoc, symDoc, manifest] = await Promise.all([
-  fetch(`../data/geo/ac/${S}.json`).then(r => r.json()).catch(() => null),
-  fetch(`../data/results/ac/${S}/2024-detail.json`).then(r => r.json()).catch(() => null),
-  fetch('../data/parties.json').then(r => r.json()),
-  fetch('../data/parties-symbols.json').then(r => r.json()).catch(() => ({ symbols: {} })),
-  fetch('../data/manifest.json').then(r => r.json()).catch(() => null),
+const [avail, coverageRes, partiesRes, symRes, regionsRes] = await Promise.all([
+  loadAvailability('../data/'),
+  fetchOptional('../data/geo/ac/coverage.json'),
+  fetchOptional('../data/parties.json'),
+  fetchOptional('../data/parties-symbols.json'),
+  fetchOptional('../data/regions.json'),
 ]);
+const partiesDoc = docOr(partiesRes, { parties: [], fallback: { colour: '#888' } });
+const symDoc = docOr(symRes, { symbols: {} });
+const stateName = (docOr(regionsRes, { regions: [] }).regions.find(r => r.code === S) || {}).name || S;
+const mapped = !!(docOr(coverageRes, { checked: {} }).checked || {})[S];
+
+/* The hero shows the latest assembly cycle whose result has been added. */
+const cycles = acCycles(avail, S);
+const shown = cycles.filter(c => c.ok).pop();
+const [topoRes, detailRes] = await Promise.all([
+  mapped ? fetchOptional(`../data/geo/ac/${S}.json`) : Promise.resolve({ ok: false }),
+  shown ? fetchOptional(`../data/results/ac/${S}/${shown.year}-detail.json`) : Promise.resolve({ ok: false }),
+]);
+const acTopo = docOr(topoRes, null);
+const results = docOr(detailRes, null);
 
 const partyColour = new Map(partiesDoc.parties.map(p => [p.code, p.colour]));
-const colour = c => partyColour.get(c) || partiesDoc.fallback?.colour || '#888';
+const colour = c => partyColour.get(c) || (partiesDoc.fallback && partiesDoc.fallback.colour) || '#888';
 const symFor = code => {
   const s = (symDoc.symbols || {})[code];
   return (s && s.file) ? '../data/' + s.file : null;
@@ -156,10 +183,10 @@ const pcName = acGeom ? acGeom.properties.pc : '';
 
 document.title = `${acName} — Election Atlas of India`;
 $('#p-const').textContent = acName;
-$('#p-sub').textContent = `Assembly constituency · ${(acTopo && acTopo.objects) ? 'State Legislative Assembly' : ''}`;
+$('#p-sub').textContent = `Assembly constituency · ${stateName} Legislative Assembly`;
 $('#back').href = `../state/?s=${S}`;
 
-/* winner + margin from the (synthetic) assembly result */
+/* winner and margin from the published assembly result */
 const cands = (results && results.constituencies && results.constituencies[acNo] && results.constituencies[acNo].c) || [];
 const sorted = [...cands].sort((a, b) => (b.v || 0) - (a.v || 0));
 const winner = sorted[0];
@@ -173,16 +200,24 @@ if (winner) {
     ? `<img class="psym" src="${sym}" alt="${esc(winner.p)} symbol">`
     : `<span class="psym" style="width:11px;height:11px;border-radius:2px;background:${colour(winner.p)};display:inline-block"></span>`;
   $('#p-party').textContent = (partiesDoc.parties.find(p => p.code === winner.p) || {}).name || winner.p;
+  $('#p-who').hidden = false;
   $('#p-name').textContent = tc(winner.n);
-  $('#p-role').textContent = 'MLA · State Legislative Assembly';
-  $('#p-face').textContent = (winner.n || '?')[0];
+  $('#p-role').textContent = `MLA · ${shown.year} assembly election`;
+  $('#p-face').innerHTML = monogramHTML(winner.n);
+  $('#p-face').hidden = false;
   $('#p-facts').innerHTML =
     `<div class="fact"><div class="k">Margin</div><div class="v">+${margin.toFixed(1)}%</div></div>` +
     `<div class="fact"><div class="k">Votes</div><div class="v">${nf(winner.v)}</div></div>` +
     `<div class="fact"><div class="k">Candidates</div><div class="v">${sorted.length}</div></div>`;
 } else {
-  $('#p-name').textContent = 'No result on record';
-  $('#p-role').textContent = 'MLA · State Legislative Assembly';
+  /* No added cycle carries this seat's result: say so, and show nothing that
+     would read as one. */
+  const latest = cycles.length ? cycles[cycles.length - 1].year : null;
+  $('#p-name').textContent = 'Result not available yet';
+  $('#p-role').textContent = 'Member of the Legislative Assembly';
+  $('#result-void').innerHTML = voidHTML(
+    `${latest ? `the ${latest} ` : 'the '}${stateName} assembly result for this seat`, ECI);
+  $('#result-void').hidden = false;
 }
 
 /* cross-link up to the containing MP */

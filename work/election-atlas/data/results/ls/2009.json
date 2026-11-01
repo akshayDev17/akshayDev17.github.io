@@ -1,10 +1,12 @@
 {
  "schema": 2,
+ "provenance": "published",
  "election": "ls",
  "year": 2009,
  "note": "PUBLISHED RESULT. Every value here is an ABSOLUTE COUNT. No percentage is stored anywhere: the page derives every share from these numbers. `electors` is the registered electorate. state totals are the exact sum of the constituency file above; electors come from the ECI's state-wise table. Election Commission of India, General Election 2009 (15th Lok Sabha) — statistical report. Every table for this year is published as PDF only; the constituency-level result was recovered from ECI's PDF and every row is validated by general + postal == total.",
  "source": {
   "publisher": "Election Commission of India",
+  "url": "https://www.eci.gov.in/statistical-reports",
   "table": null,
   "detail_table": null,
   "derivation": "constituency"

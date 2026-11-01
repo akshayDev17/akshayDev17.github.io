@@ -85,6 +85,26 @@ images**, the one duplicate being Wayanad and Rae Bareli — both won by Rahul G
 
 The images are fetched at ~7.5 KB each to keep the whole set near 5 MB.
 
+Linking to the source URLs instead of keeping copies is not possible: sansad.in
+serves every portrait with `Cross-Origin-Resource-Policy: same-site`, so a browser
+refuses to show it on another site. The copies are therefore kept, and credited:
+
+- every page carries a footer line, "Portraits: Parliament of India (sansad.in)";
+- under each portrait sits "Photo: Lok Sabha Secretariat · sansad.in ↗" (or
+  "Rajya Sabha Secretariat" for a Rajya Sabha minister), linking to the member's
+  record where the member id is known;
+- a portrait that has no file, or fails to load, shows the member's initials on a
+  plain ground (`lib/atlas.js`, one fallback shared by every page). A page never
+  requests a constituency portrait `data/availability.json` does not list, so a
+  missing file is never a broken image or a console error.
+
+## Party symbols
+
+`parties/` holds the party images `data/parties-symbols.json` lists, each with its
+source article, licence and credit. Images Wikipedia carries only under a
+fair-use rationale (DMK, RJD, LJSP) are not kept, because that rationale does not
+extend to this site; those parties show their colour swatch instead.
+
 ## Rebuilding
 
 The fetch script is not kept in the repo. To reproduce: pull the member list, join on
