@@ -462,8 +462,9 @@ def harvest(cycle, cache, code_for):
         meta["no_result"] = no_result
     colour_doc = {**meta, "note": (
         "Published Election Commission of India result. `p` is the winning party code "
-        "(data/parties.json where it covers the party by abbreviation or by its full name in the "
-        "report's table 3, otherwise the ECI abbreviation's letters and digits) and "
+        "(data/parties.json, matched by the party's full name in the report's table 3, or by "
+        "abbreviation where table 3 gives none; otherwise the ECI abbreviation reduced to its "
+        "letters and digits) and "
         "`v` its total votes (general + postal). Keys are AC numbers as the boundary set carries them. "
         "`no_result` lists ACs this report carries no result for."),
         "constituencies": colour}
