@@ -5,8 +5,9 @@ Phase 0 baseline for moving the Election Atlas off GitHub Pages. Every row is a
 URL a reader can request today, so a later host can be replayed against it:
 
   file      a tracked file Jekyll publishes byte-for-byte (no file has front matter)
-  retired   a published file that held dummy data; expected to answer 404 once the
-            dummy files are deleted, and listed so that 404 is not read as a regression
+  retired   a published file that held dummy data or a fair-use party image; expected
+            to answer 404 once it is deleted, and listed so that 404 is not read as a
+            regression
   redirect  a directory URL without its trailing slash (Pages answers 301 to the slash)
   page      a directory URL with its slash, served from that directory's index.html
   deeplink  a page URL carrying the query string the atlas pages read (?s= ?y= ?t= ?c=)
@@ -46,6 +47,10 @@ RETIRED = sorted(
     + [f'{DATA}/cabinet/state/IN-UP/{y}.json' for y in DUMMY_YEARS]
 )
 DUMMY_MARK = re.compile(r'synthetic|dummy', re.I)
+
+# Party images Wikipedia carries only under fair use; dropped for the colour swatch.
+FAIR_USE = [f'{DATA}/photos/parties/{f}' for f in ('DMK.png', 'LJSP.jpg', 'RJD.jpg')]
+RETIRED_REASON = {**{p: 'dummy data' for p in RETIRED}, **{p: 'fair-use image' for p in FAIR_USE}}
 
 # Text types GitHub Pages labels with a charset; everything else is bare.
 CT_OVERRIDES = {'.js': 'application/javascript', '.json': 'application/json',
@@ -131,7 +136,7 @@ def deeplinks(repo, ref):
 
 def build_rows(repo, ref):
     published = sorted(p for p in tracked_files(repo, ref) if jekyll_publishes(p))
-    missing = [p for p in RETIRED if p not in published]
+    missing = [p for p in RETIRED_REASON if p not in published]
     if missing:
         sys.exit(f'retired paths absent at {ref}: {missing}')
     for p in RETIRED:
@@ -140,11 +145,11 @@ def build_rows(repo, ref):
         if not DUMMY_MARK.search(meta):
             sys.exit(f'{p} at {ref} does not declare itself dummy data; refusing to retire it')
     shas = blob_sha256(repo, ref, published)
-    retired = set(RETIRED)
     rows = []
     for p in published:
-        kind = 'retired' if p in retired else 'file'
-        expect = '404 retired: dummy data' if p in retired else '200'
+        reason = RETIRED_REASON.get(p)
+        kind = 'retired' if reason else 'file'
+        expect = f'404 retired: {reason}' if reason else '200'
         rows.append({'kind': kind, 'url': '/' + p, 'expect': expect,
                      'content_type': content_type(p), 'sha256': shas[p]})
     dirs = sorted({os.path.dirname(p) for p in published if os.path.basename(p) == 'index.html'})
@@ -237,7 +242,7 @@ def summarise(rows, live):
         want = r['expect'].split()[0]
         got = str(r.get('live_status', ''))
         if r['kind'] == 'retired':
-            want = '200'  # still live until the dummy files are deleted
+            want = '200'  # still live until the retired files are deleted
         if got != want:
             bad.append((r['url'], want, got))
         elif r['sha256'] and r.get('live_sha256') and r['sha256'] != r['live_sha256']:

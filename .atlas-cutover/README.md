@@ -17,13 +17,13 @@ python3 .atlas-cutover/inventory.py --ref 4c64517 --live https://akshayprabhakan
 
 | kind | rows | what |
 |---|---|---|
-| `file` | 1,266 | tracked files Jekyll publishes byte-for-byte |
-| `retired` | 53 | published files that held dummy data; expected to answer **404** once they are deleted, and listed so that 404 is not read as a regression |
+| `file` | 1,263 | tracked files Jekyll publishes byte-for-byte |
+| `retired` | 56 | published files that held dummy data (53) or a party image Wikipedia carries only under fair use (3: DMK, LJSP, RJD); expected to answer **404** once they are deleted, and listed so that 404 is not read as a regression |
 | `page` | 5 | directory URLs with the trailing slash (`/`, the atlas and its `state/`, `mp/`, `mla/`) |
 | `redirect` | 4 | the four atlas directory URLs without the slash; Pages answers 301 to the slash |
 | `deeplink` | 1,991 | page URLs with the query strings the pages read: `?y=` and `&t=stands` on the national page, `state/?s=&y=` (with and without `&t=stands`) for every state and Lok Sabha year, `mp/?s=&c=` for every MPLADS constituency, `mla/?s=&c=` for every mapped assembly constituency |
 
-Columns: `expect` is the status after the dummy files are removed; `sha256` is the
+Columns: `expect` is the status after the retired files are removed; `sha256` is the
 committed file's hash; `live_*` is what the host answered.
 
 ## Findings from the live run
