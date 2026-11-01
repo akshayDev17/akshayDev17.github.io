@@ -339,14 +339,16 @@ def main(argv=None) -> int:
     pmi_got = fetch(fc.PMINDIA_PORTFOLIOS, cache)
     pmi_page = pmi_got["bytes"].decode("utf-8", "replace")
     current = ([fc.parse_pm(pmi_page)] if fc.parse_pm(pmi_page) else []) + fc.parse_portfolios(pmi_page)
-    have = {(m["name"], m["rank"], m["portfolio"]) for m in doc24["members"]}
+    # the roster as it stands: `members` before the first harvest, `as_it_stands` after it
+    prior = doc24.get("as_it_stands") or doc24["members"]
+    have = {(m["name"], m["rank"], m["portfolio"]) for m in prior}
     now = {(m["name"], m["rank"], m["portfolio"]) for m in current}
     if have != now:
         raise SourceShapeError(f"2024 roster differs from PM India today ({len(now - have)} new, {len(have - now)} gone); "
                                "refresh it with fetch-cabinet.py and join-sansad.py first")
     dir18_got, recs18 = sansad_directory(18, cache)
     enrich(sworn24, recs18, regions)
-    photo_of = {m["name"]: m["photo"] for m in doc24["members"] if m.get("photo")}
+    photo_of = {m["name"]: m["photo"] for m in prior if m.get("photo")}
     for m in sworn24:  # same official name, same person: reuse the portrait already held
         if m["name"] in photo_of:
             m["photo"] = photo_of[m["name"]]
@@ -365,11 +367,11 @@ def main(argv=None) -> int:
         "allocated": "2024-06-10",
         "members": sworn24,
         "asOf": pmi_got["fetched_at"][:10],
-        "as_it_stands": doc24["members"],
+        "as_it_stands": prior,
         "changes": doc24.get("changes", []),
     }
     outputs[Path(args.out) / "2024.json"] = out24
-    print(f"2024: sworn in {len(sworn24)}, as it stands {len(doc24['members'])} (matches PM India)")
+    print(f"2024: sworn in {len(sworn24)}, as it stands {len(prior)} (matches PM India)")
 
     require_valid(outputs, cache)
     if not args.dry_run:

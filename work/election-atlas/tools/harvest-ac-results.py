@@ -395,6 +395,17 @@ def geo_ac_numbers(region: str):
 
 
 # ── one cycle ────────────────────────────────────────────────────────────────
+def colour_entry(cands, winner, code):
+    """One AC's colour-file entry: the winner's party `p` and votes `v`, and `o`, every
+    other candidate's votes summed by party code (NOTA included), as the Lok Sabha files
+    carry it, so the page's vote totals count every vote, not only the winners'."""
+    others = collections.Counter()
+    for c in cands:
+        if c is not winner and c["v"]:
+            others[code(c["p"])] += c["v"]
+    return {"p": code(winner["p"]), "v": winner["v"], "o": dict(others)}
+
+
 def harvest(cycle, cache, code_for):
     region, year = cycle["region"], cycle["year"]
     cid = f"{region} {year}"
@@ -432,7 +443,7 @@ def harvest(cycle, cache, code_for):
         if len(field) > 1 and field[0]["v"] == field[1]["v"]:
             raise SourceShapeError(f"{cid} AC {no}: tie at the top ({field[0]['n']} / {field[1]['n']})")
         seats[field[0]["p"]] += 1
-        colour[str(no)] = {"p": code_for(field[0]["p"], full_names), "v": field[0]["v"]}
+        colour[str(no)] = colour_entry(cands, field[0], lambda abbr: code_for(abbr, full_names))
         detail[str(no)] = {"ac": acs[no]["ac"],
                            "c": [{"n": c["n"], "p": code_for(c["p"], full_names), "v": c["v"]} for c in cands]}
 
@@ -465,7 +476,8 @@ def harvest(cycle, cache, code_for):
         "(data/parties.json, matched by the party's full name in the report's table 3, or by "
         "abbreviation where table 3 gives none; otherwise the ECI abbreviation reduced to its "
         "letters and digits) and "
-        "`v` its total votes (general + postal). Keys are AC numbers as the boundary set carries them. "
+        "`v` its total votes (general + postal); `o` is every other party's votes in the AC, "
+        "summed by the same code, NOTA included. Keys are AC numbers as the boundary set carries them. "
         "`no_result` lists ACs this report carries no result for."),
         "constituencies": colour}
     detail_doc = {**meta, "note": (

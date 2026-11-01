@@ -41,5 +41,19 @@ class PartyCodes(unittest.TestCase):
         self.assertEqual(code_for("NOTA", {}), "NOTA")
 
 
+class ColourEntry(unittest.TestCase):
+    def test_other_parties_votes_are_kept_by_party(self):
+        cands = [{"n": "A", "p": "SP", "v": 100}, {"n": "B", "p": "BJP", "v": 80},
+                 {"n": "N", "p": "NOTA", "v": 5}, {"n": "C", "p": "IND", "v": 3},
+                 {"n": "D", "p": "IND", "v": 2}, {"n": "E", "p": "XYZ", "v": 0}]
+        entry = ac.colour_entry(cands, cands[0], lambda abbr: code_for(abbr, {}))
+        self.assertEqual(entry, {"p": "SP", "v": 100, "o": {"BJP": 80, "NOTA": 5, "IND": 5}})
+
+    def test_winner_shares_a_code_with_another_candidate(self):
+        cands = [{"n": "A", "p": "IND", "v": 50}, {"n": "B", "p": "IND", "v": 50 - 1}]
+        entry = ac.colour_entry(cands, cands[0], lambda abbr: code_for(abbr, {}))
+        self.assertEqual(entry, {"p": "IND", "v": 50, "o": {"IND": 49}})
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -109,13 +109,17 @@ Lok Sabha years.
 
 ```json
 // IN-UP/2022.json  (constituencies)
-{ "1": { "p": "SP", "v": 134513 } }
+{ "1": { "p": "SP", "v": 134513,
+         "o": { "BJP": 96633, "BSP": 45075, "INC": 1632, "AAP": 1162, "NOTA": 1117, "IND": 1241 } } }
 
 // IN-UP/2022-detail.json  (constituencies)
 { "1": { "ac": "Behat",
          "c": [ { "n": "Umar Ali Khan", "p": "SP",  "v": 134513 },
                 { "n": "Naresh Saini",  "p": "BJP", "v": 96633 } ] } }
 ```
+
+`o` is every other party's votes in the AC, summed by party code (NOTA included),
+as in the Lok Sabha files.
 
 An AC the report carries no result for (a poll countermanded and held later)
 is absent from `constituencies` and listed in the file's `no_result`.
