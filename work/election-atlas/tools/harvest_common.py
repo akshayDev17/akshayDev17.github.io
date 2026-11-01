@@ -97,10 +97,6 @@ def write_json(path: Path, doc: dict) -> None:
     path.write_text(json.dumps(doc, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
 
 
-def today() -> str:
-    return dt.date.today().isoformat()
-
-
 # ── spreadsheets ─────────────────────────────────────────────────────────────
 def sheets(body: bytes):
     """{sheet name: rows} for a .xls or .xlsx body, judged by its magic bytes."""
