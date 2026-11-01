@@ -5,10 +5,9 @@ Writes data/cabinet/union/2014.json and adds the sworn-in roster to
 data/cabinet/union/2024.json. Each file carries both tenses:
 
     "swornIn", "allocated":  oath and portfolio-allocation dates
-    "sworn_in":     [members] as sworn in
+    "members":      [members] as sworn in
     "asOf":         the date the as-it-stands roster describes
     "as_it_stands": [members] as it stands on asOf
-    "members":      the as-it-stands list again (what the page reads today)
 
 Sources (President's Secretariat and the Prime Minister's Office):
   - 2014 sworn in: "President Allocates Portfolios to Cabinet Ministers and
@@ -20,8 +19,8 @@ Sources (President's Secretariat and the Prime Minister's Office):
     sentence verbatim; the harvester stops if the sentence is not in the fetched
     release, or if a change names a minister or portfolio the roster does not hold.
   - 2024 sworn in: the press communique of 10.06.2024 (presidentofindia.gov.in).
-  - 2024 as it stands: the existing roster in data/cabinet/union/2024.json, which
-    is checked name-for-name and portfolio-for-portfolio against PM India's
+  - 2024 as it stands: the roster fetch-cabinet.py and join-sansad.py write to
+    `members` of data/cabinet/union/2024.json (run them first), which is checked name-for-name and portfolio-for-portfolio against PM India's
     current "Portfolios of the Union Council of Ministers" before it is stamped.
 
 Party, state and constituency come from the Sansad Lok Sabha directory, only
@@ -312,17 +311,16 @@ def main(argv=None) -> int:
     doc14 = {
         "schema": 2, "scope": "union", "cycle": 2014, "term": "16th Lok Sabha", "swornIn": "2014-05-26",
         "provenance": "published", "source": sources[0], "sources": sources,
-        "note": ("Union Council of Ministers from President's Secretariat releases. `sworn_in` is the "
-                 "allocation of 27.05.2014 (oath 26.05.2014). `as_it_stands` is the council at the end of "
+        "note": ("Union Council of Ministers from President's Secretariat releases. `members` is the "
+                 "council as sworn in, the allocation of 27.05.2014 (oath 26.05.2014). `as_it_stands` is the council at the end of "
                  "the 16th Lok Sabha (`asOf`): the full re-allocation of 03.09.2017 with every later change applied "
                  "(`changes`, each with its release's own sentence). Reshuffles between 2014 and 2017 are "
                  "contained in the 2017 re-allocation and are not itemised. Party, state and constituency "
                  "come from exact name matches in the Sansad 16th Lok Sabha directory."),
         "allocated": "2014-05-27", "fetchedAt": sworn_got["fetched_at"][:10],
-        "sworn_in": sworn,
+        "members": sworn,
         "asOf": "2019-05-24",
         "as_it_stands": stands,
-        "members": stands,
         "changes": log,
     }
     outputs[Path(args.out) / "2014.json"] = doc14
@@ -360,14 +358,14 @@ def main(argv=None) -> int:
         "schema": 2, "scope": "union", "cycle": 2024, "term": doc24["term"], "swornIn": doc24["swornIn"],
         "fetchedAt": pmi_got["fetched_at"][:10], "provenance": "published",
         "source": sources24[0], "sources": sources24,
-        "note": ("Union Council of Ministers. `as_it_stands` (and `members`) is PM India's current "
-                 "portfolio list, joined to the Sansad directory for party, state, constituency and photo. "
-                 "`sworn_in` is the President's press communique of 10.06.2024 (oath 09.06.2024)."),
+        "note": ("Union Council of Ministers. `as_it_stands` is PM India's current portfolio list on "
+                 "`asOf`, joined to the Sansad directory for party, state, constituency and photo. "
+                 "`members` is the council as sworn in: the President's press communique of 10.06.2024 "
+                 "(oath 09.06.2024)."),
         "allocated": "2024-06-10",
-        "sworn_in": sworn24,
+        "members": sworn24,
         "asOf": pmi_got["fetched_at"][:10],
         "as_it_stands": doc24["members"],
-        "members": doc24["members"],
         "changes": doc24.get("changes", []),
     }
     outputs[Path(args.out) / "2024.json"] = out24

@@ -101,11 +101,11 @@ def main(argv=None) -> int:
         "provenance": "published", "source": sources[0], "sources": sources,
         "note": ("Council of ministers of Uttar Pradesh as it stands, from the Chief Minister's Office "
                  "roster pages, on `asOf`. `role` is the designation as published; `src` indexes `sources`. "
-                 "`sworn_in` is null: the roster as sworn in (2022) has not been added from an official source."),
-        "sworn_in": None,
+                 "`members` (the roster as sworn in) is null: the 2022 sworn-in roster has not been added "
+                 "from an official source."),
+        "members": None,
         "asOf": as_of,
         "as_it_stands": members,
-        "members": members,
         "fetchedAt": as_of,
         "changes": [],
     }

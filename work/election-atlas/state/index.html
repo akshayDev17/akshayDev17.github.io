@@ -281,6 +281,7 @@ td .d{font-weight:500;letter-spacing:.02em}
 .belt-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s4);flex-wrap:wrap;padding:0 0 var(--s3)}
 .belt-title{font-family:var(--serif);font-size:1.0625rem;line-height:1.25;color:var(--ink);margin:0;font-weight:400}
 .belt-asof{font-family:var(--mono);font-size:.5625rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.belt-empty{font-family:var(--mono);font-size:.6875rem;line-height:1.7;color:var(--muted);max-width:30ch}
 /* ── search (docked to the belt it filters) ───────────────────────────── */
 .find{display:flex;flex-direction:column;gap:var(--s1);margin-bottom:var(--s3)}
 .find-label{font-family:var(--mono);font-size:.5625rem;letter-spacing:.13em;text-transform:uppercase;
@@ -807,6 +808,7 @@ function showCard(which, key, x, y) {
       byes.map(ev => {
         if (ev.type === 'vacated') return `<tr class="vac"><td>${ev.date}</td><td class="name">Vacated — ${ev.reason}</td></tr>`;
         const w = ev.winner;
+        if (!w) return `<tr><td>${ev.date}</td><td class="name">Result not available yet</td></tr>`;
         return `<tr><td>${ev.date}</td><td class="name"><span class="cell"><i class="sw" style="--c:${colour(w.p)}"></i>${w.n} <span class="pcode">${w.p}</span></span></td><td>${nf(w.v)}</td><td>${ev.turnout}%</td></tr>`;
       }).join('') +
       `</tbody></table></div>`;
@@ -918,7 +920,7 @@ const partySeats = { ac: new Map(), pc: new Map() };  // party code -> [seat key
 let tense = 'elected';                 // 'elected' | 'stands'
 let pcByeSeats = [];                   // by-election seats for this state + LS year
 let stateCabinet = null;               // state cabinet doc (static)
-const seatResolved = new Map();        // ls_seat_code -> { p, vacant, byeCount, events }
+const seatResolved = new Map();        // ls_seat_code -> { p, vacant, unknown, byeCount, events }
 let pcDelta = new Map();               // party -> net change under 'stands'
 
 function paintFills(which) {
@@ -945,7 +947,7 @@ function buildPCResolved(data) {
   for (const [uid, c] of Object.entries(data.pcRows)) {
     const seat = uidToSeat.get(uid);
     if (!seat) continue;
-    seatResolved.set(seat, { p: c.p, vacant: false, byeCount: 0, events: [] });
+    seatResolved.set(seat, { p: c.p, vacant: false, unknown: false, byeCount: 0, events: [] });
   }
   for (const s of pcByeSeats) {
     const r = seatResolved.get(s.seat);
@@ -955,7 +957,11 @@ function buildPCResolved(data) {
     if (tense === 'stands') {
       const last = s.events[s.events.length - 1];
       if (last && last.type === 'vacated') { r.p = null; r.vacant = true; }
-      else if (r.byeCount) r.p = s.events.filter(e => e.type === 'bye').pop().winner.p;
+      else if (r.byeCount) {
+        const w = s.events.filter(e => e.type === 'bye').pop().winner;
+        r.p = w ? w.p : null;
+        r.unknown = !w;
+      }
     }
   }
   pcDelta = new Map();
@@ -1062,7 +1068,9 @@ function buildTenseControl() {
 }
 
 function beltRoster() {
-  return (stateCabinet && stateCabinet.members) || [];
+  /* members is the roster as sworn in; as_it_stands is the roster on asOf. */
+  if (!stateCabinet) return null;
+  return (tense === 'elected' ? stateCabinet.members : stateCabinet.as_it_stands) || null;
 }
 
 /* ── find minister ─────────────────────────────────────────────────────── *
@@ -1116,13 +1124,26 @@ function bindSearch() {
 
 function renderBelt() {
   const members = beltRoster();
-  if (!members.length) { beltEl.hidden = true; return; }
+  if (!stateCabinet) { beltEl.hidden = true; return; }
   beltEl.hidden = false;
   beltTitle.textContent = `Council of ministers · ${region.name}`;
-  const byes = pcByeSeats.reduce((n, s) => n + s.events.filter(e => e.type === 'bye').length, 0);
+  const byeEvents = pcByeSeats.flatMap(s => s.events.filter(e => e.type === 'bye'));
+  const unknown = byeEvents.filter(e => !e.winner).length;
+  const byeTxt = byeEvents.length
+    ? `${byeEvents.length} by-election${byeEvents.length === 1 ? '' : 's'}` +
+      `${unknown ? ` (${unknown} result${unknown === 1 ? '' : 's'} not available yet)` : ''} in ${region.name}`
+    : `no by-elections in ${region.name}`;
+  if (!members) {
+    beltAsof.textContent = tense === 'stands' ? `as it stands · not available yet · ${byeTxt}` : 'as elected · not available yet';
+    beltSorted = [];
+    beltScroll.innerHTML = '<p class="belt-empty">Not available yet</p>';
+    updateBeltFades();
+    applyBeltQuery();
+    return;
+  }
   beltAsof.textContent = tense === 'stands'
-    ? (byes ? `as it stands · ${byes} by-election${byes === 1 ? '' : 's'} in ${region.name}` : `as it stands · no by-elections in ${region.name}`)
-    : (stateCabinet ? `state cabinet sworn in ${stateCabinet.swornIn}` : 'as elected');
+    ? `as it stands · as of ${stateCabinet.asOf} · ${byeTxt}`
+    : `state cabinet sworn in ${stateCabinet.swornIn}`;
   const order = { cm: 0, cabinet: 1, 'mos-ic': 2, mos: 3 };
   const sorted = [...members].sort((a, b) =>
     (order[a.rank] ?? 9) - (order[b.rank] ?? 9) ||

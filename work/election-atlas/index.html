@@ -781,7 +781,7 @@ function buildResolved() {
   resolved = new Map();
   if (!currentYear) return;
   for (const [uid, c] of Object.entries(currentYear.constituencies)) {
-    resolved.set(uid, { p: c.p, vacant: false, byeCount: 0 });
+    resolved.set(uid, { p: c.p, vacant: false, unknown: false, byeCount: 0 });
   }
   if (!byeData || !byeData.seats) return;
   for (const seat of byeData.seats) {
@@ -792,7 +792,11 @@ function buildResolved() {
     if (tense !== 'stands') continue;
     const last = seat.events[seat.events.length - 1];
     if (last && last.type === 'vacated') { r.p = null; r.vacant = true; }
-    else if (byes.length) r.p = byes[byes.length - 1].winner.p;
+    else if (byes.length) {
+      const w = byes[byes.length - 1].winner;
+      r.p = w ? w.p : null;
+      r.unknown = !w;
+    }
   }
 }
 function buildSeatMaps() {
@@ -1269,7 +1273,7 @@ let currentYear = null, agg = null;
 const yearCache = new Map();
 let tense = 'elected';                 // 'elected' | 'stands'
 let byeData = null, cabinetDoc = null; // by-election + cabinet docs for the cycle
-let resolved = new Map();              // uid -> { p, vacant, byeCount }
+let resolved = new Map();              // uid -> { p, vacant, unknown, byeCount }
 let electedSeats = new Map();          // party -> seats as elected
 let standsSeats = new Map();           // party -> seats under the tense
 let deltaByParty = new Map();          // party -> net change (stands - elected)
@@ -1346,7 +1350,9 @@ function paintNote() {
     } else {
       const dates = seats.flatMap(s => s.events.map(e => e.date)).sort();
       const lastDate = dates.length ? dates[dates.length - 1] : '';
-      txt = `As it stands · ${byes} by-election${byes === 1 ? '' : 's'} · ${vacant} vacant · as of ${lastDate}`;
+      const unknown = seats.reduce((n, s) => n + s.events.filter(e => e.type === 'bye' && !e.winner).length, 0);
+      const unknownTxt = unknown ? ` (${unknown} result${unknown === 1 ? '' : 's'} not available yet)` : '';
+      txt = `As it stands · ${byes} by-election${byes === 1 ? '' : 's'}${unknownTxt} · ${vacant} vacant · as of ${lastDate}`;
     }
   }
   /* A query that dims every seat must say so — a fully washed map under a line
@@ -1361,10 +1367,9 @@ function paintNote() {
 }
 
 function cabinetRoster() {
-  /* members is the fetched "as it stands" roster. The sworn-in snapshot that
-     "as elected" needs is not fetched yet, so both tenses show the same list. */
+  /* members is the roster as sworn in; as_it_stands is the roster on asOf. */
   if (!cabinetDoc) return null;
-  return cabinetDoc.members || [];
+  return (tense === 'elected' ? cabinetDoc.members : cabinetDoc.as_it_stands) || null;
 }
 
 /* Ministries are long and stackable ("Minister of X; and Minister of Y; and
@@ -1402,9 +1407,17 @@ function renderBelt() {
   if (!cabinetDoc) { beltEl.hidden = true; return; }
   beltEl.hidden = false;
   beltTitle.textContent = 'Union council of ministers';
+  if (!members) {
+    beltAsof.textContent = `${tense === 'elected' ? 'as elected' : 'as it stands'} · not available yet`;
+    beltSorted = [];
+    beltScroll.innerHTML = '<p class="belt-empty">Not available yet</p>';
+    updateBeltFades();
+    applyBeltQuery();
+    return;
+  }
   beltAsof.textContent = tense === 'elected'
     ? `as elected · sworn in ${cabinetDoc.swornIn}`
-    : `as it stands · fetched ${cabinetDoc.fetchedAt}`;
+    : `as it stands · as of ${cabinetDoc.asOf}`;
   const order = { pm: 0, cm: 0, cabinet: 1, 'mos-ic': 2, mos: 3 };
   const sorted = [...members].sort((a, b) =>
     (order[a.rank] ?? 9) - (order[b.rank] ?? 9) || (a.name || '').localeCompare(b.name || ''));

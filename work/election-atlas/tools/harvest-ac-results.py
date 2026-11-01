@@ -25,7 +25,7 @@ HR 2014, OD 2014, BR 2015, CT 2013, CT 2018) are not, and stay "not available ye
 
 Usage (from work/election-atlas/):
     python3 tools/harvest-ac-results.py                 # all cycles
-    python3 tools/harvest-ac-results.py --only IN-UP:2022 --report /tmp/ac-check.json
+    python3 tools/harvest-ac-results.py --only IN-UP:2022
     python3 tools/harvest-ac-results.py --cache /tmp/harvest --dry-run
 """
 import argparse
@@ -455,7 +455,6 @@ def main(argv=None) -> int:
     ap.add_argument("--only", action="append", help="REGION:YEAR, repeatable (default: every cycle)")
     ap.add_argument("--cache", default=str(DEFAULT_CACHE))
     ap.add_argument("--out", default=str(DATA / "results" / "ac"))
-    ap.add_argument("--report", help="write the per-cycle cross-check results here as JSON")
     ap.add_argument("--dry-run", action="store_true", help="fetch, parse and check, but write nothing")
     args = ap.parse_args(argv)
 
@@ -466,18 +465,15 @@ def main(argv=None) -> int:
         raise SystemExit(f"unknown cycle in --only: {unknown}; known: {sorted(known)}")
     cycles = [known[w] for w in wanted]
     code_for = party_code_map(json.loads((DATA / "parties.json").read_text()))
-    checks, outputs = [], {}
+    outputs = {}
     for cycle in cycles:
         colour_doc, detail_doc, check = harvest(cycle, args.cache, code_for)
         base = Path(args.out) / cycle["region"]
         outputs[base / f"{cycle['year']}.json"] = colour_doc
         outputs[base / f"{cycle['year']}-detail.json"] = detail_doc
-        checks.append(check)
         print(f"{check['cycle']}: {check['acs']} ACs, seats match table 5, "
               f"{check['candidates_from_detail']} candidates match table 9")
     require_valid(outputs, args.cache)
-    if args.report:
-        Path(args.report).write_text(json.dumps(checks, indent=1, ensure_ascii=False))
     if not args.dry_run:
         for path, doc in outputs.items():
             write_json(path, doc)

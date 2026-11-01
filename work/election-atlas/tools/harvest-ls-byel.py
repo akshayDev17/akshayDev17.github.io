@@ -29,13 +29,16 @@ Sources (all Election Commission of India):
     file pages, listed by the ECI API (old-assebly-by-election-innerpage-data);
   - 2025 on: the new backend's election-result categories, matched by cat_name.
 
-Seats vacated without a by-election having been held are not recorded: the
-index cards cover polls, and no published source with the vacancy date has
+A by-election whose ECI card cannot be used (see HELD) is still an event in
+its seat, with `winner` null and `why` saying what is wrong with the card, so
+the seat's holder reads as not available yet rather than as the general-election
+winner. Seats vacated without a by-election having been held are not recorded:
+the index cards cover polls, and no published source with the vacancy date has
 been harvested.
 
 Usage (from work/election-atlas/):
     python3 tools/harvest-ls-byel.py
-    python3 tools/harvest-ls-byel.py --cache /tmp/harvest --dry-run --report /tmp/byel.json
+    python3 tools/harvest-ls-byel.py --cache /tmp/harvest --dry-run
 """
 import argparse
 import datetime as dt
@@ -73,8 +76,8 @@ TERMS = {  # general-election year -> term and the declaration-date window it ow
     2024: {"term": "18th Lok Sabha", "from": "2024-06-04", "to": "9999-12-31"},
 }
 
-# Cards whose own figures do not add up. They are not used, and each term file
-# lists them under `not_recorded` so the gap is visible rather than silent.
+# Cards whose own figures do not add up. Their results are not used: each one is
+# an event with `winner` null and `why`, so the gap is visible rather than silent.
 # Key: (workbook label, sheet name) -> what is wrong with the card. The label is
 # the file name, or "old.eci file <id> r=<record>" for an old-site download.
 HELD = {
@@ -475,8 +478,8 @@ def build(cache):
             if (fname, sheet) in HELD:
                 state, pc_no, pc_name = read_header(rows, where)
                 seat = join({"state": state, "pc_no": pc_no, "pc_name": pc_name}, seats, where)
-                poll, declared = old_card_dates(rows, where)
-                held.append({**{k: seat[k] for k in ("uid", "pc", "st")}, "date": declared,
+                _, declared = old_card_dates(rows, where)
+                held.append({**{k: seat[k] for k in ("uid", "seat", "pc", "st")}, "date": declared,
                              "why": HELD[(fname, sheet)], "src": got, "key": (fname, sheet)})
                 continue
             card = read_card(rows, where)
@@ -504,20 +507,14 @@ def term_doc(year, cards, held, code_for):
     picked = sorted(((c, s, g) for c, s, g in cards.values() if spec["from"] <= c["declared"] < spec["to"]),
                     key=lambda t: (t[0]["declared"], t[1]["uid"]))
     sources, src_index, by_seat = [], {}, {}
-    for card, seat, got in picked:
+
+    def src_of(got):
         if got["url"] not in src_index:
             src_index[got["url"]] = len(sources)
             sources.append(source_block("eci", got))
-        win, rest = card["cands"][0], card["cands"][1:]
-        others = {}
-        for c in rest:
-            others[code_for(c["party"], year)] = others.get(code_for(c["party"], year), 0) + c["v"]
-        others["NOTA"] = card["nota"]
-        event = {"type": "bye", "date": card["declared"], "poll": card["poll"], "reason": card["reason"],
-                 "winner": {"n": win["n"], "p": code_for(win["party"], year), "v": win["v"], "o": others},
-                 "turnout": round(100 * card["voted"] / card["electors"], 2),
-                 "electors": card["electors"], "polled": card["voted"],
-                 "src": src_index[got["url"]]}
+        return src_index[got["url"]]
+
+    def events_of(seat):
         if seat["uid"] not in by_seat:
             g = general.get(seat["uid"])
             if not g:
@@ -528,57 +525,60 @@ def term_doc(year, cards, held, code_for):
                 gen["n"] = top[0]["n"]
             by_seat[seat["uid"]] = {**{k: seat[k] for k in ("uid", "seat", "pc", "st")},
                                     "general": gen, "events": []}
-        by_seat[seat["uid"]]["events"].append(event)
+        return by_seat[seat["uid"]]["events"]
+
+    for card, seat, got in picked:
+        win, rest = card["cands"][0], card["cands"][1:]
+        others = {}
+        for c in rest:
+            others[code_for(c["party"], year)] = others.get(code_for(c["party"], year), 0) + c["v"]
+        others["NOTA"] = card["nota"]
+        events_of(seat).append({
+            "type": "bye", "date": card["declared"], "poll": card["poll"], "reason": card["reason"],
+            "winner": {"n": win["n"], "p": code_for(win["party"], year), "v": win["v"], "o": others},
+            "turnout": round(100 * card["voted"] / card["electors"], 2),
+            "electors": card["electors"], "polled": card["voted"],
+            "src": src_of(got)})
     if not sources:
         raise SourceShapeError(f"{year}: no by-election cards found in the term window")
-    not_recorded = []
     for h in held:
         if spec["from"] <= h["date"] < spec["to"]:
-            if h["src"]["url"] not in src_index:
-                src_index[h["src"]["url"]] = len(sources)
-                sources.append(source_block("eci", h["src"]))
-            not_recorded.append({"uid": h["uid"], "pc": h["pc"], "st": h["st"], "date": h["date"],
-                                 "why": h["why"], "src": src_index[h["src"]["url"]]})
-    doc = {
+            events_of(h).append({"type": "bye", "date": h["date"], "winner": None,
+                                 "why": h["why"], "src": src_of(h["src"])})
+    for seat in by_seat.values():
+        seat["events"].sort(key=lambda e: e["date"])
+    return {
         "schema": 2, "election": "ls", "cycle": year, "term": spec["term"],
         "provenance": "published", "source": sources[0], "sources": sources,
         "note": ("Published Election Commission of India by-election results for the term, one event "
                  "per poll, read from ECI's index cards. `date` is the declaration of result, `poll` is "
                  "polling day, `turnout` is votes polled over electors as printed on the card, and `src` "
                  "indexes `sources`. `general.n` is present where the general-election candidate file "
-                 "exists. Seats vacated without a by-election held are not recorded here."),
+                 "exists. `winner` is null where the poll's ECI card cannot be used (`why`); a seat whose "
+                 "latest event has no winner has no known holder yet. Seats vacated without a by-election held are not recorded here."),
         "seats": sorted(by_seat.values(), key=lambda s: (s["st"], int(s["seat"]))),
     }
-    if not_recorded:
-        # by-elections that were held but whose ECI card cannot be used (see `why`)
-        doc["not_recorded"] = not_recorded
-    return doc
 
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Harvest ECI Lok Sabha by-election results per term.")
     ap.add_argument("--cache", default=str(DEFAULT_CACHE))
     ap.add_argument("--out", default=str(DATA / "results" / "ls" / "byel"))
-    ap.add_argument("--report", help="write a per-term list of by-elections here as JSON")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args(argv)
 
     cards, held, code_for = build(args.cache)
-    outputs, report = {}, {}
+    outputs = {}
     for year in TERMS:
         doc = term_doc(year, cards, held, code_for)
         outputs[Path(args.out) / f"{year}.json"] = doc
-        report[year] = [{"pc": s["pc"], "st": s["st"], "date": e["date"], "winner": e["winner"]["n"],
-                         "party": e["winner"]["p"], "votes": e["winner"]["v"], "general": s["general"]["p"]}
-                        for s in doc["seats"] for e in s["events"]]
-        print(f"{year} ({doc['term']}): {len(report[year])} by-elections in {len(doc['seats'])} seats")
-        for r in report[year]:
-            print(f"   {r['date']}  {r['pc']:<22} {r['st']}  {r['winner']} ({r['general']} -> {r['party']})")
-        for h in doc.get("not_recorded", []):
-            print(f"   {h['date']}  {h['pc']:<22} {h['st']}  NOT RECORDED: {h['why']}")
+        events = [(s, e) for s in doc["seats"] for e in s["events"]]
+        print(f"{year} ({doc['term']}): {len(events)} by-elections in {len(doc['seats'])} seats")
+        for s, e in events:
+            w = e["winner"]
+            print(f"   {e['date']}  {s['pc']:<22} {s['st']}  "
+                  + (f"{w['n']} ({s['general']['p']} -> {w['p']})" if w else f"WINNER NOT AVAILABLE: {e['why']}"))
     require_valid(outputs, args.cache)
-    if args.report:
-        Path(args.report).write_text(json.dumps(report, indent=1, ensure_ascii=False))
     if not args.dry_run:
         for path, doc in outputs.items():
             write_json(path, doc)
