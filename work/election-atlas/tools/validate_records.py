@@ -36,7 +36,9 @@ from harvest_common import cache_path, sha256_bytes  # noqa: E402
 # publisher id -> hosts it publishes from (a host matches itself or any subdomain)
 PUBLISHER_HOSTS = {
     "eci": ("eci.gov.in",),
-    "president-secretariat": ("presidentofindia.gov.in",),
+    # ramnathkovind.nic.in is the President's Secretariat archive of President
+    # Kovind's term (2017-22); presidentofindia.gov.in does not carry those releases
+    "president-secretariat": ("presidentofindia.gov.in", "ramnathkovind.nic.in"),
     "pmindia": ("pmindia.gov.in",),
     "pib": ("pib.gov.in",),
     "sansad": ("sansad.in",),
