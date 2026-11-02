@@ -2,28 +2,19 @@
 
     python3 -m unittest discover -s tools -p 'test_*.py'
 
-No page, page module or data file may point at a stored portrait, none may be
-committed, and every Lok Sabha member the pages link to has a Sansad member
-number to build that link from.
+No portrait file may be committed, no data file may point at one, and every
+Lok Sabha member the pages link to has a Sansad member number to build that
+link from. The link itself is covered by tools/test_member_link.mjs.
 """
 import json
-import re
 import unittest
 from pathlib import Path
 
 ATLAS = Path(__file__).resolve().parent.parent
 DATA = ATLAS / 'data'
-PAGE_SOURCES = ('index.html', 'state/index.html', 'mp/index.html', 'mla/index.html',
-                'lib/atlas.js', 'state/card.js', 'state/stands.js')
-PORTRAIT_PATHS = re.compile(r'photos/(ls|cabinet)\b')
 
 
 class NoStoredPortraits(unittest.TestCase):
-    def test_no_page_requests_a_portrait_path(self):
-        for rel in PAGE_SOURCES:
-            text = (ATLAS / rel).read_text(encoding='utf-8')
-            self.assertIsNone(PORTRAIT_PATHS.search(text), f'{rel} names a stored-portrait path')
-
     def test_no_portrait_files_are_kept(self):
         for d in ('photos/ls', 'photos/cabinet'):
             found = [p for p in (DATA / d).rglob('*') if p.is_file()] if (DATA / d).exists() else []
@@ -49,14 +40,6 @@ class NoStoredPortraits(unittest.TestCase):
         for uid, m in members.items():
             self.assertIsInstance(m.get('mpsno'), int, uid)
             self.assertFalse({'url', 'photo', 'image'} & set(m), f'{uid} keeps an image field')
-
-    def test_mp_page_links_the_member_to_sansad(self):
-        text = (ATLAS / 'mp/index.html').read_text(encoding='utf-8')
-        self.assertIn("officialPhotoHTML('ls', mpsno)", text)
-        lib = (ATLAS / 'lib/atlas.js').read_text(encoding='utf-8')
-        self.assertIn('View official photo on sansad.in', lib)
-        self.assertIn('https://sansad.in/ls/members/biography/${mpsno}', lib)
-        self.assertIn('target="_blank" rel="noopener"', lib)
 
 
 if __name__ == '__main__':
