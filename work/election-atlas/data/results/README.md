@@ -26,11 +26,12 @@ results/
 ├── ls/                      Lok Sabha — national files, filtered to a state at runtime
 │   ├── {year}.json              state-level rollup, keyed by region code
 │   ├── pc/{year}.json           one row per constituency
-│   └── detail/{year}.json       every candidate, per constituency
+│   ├── detail/{year}.json       every candidate, per constituency
+│   └── byel/{year}.json         by-elections and vacancies in that term
 └── ac/                      Legislative Assembly — one directory per state
     └── {STATE}/
-        ├── {year}.json          one row per assembly constituency
-        └── {year}-detail.json   every candidate, per assembly constituency
+        ├── {cycle}.json         one row per assembly constituency
+        └── {cycle}-detail.json  every candidate, per assembly constituency
 ```
 
 ---
@@ -44,7 +45,7 @@ only place the registered electorate is recorded.
 
 ```json
 {
-  "schema": 2, "election": "ls", "year": 2024,
+  "schema": 2, "provenance": "published", "election": "ls", "year": 2024,
   "regions": {
     "IN-UP": {
       "seats": 80,
@@ -101,11 +102,15 @@ in 2024 — Mumbai North West and Jajpur both flip on postal votes.
 ## Legislative Assembly — `ac/`
 
 One directory per state, because a state page never needs another state's seats.
-Keys are the assembly constituency number *as the geometry carries it*, so they
-join to `data/geo/ac/{STATE}.json` with no lookup table.
+Files are named by the state's own **assembly cycle** (UP polls in 2012, 2017,
+2022; Haryana in 2014, 2019, 2024), listed per state in
+`manifest.elections.ac.cycles`. Keys are the assembly constituency number *as the
+geometry carries it*, so they join to `data/geo/ac/{STATE}.json` with no lookup
+table. Each file has the same shape as its Lok Sabha counterpart: `{cycle}.json`
+holds `p`, `v` and `o` per seat, `{cycle}-detail.json` holds `c`, every candidate.
 
-Files are named by the state's real assembly cycle (UP: 2017, 2022), not by
-Lok Sabha years.
+An AC the report carries no result for (a poll countermanded and held later)
+is absent from `constituencies` and listed in the file's `no_result`.
 
 ```json
 // IN-UP/2022.json  (constituencies)
@@ -126,19 +131,22 @@ is absent from `constituencies` and listed in the file's `no_result`.
 
 ---
 
-## What is real and what is not
+## Provenance
 
-**This matters and it is not obvious from the files**, because both carry a
-`schema` field and look alike.
+Every file here is published Election Commission of India data and says so:
+`"provenance": "published"` at the top level and a `source` naming the
+Commission with an https `url` on its site. `tools/check_provenance.py` fails the
+build for any file that does not, and for any metadata that calls itself
+synthetic, dummy, invented, placeholder, fake or mock.
 
-| | status |
-| --- | --- |
-| `ls/` — all four years | **Published Election Commission of India results.** Seat counts, votes and candidate names are the real figures. |
-| `ac/` — real-cycle files (`provenance: "published"`) | **Published Election Commission of India results**, harvested by `tools/harvest-ac-results.py` from each report's table 10 and cross-checked against its tables 5 and 9. |
-| `ls/byel/` | **Published Election Commission of India by-election results**, from ECI's index cards (`tools/harvest-ls-byel.py`). |
+Harvested files also carry the fetched file's `sha256` and `fetched_at` in
+`source`. `tools/validate_records.py` runs in every harvester before it writes,
+and refuses a record whose provenance, publisher, host or sha256 is wrong:
 
-The assembly *boundaries* are a separate question — see `data/geo/ac/coverage.json`,
-which records the eight states where they were validated.
+| path | harvested by | cross-checked against |
+| --- | --- | --- |
+| `ac/` | `tools/harvest-ac-results.py`, from each report's table 10 | its tables 5 and 9 |
+| `ls/byel/` | `tools/harvest-ls-byel.py`, from ECI's by-election index cards | the PC geometry |
 
 ---
 
@@ -148,6 +156,7 @@ which records the eight states where they were validated.
 | --- | --- | --- | --- | --- |
 | Lok Sabha — colouring | yes | yes | yes | yes |
 | Lok Sabha — hover card | **no** | **no** | yes | yes |
+| Lok Sabha — by-elections | not yet | yes | yes | yes |
 
 Published assembly cycles (colouring and hover card), from ECI spreadsheets:
 
@@ -166,14 +175,21 @@ Not yet harvested: the cycles ECI publishes only as PDF (UP 2012, PB 2012,
 HR 2014, OD 2014, BR 2015, CT 2013, CT 2018), and TN 2016, whose report's
 table 5 disagrees with its own table 10.
 
-Assembly data exists for eight states only: `IN-BR IN-CT IN-HR IN-OD IN-PB IN-TN
-IN-UP IN-WB`. Every other state has no assembly geometry and therefore no
-assembly results — not missing files, but a boundary set that does not exist.
+Assembly results are not added for any cycle yet. Boundaries exist for eight
+states only (`IN-BR IN-CT IN-HR IN-OD IN-PB IN-TN IN-UP IN-WB`, see
+`data/geo/ac/coverage.json`); every other state has no assembly geometry and
+therefore no assembly results.
 
-**The Lok Sabha hover card does nothing on 2009 and 2014.** `ls/detail/` covers
-2019 and 2024 only. Both years have colouring data, so the maps draw correctly
-and the card silently fails — the same class of bug as a fetch that resolves to
-nothing. Closing it is a re-run of the extractor in `tools/`, not new work.
+`data/availability.json`, generated by `tools/build-availability.py`, is the
+current list of which optional files exist. The pages read it and show "not
+available yet" for anything absent, so a year without a file is never drawn
+from another year's data and never claims a fact (such as "no by-elections")
+that only a file could state.
+
+**The Lok Sabha hover card shows no candidates on 2009 and 2014.** `ls/detail/`
+covers 2019 and 2024 only. Both years have colouring data, so the maps draw
+correctly and the card names the seat. Closing it is a re-run of the extractor
+in `tools/`, not new work.
 
 ---
 
@@ -185,9 +201,8 @@ nothing. Closing it is a re-run of the extractor in `tools/`, not new work.
    and `polled` counts it is computed from are stored beside it.
 2. **Codes, never names.** Files carry region codes and party codes. A name that
    appears anywhere came from `data/regions.json` or `data/parties.json`.
-3. **Every file says where it came from, and only published data is allowed.**
-   Harvested files carry `"provenance": "published"` and a `source` with the
-   publisher, URL, sha256 and fetch time; `tools/validate_records.py` refuses
-   anything else. Synthetic or dummy data is never stored here.
+3. **Every file says where it came from.** `provenance` is `"published"` and
+   `source.url` is the Commission's own URL. A file without them fails the
+   provenance gate and is not published.
 4. **A missing file means the level is not published**, not that the data is
    broken. Readers are expected to handle absence rather than assume it.

@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
 <title>Member of Parliament — Election Atlas of India</title>
 <meta name="description" content="One member of Parliament: their development fund, their attendance, their questions, and the assembly seats under their constituency.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -212,7 +213,20 @@ td:first-child{text-align:left;padding-right:var(--s4)}
 .info-wrap:hover .info-tip,.info:focus-visible + .info-tip{opacity:1;visibility:visible}
 .info-tip b{font-weight:500}
 
+.face .monogram{display:flex;align-items:center;justify-content:center;width:100%;height:100%;
+  font-size:2rem;color:var(--muted);font-family:var(--serif);letter-spacing:.02em}
+.portrait{flex:0 0 9rem;display:flex;flex-direction:column;gap:4px;min-width:0}
+.portrait .face{flex:none;width:100%}
+.photo-credit{display:block;font-family:var(--mono);font-size:.5625rem;line-height:1.4;color:var(--muted);letter-spacing:.02em}
+.photo-credit a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.photo-credit a:hover{color:var(--ink)}
+.credits{max-width:52rem;margin:var(--s6) auto 0;padding-top:var(--s3);border-top:1px solid var(--rule);
+  font-family:var(--mono);font-size:.5625rem;line-height:1.5;letter-spacing:.04em;color:var(--muted)}
+.credits p{margin:0}
+.credits a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+
 @media (max-width:48rem){
+  .portrait{width:100%;max-width:12rem;flex:none}
   .fund{grid-template-columns:repeat(2,1fr);row-gap:var(--s4)}
   .fstep{border-right:0}
   .gauges{grid-template-columns:1fr}
@@ -240,9 +254,9 @@ td:first-child{text-align:left;padding-right:var(--s4)}
   </div>
 
   <div class="hero">
-    <div class="face" id="p-face"></div>
+    <div class="portrait"><div class="face" id="p-face"></div><span id="p-credit"></span></div>
     <div class="ident">
-      <div class="who"><span id="p-sym"></span><span class="lbl" id="p-party">—</span></div>
+      <div class="who" id="p-who"><span id="p-sym"></span><span class="lbl" id="p-party"></span></div>
       <p class="name" id="p-name">—</p>
       <p class="role" id="p-role">—</p>
       <p class="srcrow" id="p-src"></p>
@@ -253,14 +267,16 @@ td:first-child{text-align:left;padding-right:var(--s4)}
 
   <section class="block">
     <h3>Development fund · MPLADS · 18th Lok Sabha</h3>
+    <div id="mplads-body">
     <p class="srcrow" id="mplads-src"></p>
     <div class="fund" id="fund"></div>
     <div class="gauges" id="gauges"></div>
     <p class="srcrow" id="where-label" style="margin-top:var(--s4)"></p>
     <div class="bd" id="bd"></div>
+    </div>
   </section>
 
-  <section class="block">
+  <section class="block" id="works-block">
     <h3 id="works-heading">Works</h3>
     <div class="whead"><div class="wfilters" id="works-filters"></div></div>
     <table id="works-table"></table>
@@ -269,6 +285,7 @@ td:first-child{text-align:left;padding-right:var(--s4)}
 
   <section class="block">
     <h3>In the Lok Sabha · 18th Lok Sabha</h3>
+    <div id="ls-body">
     <div class="ls-stats" id="ls-stats"></div>
     <div class="qhead">
       <span class="qhead-label" id="bills-label">Bills</span>
@@ -282,10 +299,11 @@ td:first-child{text-align:left;padding-right:var(--s4)}
     <div class="wfilters" id="q-filters"></div>
     <div class="qs" id="questions"></div>
     <nav class="pager" id="q-pager" aria-label="Questions pages"></nav>
+    </div>
   </section>
 
   <section class="block">
-    <h3>Made of 5 assembly seats</h3>
+    <h3 id="ac-heading">Assembly seats</h3>
     <div class="cross ac-list" id="ac-cross"></div>
   </section>
 
@@ -294,9 +312,15 @@ td:first-child{text-align:left;padding-right:var(--s4)}
     <div class="void"><p>No news yet — the news fetcher isn't built. This section will hold a bounded, sourced list per MP once it is.</p></div>
   </section>
 </div>
+<footer class="credits"><p>Portraits: Parliament of India (sansad.in). Party symbols: Wikimedia Commons contributors (<a href="../data/parties-symbols.json">licences listed</a>).</p></footer>
 
 <script type="module">
+import {
+  fetchOptional, loadAvailability, listed, hasPhoto, lsDetailAvailable, voidHTML, ECI,
+  portraitHTML, monogramHTML, photoCreditHTML, installPortraitFallback,
+} from '../lib/atlas.js';
 const $ = s => document.querySelector(s);
+installPortraitFallback();
 const nf = n => Math.round(n).toLocaleString('en-IN');
 const cr = v => '₹' + (v / 1e7).toFixed(2) + ' Cr';
 const tc = s => (s || '').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
@@ -307,49 +331,104 @@ const qs = new URLSearchParams(location.search);
 const S = (qs.get('s') || 'IN-UP').toUpperCase();
 const C = (qs.get('c') || 'gorakhpur').toLowerCase();
 
-const [par, mplads, partiesDoc, symDoc, acTopo, results] = await Promise.all([
-  fetch(`../data/parliament/${S}/${C}.json`).then(r => r.json()),
-  fetch(`../data/mplads/${S}/${C}.json`).then(r => r.json()),
-  fetch('../data/parties.json').then(r => r.json()),
-  fetch('../data/parties-symbols.json').then(r => r.json()).catch(() => ({ symbols: {} })),
-  fetch(`../data/geo/ac/${S}.json`).then(r => r.json()).catch(() => null),
-  fetch('../data/results/ls/detail/2024.json').then(r => r.json()).catch(() => null),
+/* Each section stands on its own: the Sansad record and the MPLADS file exist
+   for some constituencies only, and availability.json says which, so a missing
+   one shows "not available yet" and never stops the rest of the page. */
+const avail = await loadAvailability('../data/');
+const docOr = (res, fallback) => (res.ok ? res.doc : fallback);
+const none = Promise.resolve({ ok: false });
+const [parRes, mpladsRes, partiesRes, symRes, coverageRes, detailRes, pcRes, regionsRes, creditsRes] = await Promise.all([
+  listed(avail, 'parliament', S, C) ? fetchOptional(`../data/parliament/${S}/${C}.json`) : none,
+  listed(avail, 'mplads', S, C) ? fetchOptional(`../data/mplads/${S}/${C}.json`) : none,
+  fetchOptional('../data/parties.json'),
+  fetchOptional('../data/parties-symbols.json'),
+  fetchOptional('../data/geo/ac/coverage.json'),
+  lsDetailAvailable(avail, 2024) ? fetchOptional('../data/results/ls/detail/2024.json') : none,
+  fetchOptional(`../data/geo/ls/${S}.json`),
+  fetchOptional('../data/regions.json'),
+  fetchOptional('../data/photos/ls/2024/credits.json'),
 ]);
+const par = docOr(parRes, null);
+const mplads = docOr(mpladsRes, null);
+const partiesDoc = docOr(partiesRes, { parties: [], fallback: { colour: '#888' } });
+const symDoc = docOr(symRes, { symbols: {} });
+const results = docOr(detailRes, null);
+const stateName = (docOr(regionsRes, { regions: [] }).regions.find(r => r.code === S) || {}).name || '';
+const mapped = !!(docOr(coverageRes, { checked: {} }).checked || {})[S];
+const acTopo = mapped ? docOr(await fetchOptional(`../data/geo/ac/${S}.json`), null) : null;
 
 const partyColour = new Map(partiesDoc.parties.map(p => [p.code, p.colour]));
-const colour = c => partyColour.get(c) || partiesDoc.fallback?.colour || '#888';
+const colour = c => partyColour.get(c) || (partiesDoc.fallback && partiesDoc.fallback.colour) || '#888';
 const symFor = code => {
   const s = (symDoc.symbols || {})[code];
   return (s && s.file) ? '../data/' + s.file : null;
 };
 
-/* ── hero + header ─────────────────────────────────────────────────── */
-const profile = par.profile || {};
-const region = (partiesDoc.parties.find(p => p.code === profile.party) || {});
-document.title = `${profile.constituency || 'MP'} — Election Atlas of India`;
-$('#p-const').textContent = profile.constituency || C;
-$('#p-sub').textContent = `Parliamentary constituency · ${profile.state || ''} · 18th Lok Sabha`;
+/* ── hero + header ─────────────────────────────────────────────────── *
+ * The constituency key resolves to a seat through the state's own geometry, with
+ * the fold the state page uses to link here (lowercase, no (SC)/(ST), no trailing
+ * state abbreviation), and the seat's unique_id then joins the 2024 result. That
+ * never depends on how the result file spells the name ("Baharaich"). */
+const fold = s => String(s || '').toLowerCase().replace(/\(sc\)|\(st\)/g, '').replace(/[^a-z0-9]/g, '');
+const abbr = (S.split('-')[1] || '').toLowerCase();
+const seatFold = s => { const k = fold(s); return abbr && k.endsWith(abbr) ? k.slice(0, -abbr.length) : k; };
+const pcTopo = docOr(pcRes, null);
+const seatGeom = ((pcTopo && pcTopo.objects && pcTopo.objects.pcs && pcTopo.objects.pcs.geometries) || [])
+  .find(g => seatFold(g.properties.ls_seat_name) === C || fold(g.properties.ls_seat_name) === C);
+const seatKey = seatGeom ? seatGeom.properties.unique_id : '';
+const seatMatch = seatKey && results && results.constituencies[seatKey]
+  ? [seatKey, results.constituencies[seatKey]] : null;
+const winner = seatMatch ? [...seatMatch[1].c].sort((a, b) => b.v - a.v)[0] : null;
+const credit = (docOr(creditsRes, { credits: {} }).credits || {})[seatKey] || {};
+
+const profile = (par && par.profile) || {};
+const constituency = profile.constituency || (seatGeom ? seatGeom.properties.ls_seat_name : C);
+const memberName = profile.name || (winner ? winner.n : '');
+const party = profile.party || (winner ? winner.p : '');
+const mpsno = (par && par.mpsno) || credit.mpsno || '';
+
+document.title = `${constituency} — Election Atlas of India`;
+$('#p-const').textContent = constituency;
+$('#p-sub').textContent = `Parliamentary constituency · ${profile.state || stateName} · 18th Lok Sabha`;
 $('#back').href = `../state/?s=${S}`;
 
-const seatMatch = Object.entries((results && results.constituencies) || {}).find(([, v]) => String(v.pc || '').toLowerCase() === C);
-const seatKey = seatMatch ? seatMatch[0] : '';
-const initial = esc((profile.name || '?')[0]);
-$('#p-face').innerHTML = seatKey
-  ? `<img src="../data/photos/ls/2024/${seatKey}.jpg" alt="" decoding="async" onerror="this.remove()">`
-  : `<span style="display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;color:var(--muted)">${initial}</span>`;
+const photo = seatKey && hasPhoto(avail, '2024', seatKey);
+$('#p-face').innerHTML = photo
+  ? portraitHTML(`../data/photos/ls/2024/${seatKey}.jpg`, memberName)
+  : (memberName ? monogramHTML(memberName) : '');
+$('#p-credit').innerHTML = photo ? photoCreditHTML('ls', mpsno) : '';
 
-const sym = symFor(profile.party);
-$('#p-sym').innerHTML = sym
-  ? `<img class="psym" src="${sym}" alt="${esc(profile.party)} symbol">`
-  : `<span class="psym" style="width:11px;height:11px;border-radius:2px;background:${colour(profile.party)};display:inline-block"></span>`;
-$('#p-party').textContent = region.name || profile.party || '';
+if (party) {
+  const sym = symFor(party);
+  $('#p-sym').innerHTML = sym
+    ? `<img class="psym" src="${sym}" alt="${esc(party)} symbol">`
+    : `<span class="psym" style="width:11px;height:11px;border-radius:2px;background:${colour(party)};display:inline-block"></span>`;
+  $('#p-party').textContent = (partiesDoc.parties.find(p => p.code === party) || {}).name || party;
+} else {
+  $('#p-who').hidden = true;
+}
 
-const displayName = tc(String(profile.name || '').replace(/^(shri|smt|dr|prof)\.?\s+/i, ''));
-$('#p-name').textContent = displayName;
-$('#p-role').textContent = `MP · Lok Sabha · Age ${ageFrom(profile.dateOfBirth)}`;
-$('#p-src').innerHTML = `Profile: <a class="src" href="${par.mpsno ? `https://sansad.in/ls/members/biography/${par.mpsno}?locale=en` : 'https://sansad.in'}" target="_blank" rel="noopener">sansad.in ↗</a>`;
-$('#caveat').textContent =
-  `Figures from official sources — MPLADS (eSAKSHI portal) and the Lok Sabha record (sansad.in). Every question and bill links to its official document.`;
+const displayName = tc(String(memberName).replace(/^(shri|smt|dr|prof)\.?\s+/i, ''));
+if (par) {
+  $('#p-name').textContent = displayName;
+  $('#p-role').textContent = `MP · Lok Sabha · Age ${ageFrom(profile.dateOfBirth)}`;
+} else if (winner) {
+  /* Without the Sansad record the page knows who won the seat in 2024, which is
+     what it says; a later by-election would not be reflected here. */
+  $('#p-name').textContent = displayName;
+  $('#p-role').textContent = 'Won the seat · 2024 general election';
+} else {
+  $('#p-name').textContent = 'Result not available yet';
+  $('#p-role').textContent = 'Member of Parliament · Lok Sabha';
+}
+$('#p-src').innerHTML = `Profile: <a class="src" href="${mpsno ? `https://sansad.in/ls/members/biography/${mpsno}?locale=en` : 'https://sansad.in/ls/members'}" target="_blank" rel="noopener">sansad.in ↗</a>`;
+const sources = [
+  par ? 'the Lok Sabha record (sansad.in)' : 'the 2024 result (Election Commission of India)',
+  mplads ? 'MPLADS (eSAKSHI portal)' : null,
+].filter(Boolean);
+$('#caveat').textContent = `Figures from official sources: ${sources.join(' and ')}. ` +
+  (par ? 'Every question and bill links to its official document. ' : '') +
+  'Where a section says “not available yet”, that data has not been added.';
 
 function ageFrom(dob) {
   const m = String(dob || '').match(/(\d{1,2})-(\w{3})-(\d{4})/);
@@ -363,6 +442,13 @@ function ageFrom(dob) {
 }
 
 /* ── MPLADS ────────────────────────────────────────────────────────── */
+const worksPage = { n: 0, size: 5, filter: 'All' };
+const qPage = { n: 0, size: 10, filter: 'All' };
+let renderRecord = null;   // set when the Sansad record is present; run once the page is wired
+if (!mplads) {
+  $('#mplads-body').innerHTML = voidHTML('this member\u2019s MPLADS record', 'the eSAKSHI MPLADS portal');
+  $('#works-block').hidden = true;
+} else {
 $('#mplads-src').innerHTML = `Source: <a class="src" href="https://mplads.mospi.gov.in/digigov/dashboard.html" target="_blank" rel="noopener">eSAKSHI MPLADS portal ↗</a>`;
 const tile = key => {
   const a = (mplads.tiles || {})[key] || [];
@@ -429,7 +515,6 @@ $('#bd').innerHTML =
 /* ── works ledger ──────────────────────────────────────────────────── */
 const works = mplads.works || [];
 $('#works-heading').textContent = `Works · ${works.length} recommended`;
-const worksPage = { n: 0, size: 5, filter: 'All' };
 const stageKey = s => {
   s = (s || '').toLowerCase();
   if (s.includes('partially')) return 'partial';
@@ -465,8 +550,12 @@ $('#works-filters').addEventListener('click', e => {
   renderWorks();
 });
 renderWorks();
+}
 
 /* ── parliamentary record ──────────────────────────────────────────── */
+if (!par) {
+  $('#ls-body').innerHTML = voidHTML('this member\u2019s Sansad record', 'the Lok Sabha Secretariat (sansad.in)');
+} else {
 const att = par.attendance || {};
 const attPct = att.totalDays ? 100 * att.signedDays / att.totalDays : 0;
 const bills = par.bills || [];
@@ -487,7 +576,6 @@ $('#bills').innerHTML = bills.length ? bills.map(b =>
   `<a class="src" href="${esc(b.sourceUrl || 'https://sansad.in/ls/legislation/bills')}" target="_blank" rel="noopener">official text ↗</a></span></div></div>`).join('')
   : `<p class="srcrow">No private member bills on record.</p>`;
 
-const qPage = { n: 0, size: 10, filter: 'All' };
 $('#q-label').textContent = `Questions · ${questions.length}`;
 $('#q-filters').innerHTML = ['All', 'Starred', 'Unstarred'].map(f =>
   `<button class="wf ${f === 'All' ? 'on' : ''}" data-qf="${f}">${f}</button>`).join('');
@@ -528,18 +616,20 @@ function renderQuestions() {
   wirePager('#q-pager', 'q', count, () => renderQuestions());
   initAnswers();
 }
+renderRecord = renderQuestions;
+}
 
 /* ── assembly seats ────────────────────────────────────────────────── */
 if (acTopo && acTopo.objects && acTopo.objects.acs) {
   const geoms = acTopo.objects.acs.geometries || [];
-  const ackeyify = s => String(s || '').toLowerCase().replace(/\(sc\)|\(st\)/g, '').replace(/[^a-z0-9]/g, '');
-  const pcName = String(profile.constituency || C).toUpperCase();
-  const seats = geoms.filter(g => String((g.properties || {}).pc || '').toUpperCase() === pcName)
+  const seats = geoms.filter(g => fold((g.properties || {}).pc) === fold(constituency))
     .map(g => g.properties).sort((a, b) => (a.no || 0) - (b.no || 0));
-  $('#ac-cross').innerHTML = seats.map(s =>
-    `<a href="../mla/?s=${S}&c=${ackeyify(s.ac)}">${esc(s.ac)}</a>`
-  ).join('<span style="color:var(--muted)"> · </span>');
+  $('#ac-heading').textContent = seats.length ? `Made of ${seats.length} assembly seats` : 'Assembly seats';
+  $('#ac-cross').innerHTML = seats.length ? seats.map(s =>
+    `<a href="../mla/?s=${S}&c=${fold(s.ac)}">${esc(s.ac)}</a>`
+  ).join('<span style="color:var(--muted)"> · </span>') : 'No assembly seats matched this constituency.';
 } else {
+  $('#ac-heading').textContent = 'Assembly seats';
   $('#ac-cross').textContent = 'Assembly seats unavailable for this state.';
 }
 
@@ -628,7 +718,7 @@ const attachAnswer = ans => {
 };
 function initAnswers() { document.querySelectorAll('.q-ans').forEach(attachAnswer); }
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(initAnswers);
-renderQuestions();
+if (renderRecord) renderRecord();
 </script>
 </body>
 </html>

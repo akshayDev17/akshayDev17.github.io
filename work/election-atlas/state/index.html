@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
 <title>State — Election Atlas of India</title>
 <meta name="description" content="One state under two grids: its legislative assembly seats and its Lok Sabha seats, with each constituency's own result on hover.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -281,7 +282,6 @@ td .d{font-weight:500;letter-spacing:.02em}
 .belt-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s4);flex-wrap:wrap;padding:0 0 var(--s3)}
 .belt-title{font-family:var(--serif);font-size:1.0625rem;line-height:1.25;color:var(--ink);margin:0;font-weight:400}
 .belt-asof{font-family:var(--mono);font-size:.5625rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
-.belt-empty{font-family:var(--mono);font-size:.6875rem;line-height:1.7;color:var(--muted);max-width:30ch}
 /* ── search (docked to the belt it filters) ───────────────────────────── */
 .find{display:flex;flex-direction:column;gap:var(--s1);margin-bottom:var(--s3)}
 .find-label{font-family:var(--mono);font-size:.5625rem;letter-spacing:.13em;text-transform:uppercase;
@@ -344,6 +344,30 @@ td .d{font-weight:500;letter-spacing:.02em}
 .belt .sw{width:9px;height:9px;border-radius:2px;flex:0 0 auto;background:var(--c);box-shadow:inset 0 0 0 1px rgba(15,18,32,.2)}
 .belt .belt-sym{flex:0 0 auto;max-width:18px;max-height:18px;width:auto;height:auto;display:block}
 
+/* ── not available yet, portraits, credits ────────────────────────────── */
+/* A year with no data stays in its row, quieter, and still answers a click
+   with the "not available yet" state rather than an error. */
+.year.na{color:var(--rule-3);text-decoration:line-through;text-decoration-thickness:1px}
+.year.na[aria-pressed="true"]{color:var(--muted)}
+.tense-opt[aria-disabled="true"]{color:var(--rule-3);cursor:default;text-decoration:line-through;
+  text-decoration-thickness:1px}
+.tense-opt[aria-disabled="true"]:hover{color:var(--rule-3)}
+.table .void{min-height:7rem;margin-top:var(--s2)}
+.belt .void{min-height:7rem}
+.void[hidden],.find[hidden],.belt-view[hidden],.belt[hidden]{display:none}
+.monogram{display:flex;align-items:center;justify-content:center;width:100%;height:100%;
+  background:var(--paper-2);color:var(--muted);font-family:var(--serif);letter-spacing:.02em}
+#card .face .monogram{font-size:1.4rem}
+.photo-credit{display:block;font-family:var(--mono);font-size:.5625rem;line-height:1.4;
+  color:var(--muted);letter-spacing:.02em}
+.photo-credit a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.photo-credit a:hover{color:var(--ink)}
+#card .photo-credit{margin-top:3px;text-align:right}
+#card .portrait{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end}
+.credits{flex:0 0 auto;padding:var(--s3) var(--pad) var(--s4);font-family:var(--mono);
+  font-size:.5625rem;line-height:1.5;letter-spacing:.04em;color:var(--muted);border-top:1px solid var(--rule)}
+.credits a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+
 @media (min-width:60rem){
   .panels{grid-template-columns:1fr 1px 1fr}
   /* Apple-ish: barely there, and it dissolves before it reaches either end
@@ -373,7 +397,7 @@ td .d{font-weight:500;letter-spacing:.02em}
       <div class="tense" id="tense" role="group" aria-label="Result as elected or as it stands" hidden></div>
     </div>
     <hr class="hair" style="margin-top:var(--s4)">
-    <p class="caveat">Work in progress — the assembly figures are synthetic and none of this is verified.</p>
+    <p class="caveat">Results: Election Commission of India statistical reports. Where a view says “not available yet”, that data has not been added.</p>
   </header>
 
   <div class="panels" id="panels">
@@ -414,6 +438,7 @@ td .d{font-weight:500;letter-spacing:.02em}
         <div class="belt-view">
           <div class="belt-scroll" id="belt-scroll" tabindex="0" role="region" aria-label="Council of ministers. Use the arrow keys to scroll."></div>
         </div>
+        <div class="void" id="belt-void" hidden><p></p></div>
       </section>
     </section>
 
@@ -442,13 +467,20 @@ td .d{font-weight:500;letter-spacing:.02em}
     </section>
   </div>
 </main>
+<footer class="credits"><p>Portraits: Parliament of India (sansad.in). Party symbols: Wikimedia Commons contributors (<a href="../data/parties-symbols.json">licences listed</a>).</p></footer>
 
 <div id="card" role="status" aria-live="polite"></div>
 
 <script type="module">
+import {
+  fetchOptional, loadAvailability, byelAvailable, lsDetailAvailable, stateRoster, acCycles, notAvailable, voidHTML,
+  ECI, CMO_UP, markUnavailable, hasPhoto, portraitHTML, monogramHTML, photoCreditHTML,
+  photoMember, installPortraitFallback,
+} from '../lib/atlas.js';
 import { resolveSeat, tallyStands } from './stands.js';
 const NS = 'http://www.w3.org/2000/svg';
 const $ = s => document.querySelector(s);
+installPortraitFallback();
 const nf = n => Math.round(n).toLocaleString('en-IN');
 const pc1 = n => (n * 100).toFixed(1) + '%';
 const titleCase = s => (s || '').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
@@ -464,13 +496,20 @@ try {
 const qs = new URLSearchParams(location.search);
 let stateCode = (qs.get('s') || '').toUpperCase();
 
-const [manifest, regionsDoc, partiesDoc, statesTopo, coverage] = await Promise.all([
-  fetch('../data/manifest.json').then(r => r.json()),
-  fetch('../data/regions.json').then(r => r.json()),
-  fetch('../data/parties.json').then(r => r.json()),
-  fetch('../data/geo/india-states.json').then(r => r.json()),
-  fetch('../data/geo/ac/coverage.json').then(r => r.json()).catch(() => ({ checked: {} })),
-]);
+/* The first four draw the page at all; if one cannot be read the page says so
+   and stops, rather than throwing half-way through a paint. */
+const core = await Promise.all([
+  '../data/manifest.json', '../data/regions.json', '../data/parties.json',
+  '../data/geo/india-states.json',
+].map(fetchOptional));
+if (!core.every(r => r.ok)) {
+  $('#cap-pc').textContent = 'the atlas data could not be loaded';
+  throw new Error('core atlas data unavailable');
+}
+const [manifest, regionsDoc, partiesDoc, statesTopo] = core.map(r => r.doc);
+const coverageRes = await fetchOptional('../data/geo/ac/coverage.json');
+const coverage = coverageRes.ok ? coverageRes.doc : { checked: {} };
+const avail = await loadAvailability('../data/');
 
 const regionByCode = new Map(regionsDoc.regions.map(r => [r.code, r]));
 const regionBySource = new Map();
@@ -481,9 +520,8 @@ const colour = c => (partyByCode.get(c) || fallback).colour;
 
 /* Party symbols (optional): an emblem image replaces the colour square in the
    cabinet when on file; a party without one keeps the square. */
-let symbolsDoc = { symbols: {} };
-try { symbolsDoc = await fetch('../data/parties-symbols.json').then(r => r.ok ? r.json() : { symbols: {} }); }
-catch { symbolsDoc = { symbols: {} }; }
+const symbolsRes = await fetchOptional('../data/parties-symbols.json');
+const symbolsDoc = symbolsRes.ok ? symbolsRes.doc : { symbols: {} };
 const symbolFor = code => {
   const s = (symbolsDoc.symbols || {})[code];
   return (s && s.file) ? '../data/' + s.file : null;
@@ -496,7 +534,7 @@ const partyMark = code => {
 
 if (!regionByCode.has(stateCode)) stateCode = 'IN-UP';
 const region = regionByCode.get(stateCode);
-const hasAC = !!coverage.checked[stateCode];
+let hasAC = !!coverage.checked[stateCode];
 
 /* Seat → constituency_key join, for the Level-3 MP click-through. Mirrors the
    fetcher's keyify: lowercase, drop "(SC)"/"(ST)", then the trailing state
@@ -509,11 +547,12 @@ const keyify = name => {
   if (STATE_ABBR && s.endsWith(STATE_ABBR.toLowerCase())) s = s.slice(0, -STATE_ABBR.length);
   return s;
 };
+/* No MPLADS directory for the state means no index, and PC clicks just won't navigate. */
 const mpKeyByName = new Map();
-try {
-  const midx = await fetch(`../data/mplads/${stateCode}/index.json`).then(r => r.json());
-  for (const m of (midx.mps || [])) mpKeyByName.set(keyify(m.constituency), m.constituency_key);
-} catch { /* no MPLADS index — PC clicks just won't navigate */ }
+if (avail.mplads && avail.mplads[stateCode]) {
+  const midx = await fetchOptional(`../data/mplads/${stateCode}/index.json`);
+  if (midx.ok) for (const m of (midx.doc.mps || [])) mpKeyByName.set(keyify(m.constituency), m.constituency_key);
+}
 
 /* the page is about one state, and says so */
 document.title = `Election Atlas of ${region.name}`;
@@ -523,14 +562,27 @@ $('#eyebrow').textContent = `Election Atlas of ${region.name}`;
    from Lok Sabha ones, so the two controls are independent by construction: a
    year chosen on the left never touches the right. */
 const LS_YEARS = manifest.elections.ls.years;
-const LA_YEARS = manifest.elections.ac.years.length ? manifest.elections.ac.years : LS_YEARS;
+/* The assembly runs on the state's own calendar: its real cycles, each marked with
+   whether its result has been added. A state can have its boundaries mapped and
+   no cycle added yet. */
+const LA_CYCLES = acCycles(avail, stateCode);
+const LA_YEARS = LA_CYCLES.map(c => c.year);
+const laAvailable = y => LA_CYCLES.some(c => c.year === y && c.ok);
+const hasCycles = LA_YEARS.length > 0;
+const latestLA = (LA_CYCLES.filter(c => c.ok).pop() || LA_CYCLES[LA_CYCLES.length - 1] || {}).year;
 
-const pcTopo = await fetch('../data/geo/ls/' + stateCode + '.json').then(r => r.json());
+const pcRes = await fetchOptional('../data/geo/ls/' + stateCode + '.json');
+if (!pcRes.ok) {
+  $('#cap-pc').textContent = 'the Lok Sabha map could not be loaded';
+  throw new Error('state geometry unavailable');
+}
+const pcTopo = pcRes.doc;
 const pcs = topojson.feature(pcTopo, pcTopo.objects.pcs);
 let acs = null;
 if (hasAC) {
-  const t = await fetch('../data/geo/ac/' + stateCode + '.json').then(r => r.json());
-  acs = topojson.feature(t, t.objects.acs);
+  const t = await fetchOptional('../data/geo/ac/' + stateCode + '.json');
+  if (t.ok) acs = topojson.feature(t.doc, t.doc.objects.acs);
+  else hasAC = false;
 }
 const stateFeature = topojson.feature(statesTopo, statesTopo.objects.states).features
   .find(f => regionBySource.get(f.properties.state_ut_name) === stateCode);
@@ -765,14 +817,12 @@ function pageList(p, count) {
 /* ── per-constituency detail ──────────────────────────────────────────── */
 const detail = { ac: new Map(), pc: new Map() };
 
+/* A year without candidate detail draws its map and shows each seat's card
+   without candidates. */
 async function loadPCDetail(year) {
-  const doc = await fetch(`../data/results/ls/detail/${year}.json`).then(r => r.json()).catch(() => null);
-  detail.pc = new Map(doc ? Object.entries(doc.constituencies) : []);
-}
-async function loadACDetail(year) {
-  if (!hasAC) return;
-  const doc = await fetch(`../data/results/ac/${stateCode}/${year}-detail.json`).then(r => r.json()).catch(() => null);
-  detail.ac = new Map(doc ? Object.entries(doc.constituencies) : []);
+  const res = lsDetailAvailable(avail, year)
+    ? await fetchOptional(`../data/results/ls/detail/${year}.json`) : { ok: false };
+  detail.pc = new Map(res.ok ? Object.entries(res.doc.constituencies) : []);
 }
 
 /* ── the card ─────────────────────────────────────────────────────────── */
@@ -783,7 +833,8 @@ function showCard(which, key, x, y) {
   const cands = (which === 'ac' ? cardRows.ac : cardRows.pc).get(key);
   const r = which === 'pc' ? seatResolved.get(key) : null;
   const byes = (r && r.events) || [];
-  if ((!cands || !cands.length) && !byes.length && !(r && r.vacant)) return;
+  const acMissing = which === 'ac' && lastAC && lastAC.missing;
+  if ((!cands || !cands.length) && !byes.length && !(r && r.vacant) && !acMissing) return;
   const nm = (which === 'ac' ? acName : pcName).get(key) || '';
   let body = '';
   if (cands && cands.length) {
@@ -795,7 +846,7 @@ function showCard(which, key, x, y) {
          <p class="sub">${which === 'ac' ? 'Assembly constituency' : 'Lok Sabha constituency'}</p>
          <h3>${nm}</h3>
          <p class="meta"><span>${cands.length} candidates</span><span>${nf(total)} votes polled</span></p>
-       </div>${faceFor(which, key)}</div>
+       </div>${faceFor(which, key, cands[0] && cands[0].n)}</div>
        <table><thead><tr><th>Party</th><th>Candidate</th><th>Votes</th><th>Share</th></tr></thead><tbody>` +
       cands.slice(0, 6).map(c =>
         `<tr><td><span class="cell"><i class="sw" style="--c:${colour(c.p)}"></i>${c.p}</span></td>` +
@@ -804,11 +855,18 @@ function showCard(which, key, x, y) {
       (rest.length ? `<tr class="more"><td>+${rest.length} more</td><td></td><td>${nf(restV)}</td>` +
         `<td>${pc1(total ? restV / total : 0)}</td></tr>` : '') +
       `</tbody></table>`;
+  } else if (acMissing) {
+    /* The cycle has not been added: the seat's name, and nothing that would read
+       as a result. */
+    body = `<div class="top"><div class="who">
+       <p class="sub">Assembly constituency</p>
+       <h3>${nm}</h3>
+     </div></div>`;
   } else {
     body = `<div class="top"><div class="who">
        <p class="sub">${which === 'ac' ? 'Assembly constituency' : 'Lok Sabha constituency'}</p>
        <h3>${nm}</h3>
-       <p class="meta"><span>No candidate detail for this year</span></p>
+       <p class="meta"><span>Candidate detail not available yet for this year</span></p>
      </div></div>`;
   }
   if (r && r.vacant && tense === 'stands') {
@@ -891,12 +949,13 @@ function wire(svg, which) {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { hideCard(); clearPanel('ac'); clearPanel('pc'); } });
 
 /* ── year controls: two of them, independent ──────────────────────────── */
-function buildYears(container, years, initial, onPick) {
+function buildYears(container, years, initial, onPick, isAvailable = () => true) {
   container.textContent = '';
   for (const y of years) {
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'year'; b.dataset.year = y; b.textContent = y;
     b.setAttribute('aria-pressed', String(y === initial));
+    if (!isAvailable(y)) markUnavailable(b, 'not available yet');
     b.addEventListener('click', () => onPick(y));
     container.appendChild(b);
   }
@@ -908,12 +967,17 @@ const seatToUid = new Map();
 for (const [uid, seat] of uidToSeat) if (!seatToUid.has(seat)) seatToUid.set(seat, uid);
 // portraits are filed per seat for the term a member currently sits in, so 2024 only
 const PHOTO_YEAR = 2024;
-function faceFor(which, key) {
+const creditsRes = await fetchOptional(`../data/photos/ls/${PHOTO_YEAR}/credits.json`);
+const photoCredits = (creditsRes.ok && creditsRes.doc.credits) || {};
+function faceFor(which, key, winner) {
   if (which !== 'pc' || !lastPC || lastPC.year !== PHOTO_YEAR) return '';
   const uid = seatToUid.get(key);
   if (!uid) return '';
-  return `<div class="face"><img src="../data/photos/ls/${PHOTO_YEAR}/${uid}.jpg" alt=""` +
-         ` decoding="async" onerror="this.parentNode.remove()"></div>`;
+  const face = hasPhoto(avail, String(PHOTO_YEAR), uid)
+    ? portraitHTML(`../data/photos/ls/${PHOTO_YEAR}/${uid}.jpg`, winner)
+    : monogramHTML(winner);
+  return `<div class="portrait"><div class="face">${face}</div>` +
+    (hasPhoto(avail, String(PHOTO_YEAR), uid) ? photoCreditHTML('ls', (photoCredits[uid] || {}).mpsno || '') : '') + `</div>`;
 }
 const acNums = acs ? new Set(acs.features.map(f => String(f.properties.no))) : new Set();
 
@@ -929,8 +993,8 @@ const seatParty = { ac: new Map(), pc: new Map() };   // seat key -> party code
 const partySeats = { ac: new Map(), pc: new Map() };  // party code -> [seat key]
 let tense = 'elected';                 // 'elected' | 'stands'
 let pcByeSeats = [];                   // by-election seats for this state + LS year
-let stateCabinet = null;               // state cabinet doc (static)
-const seatResolved = new Map();        // ls_seat_code -> { p, vacant, byeCount, events }
+let stateCabinet = { elected: null, stands: null }; // rosters for the shown assembly cycle
+const seatResolved = new Map();        // ls_seat_code -> { p, vacant, unknown, byeCount, events }
 let pcStands = null;                   // tallyStands() under 'stands', else null
 
 function paintFills(which) {
@@ -1054,17 +1118,38 @@ function buildTenseControl() {
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'tense-opt'; b.dataset.tense = val; b.textContent = label;
     b.setAttribute('aria-pressed', String(val === tense));
-    b.addEventListener('click', () => { if (tense !== val) { tense = val; applyTense(); } });
+    b.addEventListener('click', () => {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      if (tense !== val) { tense = val; applyTense(); }
+    });
     tenseEl.appendChild(b);
   }
   tenseEl.hidden = false;
 }
 
-function beltRoster() {
-  /* members is the roster as sworn in; as_it_stands is the roster on asOf. */
-  if (!stateCabinet) return null;
-  return (tense === 'elected' ? stateCabinet.members : stateCabinet.as_it_stands) || null;
+/* "As it stands" has something to show when the Lok Sabha year's by-election
+   record, or the shown assembly cycle's current council of ministers, has been
+   added. With neither the tense stays in the row, unavailable, and a page asked
+   for it falls back to "As elected". */
+function syncTenseAvailability() {
+  const lsY = lastPC && lastPC.year;
+  const ok = (lsY && byelAvailable(avail, lsY)) ||
+    (lastAC && stateRoster(avail, stateCode, lastAC.year).as_it_stands);
+  /* Both panels decide whether "As it stands" has data, so a tense asked for in
+     the URL is only withdrawn once both have loaded. */
+  const loaded = !!lastPC && (!!lastAC || !(hasAC && hasCycles));
+  const changed = loaded && !ok && tense === 'stands';
+  if (changed) tense = 'elected';
+  for (const b of tenseEl.children) {
+    b.setAttribute('aria-pressed', String(b.dataset.tense === tense));
+    if (b.dataset.tense !== 'stands') continue;
+    if (ok) { b.removeAttribute('aria-disabled'); b.removeAttribute('title'); }
+    else { b.setAttribute('aria-disabled', 'true'); b.title = `By-election record for ${lsY} not available yet`; }
+  }
+  return changed;
 }
+
+const beltRoster = () => (stateCabinet[tense] && stateCabinet[tense].members) || [];
 
 /* ── find minister ─────────────────────────────────────────────────────── *
  * One query, one surface: matching cabinet cards stay bright, the rest recede
@@ -1115,43 +1200,48 @@ function bindSearch() {
   });
 }
 
+/* The council of ministers follows the assembly cycle shown on the left. A state
+   without declared assembly cycles has no cycle to key a council by, so the belt
+   stays out of the page there. */
+const cabinetPublisher = () => stateCode === 'IN-UP' ? CMO_UP : `the Government of ${region.name}`;
 function renderBelt() {
+  if (!hasCycles || !lastAC) { beltEl.hidden = true; return; }
+  const cycle = lastAC.year;
+  const doc = stateCabinet[tense];
   const members = beltRoster();
-  if (!stateCabinet) { beltEl.hidden = true; return; }
   beltEl.hidden = false;
-  beltTitle.textContent = `Council of ministers · ${region.name}`;
-  const byeEvents = pcByeSeats.flatMap(s => s.events.filter(e => e.type === 'bye'));
-  const unknown = byeEvents.filter(e => !e.winner).length;
-  const byeTxt = byeEvents.length
-    ? `${byeEvents.length} by-election${byeEvents.length === 1 ? '' : 's'}` +
-      `${unknown ? ` (${unknown} result${unknown === 1 ? '' : 's'} not available yet)` : ''} in ${region.name}`
-    : `no by-elections in ${region.name}`;
-  if (!members) {
-    beltAsof.textContent = tense === 'stands' ? `as it stands · not available yet · ${byeTxt}` : 'as elected · not available yet';
-    beltSorted = [];
-    beltScroll.innerHTML = '<p class="belt-empty">Not available yet</p>';
-    updateBeltFades();
-    applyBeltQuery();
+  beltTitle.textContent = `Council of ministers · ${region.name} · ${cycle}`;
+  const voidEl = $('#belt-void');
+  const findEl = beltEl.querySelector('.find');
+  if (!members.length) {
+    voidEl.querySelector('p').textContent = notAvailable(
+      `the ${region.name} council of ministers ${tense === 'elected' ? 'as sworn in' : 'as it stands'} ` +
+      `for the ${cycle} assembly`, cabinetPublisher());
+    voidEl.hidden = false; findEl.hidden = true; beltView.hidden = true;
+    beltAsof.textContent = '';
+    beltSorted = []; beltScroll.innerHTML = '';
     return;
   }
+  voidEl.hidden = true; findEl.hidden = false; beltView.hidden = false;
   beltAsof.textContent = tense === 'stands'
-    ? `as it stands · as of ${stateCabinet.asOf} · ${byeTxt}`
-    : `state cabinet sworn in ${stateCabinet.swornIn}`;
+    ? `as it stands · fetched ${doc.fetchedAt}`
+    : `as sworn in · ${doc.swornIn}`;
   const order = { cm: 0, cabinet: 1, 'mos-ic': 2, mos: 3 };
   const sorted = [...members].sort((a, b) =>
     (order[a.rank] ?? 9) - (order[b.rank] ?? 9) ||
     (a.name || '').localeCompare(b.name || ''));
   beltSorted = sorted;
   beltScroll.innerHTML = sorted.map(m => {
-    const initials = (m.name || '?').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
     const roleTxt = m.portfolio || m.role || '';
     const seatLabel = m.constituency || (m.state ? 'Rajya Sabha' : '');
     const seat = seatLabel
       ? `<span class="belt-seat">${partyMark(m.party)}${seatLabel}</span>`
       : '';
+    const ph = photoMember(m.photo);
     const face = m.photo
-      ? `<div class="belt-face"><img src="../data/photos/cabinet/${m.photo}" alt="" loading="lazy" onerror="this.parentNode.innerHTML='${initials}'"></div>`
-      : `<div class="belt-face" aria-hidden="true">${initials}</div>`;
+      ? `<div class="belt-face">${portraitHTML(`../data/photos/cabinet/${m.photo}`, m.name)}</div>` +
+        photoCreditHTML(ph.house, ph.id)
+      : `<div class="belt-face">${monogramHTML(m.name)}</div>`;
     return `<div class="belt-card">` +
       face +
       `<p class="belt-name">${titleCase(m.name)}</p>` +
@@ -1169,32 +1259,72 @@ function updateBeltFades() {
   beltView.classList.toggle('more-r', hasMore && beltScroll.scrollLeft < max - 2);
 }
 
+/* The Lok Sabha caption carries the by-election status under "As it stands":
+   a count only from a by-election record that exists, and "none" only when that
+   record exists and lists none. */
+function paintPCCaption() {
+  if (!lastPC) return;
+  const n = Object.keys(lastPC.pcRows).length;
+  let txt = `${n} seats`;
+  if (tense === 'stands') {
+    if (!lastPC.byeKnown) txt += ' · by-election record not available yet, so seats show as elected';
+    else {
+      const byes = pcByeSeats.reduce((k, s) => k + s.events.filter(e => e.type === 'bye').length, 0);
+      txt += byes
+        ? ` · as it stands · ${byes} by-election${byes === 1 ? '' : 's'} in ${region.name}`
+        : ` · as it stands · none in ${region.name}`;
+    }
+  }
+  $('#cap-pc').textContent = txt;
+}
+
 function applyTense() {
+  syncTenseAvailability();
   if (lastPC) {
     paintPC(lastPC);
     page.pc = 0;
     renderTable($('#table-pc'), lastPC.pcAgg, 'pc', $('#reset-pc'), $('#clear-pc'));
+    paintPCCaption();
   }
   renderBelt();
-  for (const b of tenseEl.children) b.setAttribute('aria-pressed', String(b.dataset.tense === tense));
 }
 
 async function loadLS(year) {
-  const all = await fetch(`../data/results/ls/pc/${year}.json`).then(r => r.json());
-  const pcRows = Object.fromEntries(Object.entries(all.constituencies).filter(([, c]) => c.st === stateCode));
+  const res = await fetchOptional(`../data/results/ls/pc/${year}.json`);
+  if (!res.ok) throw new Error(`no Lok Sabha result file for ${year}`);
+  const pcRows = Object.fromEntries(Object.entries(res.doc.constituencies).filter(([, c]) => c.st === stateCode));
   await loadPCDetail(year);
-  const bye = await fetch(`../data/results/ls/byel/${year}.json`).then(r => r.ok ? r.json() : null).catch(() => null);
-  pcByeSeats = (bye && bye.seats ? bye.seats : []).filter(s => s.st === stateCode);
-  return { year, pcRows, pcAgg: aggregateFrom(pcRows) };
+  const byeKnown = byelAvailable(avail, year);
+  const bye = byeKnown ? await fetchOptional(`../data/results/ls/byel/${year}.json`) : { ok: false };
+  pcByeSeats = (bye.ok && bye.doc.seats ? bye.doc.seats : []).filter(s => s.st === stateCode);
+  return { year, pcRows, pcAgg: aggregateFrom(pcRows), byeKnown: byeKnown && bye.ok };
 }
+
+/* One assembly cycle. A cycle that has not been added, or whose files cannot be
+   read, comes back `missing`: the panel then draws the boundaries with no fills
+   and says the result is not available yet. */
 async function loadLA(year) {
   if (!hasAC) return null;
-  const doc = await fetch(`../data/results/ac/${stateCode}/${year}.json`).then(r => r.json());
-  await loadACDetail(year);
-  /* The state cabinet follows the assembly timeline, not the Lok Sabha one. */
-  stateCabinet = await fetch(`../data/cabinet/state/${stateCode}/${year}.json`)
-    .then(r => r.ok ? r.json() : null).catch(() => null);
-  return { year, acRows: doc.constituencies, acAgg: aggregateFrom(doc.constituencies) };
+  const roster = stateRoster(avail, stateCode, year);
+  const getRoster = async (on, url) => {
+    if (!on) return null;
+    const r = await fetchOptional(url);
+    return r.ok ? r.doc : null;
+  };
+  const [elected, stands] = await Promise.all([
+    getRoster(roster.sworn_in, `../data/cabinet/state/${stateCode}/${year}-sworn-in.json`),
+    getRoster(roster.as_it_stands, `../data/cabinet/state/${stateCode}/${year}.json`),
+  ]);
+  stateCabinet = { elected, stands };
+  const missing = { year, missing: true, acRows: {}, acAgg: null };
+  if (!laAvailable(year)) { detail.ac = new Map(); return missing; }
+  const [res, det] = await Promise.all([
+    fetchOptional(`../data/results/ac/${stateCode}/${year}.json`),
+    fetchOptional(`../data/results/ac/${stateCode}/${year}-detail.json`),
+  ]);
+  if (!res.ok) { detail.ac = new Map(); return missing; }
+  detail.ac = new Map(det.ok ? Object.entries(det.doc.constituencies) : []);
+  return { year, missing: false, acRows: res.doc.constituencies, acAgg: aggregateFrom(res.doc.constituencies) };
 }
 
 let firstPaintDone = false;
@@ -1211,28 +1341,52 @@ async function selectLS(y) {
   try {
     const data = await loadLS(y);
     lastPC = data;
-    const n = Object.keys(data.pcRows).length;
-    $('#cap-pc').textContent = `${n} seats`;
+    syncTenseAvailability();
     layout(); paintPC(data); renderBelt();
+    paintPCCaption();
     page.pc = 0;
     renderTable($('#table-pc'), data.pcAgg, 'pc', $('#reset-pc'), $('#clear-pc'));
     await markReady();
+  } catch {
+    /* The result file could not be read: the panel says so instead of throwing. */
+    lastPC = null; seatResolved.clear(); seatParty.pc = new Map(); cardRows.pc = new Map();
+    layout(); paintFills('pc');
+    $('#cap-pc').textContent = `${pcs.features.length} seats · not available yet`;
+    $('#table-pc').innerHTML = voidHTML(`${region.name} ${y} Lok Sabha results`, ECI, 'have');
+    $('#reset-pc').hidden = true; $('#clear-pc').hidden = true;
   } finally { for (const b of $('#years-pc').children) b.disabled = false; }
 }
 async function selectLA(y) {
   if (!hasAC) return;
   for (const b of $('#years-ac').children) { b.setAttribute('aria-pressed', String(+b.dataset.year === y)); b.disabled = true; }
   clearPanel('ac'); hideCard();
+  let data;
+  try { data = await loadLA(y); }
+  catch { data = { year: y, missing: true, acRows: {}, acAgg: null }; detail.ac = new Map(); }
   try {
-    const data = await loadLA(y);
     lastAC = data;
-    const n = Object.keys(data.acRows).length;
-    $('#cap-ac').textContent = `${n} seats`;
+    sel.ac.clear();
+    if (syncTenseAvailability()) applyTense();
     page.ac = 0;
-    renderTable($('#table-ac'), data.acAgg, 'ac', $('#reset-ac'), $('#clear-ac'));
+    if (data.missing) {
+      $('#cap-ac').textContent = `${acs.features.length} seats · not available yet`;
+      $('#table-ac').innerHTML = voidHTML(`${region.name} ${y} assembly results`, ECI, 'have');
+      $('#reset-ac').hidden = true; $('#clear-ac').hidden = true;
+    } else {
+      $('#cap-ac').textContent = `${Object.keys(data.acRows).length} seats`;
+      renderTable($('#table-ac'), data.acAgg, 'ac', $('#reset-ac'), $('#clear-ac'));
+    }
     layout(); paintAC(data); renderBelt();
     await markReady();
   } finally { for (const b of $('#years-ac').children) b.disabled = false; }
+}
+/* A mapped state with no assembly cycle listed (or an unreadable availability
+   index): draw the boundaries unfilled and say the results are not available. */
+function showNoCycles() {
+  lastAC = { year: null, missing: true, acRows: {}, acAgg: null };
+  $('#cap-ac').textContent = `${acs.features.length} seats · not available yet`;
+  $('#table-ac').innerHTML = voidHTML(`${region.name} assembly results`, ECI, 'have');
+  paintAC(lastAC);
 }
 
 $('#reset-pc').addEventListener('click', () => {
@@ -1277,7 +1431,7 @@ beltScroll.addEventListener('error', e => {
 const wantsYear = Number(qs.get('y')) || 0;
 const firstLS = LS_YEARS.includes(wantsYear) ? wantsYear : LS_YEARS[LS_YEARS.length - 1];
 buildYears($('#years-pc'), LS_YEARS, firstLS, selectLS);
-if (hasAC) buildYears($('#years-ac'), LA_YEARS, LA_YEARS[LA_YEARS.length - 1], selectLA);
+if (hasAC && hasCycles) buildYears($('#years-ac'), LA_YEARS, latestLA, selectLA, laAvailable);
 
 let rt;
 new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(() => layout(), 80); }).observe($('#panels'));
@@ -1285,8 +1439,10 @@ new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(() => layout(), 80)
 // the two timelines load independently and never touch each other
 await Promise.all([
   selectLS(firstLS),
-  hasAC ? selectLA(LA_YEARS[LA_YEARS.length - 1]) : Promise.resolve(),
+  hasAC && hasCycles ? selectLA(latestLA) : Promise.resolve(),
 ]);
+if (hasAC && !hasCycles) showNoCycles();
+if (syncTenseAvailability()) applyTense();
 </script>
 </body>
 </html>

@@ -47,6 +47,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESEARCH = os.path.join(ROOT, "_research", "eci")
 DATA = os.path.join(ROOT, "data")
 
+# The Commission's statistical-reports index, which lists every year's report.
+# A year whose table files have a direct URL on the Commission's site names them
+# in `statewise_url` / `detailed_url`; any other year points at this index.
+ECI_REPORTS = "https://www.eci.gov.in/statistical-reports"
+ECI_GE2024 = "https://www.eci.gov.in/eci-backend/public/all_files/GE-2024-statistical-report/"
+
 # ── per-year ECI source configuration ──────────────────────────────────────────
 # row/col indices are read off the actual files; see _research/ECI-SOURCES.md.
 YEARS = {
@@ -63,6 +69,8 @@ YEARS = {
         pcwise=("ls2024_statistical/7-Constituency-(PC)-Wise-Summary.xls", "xls"),
         pcwise_cols=dict(state=0, no=0, name=1, electors=4, voters=9), pcwise_start=3,
         note="Election Commission of India, General Election 2024 (18th Lok Sabha) — statistical reports, tables 17 and 33.",
+        statewise_url=ECI_GE2024 + "17-State-Wise-Seat-Won-&-Valid-Votes-Polled-by-Political-Parties.xls",
+        detailed_url=ECI_GE2024 + "33-Constituency-Wise-Detailed-Result.xls",
     ),
     2019: dict(
         detailed=("eci_pdfs/GE2019_33-constituency-wise-detailed-result_part1.xls", "xls"),
@@ -779,13 +787,14 @@ def emit(year, cfg, pcs, states, ix, geo, log):
     detail_src = cfg["detailed"][0] if cfg.get("detailed") else (
         cfg.get("winners", ("", ""))[0] if cfg.get("winners") else None)
     pc_doc = {
-        "schema": 2, "election": "ls", "year": year,
+        "schema": 2, "provenance": "published", "election": "ls", "year": year,
         "note": ("PUBLISHED RESULT. Every value is an ABSOLUTE COUNT carried from the "
                  "Election Commission of India's own statistical report; no percentage is "
                  "stored. `p` is the winning party and `v` its votes; `o` holds every other "
                  "party that polled in the constituency. " + cfg["note"]),
         "source": {
             "publisher": "Election Commission of India",
+            "url": cfg.get("detailed_url", ECI_REPORTS),
             "detail_table": detail_src,
             "party_code_rule": ("data/parties.json code where the vocabulary covers the party, "
                                 "otherwise the ECI abbreviation printed in the source table"),
@@ -824,11 +833,12 @@ def emit(year, cfg, pcs, states, ix, geo, log):
             "parties": d["parties"],
         }
     st_doc = {
-        "schema": 2, "election": "ls", "year": year,
+        "schema": 2, "provenance": "published", "election": "ls", "year": year,
         "note": ("PUBLISHED RESULT. Every value here is an ABSOLUTE COUNT. No percentage is "
                  "stored anywhere: the page derives every share from these numbers. `electors` "
                  "is the registered electorate. " + src_note + ". " + cfg["note"]),
         "source": {"publisher": "Election Commission of India",
+                   "url": cfg.get("statewise_url", ECI_REPORTS),
                    "table": cfg["statewise"][0] if cfg.get("statewise") else None,
                    "detail_table": detail_src,
                    "derivation": "constituency" if have_votes else "state_table"},

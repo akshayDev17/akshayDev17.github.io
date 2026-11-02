@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "note": "Party symbol/logo images fetched from Wikipedia. `symbols` maps party code to its image; a party absent here had no usable image. Paths are relative to work/election-atlas/data/.",
+  "note": "Party symbol/logo images fetched from Wikipedia. `symbols` maps party code to its image; a party absent here had no usable image. Paths are relative to work/election-atlas/data/. Images Wikipedia carries only under a fair-use rationale are not kept: that rationale does not extend to this site, so those parties show their colour swatch.",
   "symbols": {
     "BJP": {
       "file": "photos/parties/BJP.png",
@@ -44,12 +44,6 @@
       "license": "Public domain",
       "credit": "Unknown author Unknown author"
     },
-    "DMK": {
-      "file": "photos/parties/DMK.png",
-      "source": "https://en.wikipedia.org/wiki/Dravida_Munnetra_Kazhagam",
-      "license": "Fair use",
-      "credit": "https://www.facebook.com/arivalayam"
-    },
     "AIADMK": {
       "file": "photos/parties/AIADMK.png",
       "source": "https://en.wikipedia.org/wiki/All_India_Anna_Dravida_Munnetra_Kazhagam",
@@ -79,12 +73,6 @@
       "source": "https://en.wikipedia.org/wiki/Janata_Dal_(United)",
       "license": "CC BY-SA 3.0",
       "credit": "Abilngeorge"
-    },
-    "RJD": {
-      "file": "photos/parties/RJD.jpg",
-      "source": "https://en.wikipedia.org/wiki/Rashtriya_Janata_Dal",
-      "license": "Fair use",
-      "credit": "https://rjd.co.in/"
     },
     "SHS": {
       "file": "photos/parties/SHS.png",
@@ -121,12 +109,6 @@
       "source": "https://en.wikipedia.org/wiki/Hindustani_Awam_Morcha_(Secular)",
       "license": "CC BY-SA 4.0",
       "credit": "Election Commission of India"
-    },
-    "LJSP": {
-      "file": "photos/parties/LJSP.jpg",
-      "source": "https://en.wikipedia.org/wiki/Lok_Janshakti_Party_(Ram_Vilas)",
-      "license": "Fair use",
-      "credit": "https://lokjanshaktiparty.com/"
     },
     "RLD": {
       "file": "photos/parties/RLD.png",

@@ -1,0 +1,41 @@
+name: Atlas provenance gate
+
+# Fails the build if anything but published data reaches the Election Atlas:
+# work/election-atlas/tools/check_provenance.py over the atlas data, its negative
+# tests (the gate must fail on planted dummy data), and a check that
+# data/availability.json matches the files present.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  provenance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history without blobs: the negative test reads one removed dummy
+          # file from history on demand, and the bill PDFs are never downloaded.
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /work/election-atlas/
+            !/work/election-atlas/**/*.pdf
+            !/work/election-atlas/tools/vendor/
+            !/work/election-atlas/tools/tessdata/
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Provenance gate over the atlas data
+        run: python3 work/election-atlas/tools/check_provenance.py work/election-atlas/data
+      - name: Negative tests (the gate must fail on planted dummy data)
+        working-directory: work/election-atlas
+        run: python3 -m unittest discover -s tools -p 'test_*.py' -v
+      - name: availability.json matches the files present
+        run: python3 work/election-atlas/tools/build-availability.py --check
