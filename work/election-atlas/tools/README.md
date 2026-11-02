@@ -41,10 +41,17 @@ Each stops with an error on a source shape it does not expect.
   (`state/stands.js`) adds up to each state's seat count.
 - `node --test tools/test_card.mjs`: the state page's hover card (`state/card.js`)
   shows only the hovered seat, including an AC listed in a file's `no_result`.
-- `node --test tools/test_member_link.mjs` and `python3 tools/test_no_stored_portraits.py`:
-  members are initials on the party colour plus a "View official photo on sansad.in"
-  link built from the Sansad member number; no page names a stored-portrait path and
-  none is committed.
+- `node --test tools/test_member_link.mjs`: members are initials on the party colour
+  plus a "View official photo on sansad.in" link built from the Sansad member number.
+- `python3 tools/test_no_stored_portraits.py`: no portrait files under `data/photos/ls`
+  or `data/photos/cabinet`, no `photos` key in `data/availability.json`, no `photo`
+  field on any cabinet member, and an integer `mpsno` (and no image field) for every
+  2024 Lok Sabha seat.
+- `python3 tools/test_harvest_union_cabinet.py`: sworn-in ministers take party, seat
+  and Sansad id from the as-it-stands roster only by exact name or an explicit alias;
+  join-sansad joins only by exact name or alias; and every `mpsno` on both 2024
+  rosters is that minister's own seat in `data/members/ls/2024.json`, with the same
+  state and constituency.
 
 ## Succession
 
