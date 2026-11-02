@@ -175,7 +175,7 @@ Not yet harvested: the cycles ECI publishes only as PDF (UP 2012, PB 2012,
 HR 2014, OD 2014, BR 2015, CT 2013, CT 2018), and TN 2016, whose report's
 table 5 disagrees with its own table 10.
 
-Assembly results are not added for any cycle yet. Boundaries exist for eight
+Boundaries exist for eight
 states only (`IN-BR IN-CT IN-HR IN-OD IN-PB IN-TN IN-UP IN-WB`, see
 `data/geo/ac/coverage.json`); every other state has no assembly geometry and
 therefore no assembly results.

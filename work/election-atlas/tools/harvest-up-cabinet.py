@@ -2,8 +2,9 @@
 """Harvest the Uttar Pradesh council of ministers as it stands, from the CM's Office.
 
 Writes data/cabinet/state/IN-UP/2022.json: the ministry formed after the 2022
-assembly election, as it stands on the day of the fetch. The state page keys
-state cabinets by the real assembly cycle.
+assembly election, as it stands on the day of the fetch (`members`). The state
+page keys state cabinets by the real assembly cycle and reads the roster as
+sworn in from a separate {cycle}-sworn-in.json, which is not produced here.
 
 Source: the Chief Minister's Office, Uttar Pradesh (linked as "मंत्री परिषद"
 from uplegisassembly.gov.in):
@@ -101,12 +102,10 @@ def main(argv=None) -> int:
         "provenance": "published", "source": sources[0], "sources": sources,
         "note": ("Council of ministers of Uttar Pradesh as it stands, from the Chief Minister's Office "
                  "roster pages, on `asOf`. `role` is the designation as published; `src` indexes `sources`. "
-                 "`members` (the roster as sworn in) is null: the 2022 sworn-in roster has not been added "
-                 "from an official source."),
-        "members": None,
+                 "The 2022 roster as sworn in (2022-sworn-in.json) has not been added from an official source."),
         "asOf": as_of,
-        "as_it_stands": members,
         "fetchedAt": as_of,
+        "members": members,
         "changes": [],
     }
     require_valid({args.out: doc}, args.cache)

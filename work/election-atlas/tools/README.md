@@ -21,11 +21,12 @@ Each stops with an error on a source shape it does not expect.
 | --- | --- | --- |
 | `harvest-ac-results.py` | `data/results/ac/{STATE}/{cycle}.json` + `-detail.json` | ECI statistical reports, table 10 (cross-checked against tables 5 and 9) |
 | `harvest-ls-byel.py` | `data/results/ls/byel/{2014,2019,2024}.json` | ECI by-election index cards |
-| `harvest-union-cabinet.py` | `data/cabinet/union/{2014,2024}.json` | President's Secretariat releases, PM India, Sansad |
+| `harvest-union-cabinet.py` | `data/cabinet/union/{2014,2024}.json` and `{2014,2024}-sworn-in.json` | President's Secretariat releases, PM India, Sansad |
 | `harvest-up-cabinet.py` | `data/cabinet/state/IN-UP/2022.json` | Chief Minister's Office, Uttar Pradesh |
 
 - run: `.venv/bin/python tools/harvest-ac-results.py` (each takes `--dry-run`)
-- `validate_records.py`: the provenance gate. `python3 tools/validate_records.py
+- `validate_records.py`: the per-record gate each harvester runs before writing
+  (`check_provenance.py` below is the repository-wide gate CI runs). `python3 tools/validate_records.py
   [--cache DIR] <files or dirs>` exits non-zero and lists every record that is not
   published, names a publisher or host off the allow-list, has a sha256 that does
   not match the cached source, or has synthetic/dummy wording in its metadata.

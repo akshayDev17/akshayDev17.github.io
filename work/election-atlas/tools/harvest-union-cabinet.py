@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 """Harvest the Union Council of Ministers "as sworn in" and "as it stands".
 
-Writes data/cabinet/union/2014.json and adds the sworn-in roster to
-data/cabinet/union/2024.json. Each file carries both tenses:
+Writes one file per tense for each term, the layout the pages and
+tools/build-availability.py read:
 
-    "swornIn", "allocated":  oath and portfolio-allocation dates
-    "members":      [members] as sworn in
-    "asOf":         the date the as-it-stands roster describes
-    "as_it_stands": [members] as it stands on asOf
+    data/cabinet/union/{year}-sworn-in.json   `members` as sworn in; `swornIn`, `allocated`
+    data/cabinet/union/{year}.json            `members` as it stands on `asOf`; `changes`
 
 Sources (President's Secretariat and the Prime Minister's Office):
   - 2014 sworn in: "President Allocates Portfolios to Cabinet Ministers and
@@ -20,8 +18,9 @@ Sources (President's Secretariat and the Prime Minister's Office):
     release, or if a change names a minister or portfolio the roster does not hold.
   - 2024 sworn in: the press communique of 10.06.2024 (presidentofindia.gov.in).
   - 2024 as it stands: the roster fetch-cabinet.py and join-sansad.py write to
-    `members` of data/cabinet/union/2024.json (run them first), which is checked name-for-name and portfolio-for-portfolio against PM India's
-    current "Portfolios of the Union Council of Ministers" before it is stamped.
+    `members` of data/cabinet/union/2024.json (run them first), which is checked
+    name-for-name and portfolio-for-portfolio against PM India's current
+    "Portfolios of the Union Council of Ministers" before it is stamped.
 
 Party, state and constituency come from the Sansad Lok Sabha directory, only
 where a minister's name matches a member exactly; Rajya Sabha ministers and
@@ -308,22 +307,29 @@ def main(argv=None) -> int:
         entry["src"] = src_of[entry.pop("url")]
     enrich(sworn, recs16, regions)
     enrich(stands, recs16, regions)
-    doc14 = {
-        "schema": 2, "scope": "union", "cycle": 2014, "term": "16th Lok Sabha", "swornIn": "2014-05-26",
-        "provenance": "published", "source": sources[0], "sources": sources,
-        "note": ("Union Council of Ministers from President's Secretariat releases. `members` is the "
-                 "council as sworn in, the allocation of 27.05.2014 (oath 26.05.2014). `as_it_stands` is the council at the end of "
-                 "the 16th Lok Sabha (`asOf`): the full re-allocation of 03.09.2017 with every later change applied "
-                 "(`changes`, each with its release's own sentence). Reshuffles between 2014 and 2017 are "
-                 "contained in the 2017 re-allocation and are not itemised. Party, state and constituency "
-                 "come from exact name matches in the Sansad 16th Lok Sabha directory."),
-        "allocated": "2014-05-27", "fetchedAt": sworn_got["fetched_at"][:10],
+    sansad16 = sources[-1]
+    outputs[Path(args.out) / "2014-sworn-in.json"] = {
+        "schema": 2, "scope": "union", "cycle": 2014, "term": "16th Lok Sabha",
+        "provenance": "published", "source": sources[0], "sources": [sources[0], sansad16],
+        "note": ("Union Council of Ministers as sworn in: the President's Secretariat allocation of "
+                 "27.05.2014 (oath 26.05.2014). Party, state and constituency come from exact name "
+                 "matches in the Sansad 16th Lok Sabha directory."),
+        "swornIn": "2014-05-26", "allocated": "2014-05-27", "fetchedAt": sworn_got["fetched_at"][:10],
         "members": sworn,
-        "asOf": "2019-05-24",
-        "as_it_stands": stands,
+    }
+    outputs[Path(args.out) / "2014.json"] = {
+        "schema": 2, "scope": "union", "cycle": 2014, "term": "16th Lok Sabha",
+        "provenance": "published", "source": sources[1], "sources": sources,
+        "note": ("Union Council of Ministers as it stands at the end of the 16th Lok Sabha (`asOf`), from "
+                 "President's Secretariat releases: the full re-allocation of 03.09.2017 with every later "
+                 "change applied (`changes`, each with its release's own sentence; `src` indexes `sources`). "
+                 "Reshuffles between 2014 and 2017 are contained in the 2017 re-allocation and are not "
+                 "itemised. Party, state and constituency come from exact name matches in the Sansad 16th "
+                 "Lok Sabha directory."),
+        "swornIn": "2014-05-26", "asOf": "2019-05-24", "fetchedAt": full_got["fetched_at"][:10],
+        "members": stands,
         "changes": log,
     }
-    outputs[Path(args.out) / "2014.json"] = doc14
     print(f"2014: sworn in {len(sworn)}, as it stands {len(stands)} after {len(log)} changes")
 
     # 2024
@@ -339,7 +345,8 @@ def main(argv=None) -> int:
     pmi_got = fetch(fc.PMINDIA_PORTFOLIOS, cache)
     pmi_page = pmi_got["bytes"].decode("utf-8", "replace")
     current = ([fc.parse_pm(pmi_page)] if fc.parse_pm(pmi_page) else []) + fc.parse_portfolios(pmi_page)
-    # the roster as it stands: `members` before the first harvest, `as_it_stands` after it
+    # the roster as it stands is `members` of 2024.json (`as_it_stands` in files from
+    # before the one-file-per-tense layout)
     prior = doc24.get("as_it_stands") or doc24["members"]
     have = {(m["name"], m["rank"], m["portfolio"]) for m in prior}
     now = {(m["name"], m["rank"], m["portfolio"]) for m in current}
@@ -352,25 +359,27 @@ def main(argv=None) -> int:
     for m in sworn24:  # same official name, same person: reuse the portrait already held
         if m["name"] in photo_of:
             m["photo"] = photo_of[m["name"]]
-    sources24 = [source_block("pmindia", pmi_got), source_block("president-secretariat", sworn24_got),
-                 source_block("sansad", dir18_got)]
-    doc24.pop("_communiques", None)
-    doc24.pop("_note", None)
-    out24 = {
-        "schema": 2, "scope": "union", "cycle": 2024, "term": doc24["term"], "swornIn": doc24["swornIn"],
-        "fetchedAt": pmi_got["fetched_at"][:10], "provenance": "published",
-        "source": sources24[0], "sources": sources24,
-        "note": ("Union Council of Ministers. `as_it_stands` is PM India's current portfolio list on "
-                 "`asOf`, joined to the Sansad directory for party, state, constituency and photo. "
-                 "`members` is the council as sworn in: the President's press communique of 10.06.2024 "
-                 "(oath 09.06.2024)."),
-        "allocated": "2024-06-10",
+    pmi_src, sworn24_src, sansad18 = (source_block("pmindia", pmi_got),
+                                      source_block("president-secretariat", sworn24_got),
+                                      source_block("sansad", dir18_got))
+    outputs[Path(args.out) / "2024-sworn-in.json"] = {
+        "schema": 2, "scope": "union", "cycle": 2024, "term": doc24["term"],
+        "provenance": "published", "source": sworn24_src, "sources": [sworn24_src, sansad18],
+        "note": ("Union Council of Ministers as sworn in: the President's press communique of "
+                 "10.06.2024 (oath 09.06.2024), joined to the Sansad 18th Lok Sabha directory for "
+                 "party, state and constituency by exact name."),
+        "swornIn": doc24["swornIn"], "allocated": "2024-06-10", "fetchedAt": sworn24_got["fetched_at"][:10],
         "members": sworn24,
-        "asOf": pmi_got["fetched_at"][:10],
-        "as_it_stands": prior,
+    }
+    outputs[Path(args.out) / "2024.json"] = {
+        "schema": 2, "scope": "union", "cycle": 2024, "term": doc24["term"],
+        "provenance": "published", "source": pmi_src, "sources": [pmi_src, sansad18],
+        "note": ("Union Council of Ministers as it stands: PM India's current portfolio list on `asOf`, "
+                 "joined to the Sansad directory for party, state, constituency and photo."),
+        "swornIn": doc24["swornIn"], "asOf": pmi_got["fetched_at"][:10], "fetchedAt": pmi_got["fetched_at"][:10],
+        "members": prior,
         "changes": doc24.get("changes", []),
     }
-    outputs[Path(args.out) / "2024.json"] = out24
     print(f"2024: sworn in {len(sworn24)}, as it stands {len(prior)} (matches PM India)")
 
     require_valid(outputs, cache)

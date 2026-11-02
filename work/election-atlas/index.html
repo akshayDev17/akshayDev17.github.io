@@ -1506,7 +1506,7 @@ function renderBelt() {
   const members = doc.members;
   beltAsof.textContent = tense === 'elected'
     ? `as sworn in · ${doc.swornIn}`
-    : `as it stands · fetched ${doc.fetchedAt}`;
+    : `as it stands · ${doc.asOf ? `as of ${doc.asOf}` : `fetched ${doc.fetchedAt}`}`;
   const order = { pm: 0, cm: 0, cabinet: 1, 'mos-ic': 2, mos: 3 };
   const sorted = [...members].sort((a, b) =>
     (order[a.rank] ?? 9) - (order[b.rank] ?? 9) || (a.name || '').localeCompare(b.name || ''));

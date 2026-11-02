@@ -4,9 +4,9 @@
  "ls": {
   "byel": {
    "2009": false,
-   "2014": false,
-   "2019": false,
-   "2024": false
+   "2014": true,
+   "2019": true,
+   "2024": true
   },
   "detail": {
    "2009": false,
@@ -22,15 +22,15 @@
     "as_it_stands": false
    },
    "2014": {
-    "sworn_in": false,
-    "as_it_stands": false
+    "sworn_in": true,
+    "as_it_stands": true
    },
    "2019": {
     "sworn_in": false,
     "as_it_stands": false
    },
    "2024": {
-    "sworn_in": false,
+    "sworn_in": true,
     "as_it_stands": true
    }
   },
@@ -130,7 +130,7 @@
     },
     "2022": {
      "sworn_in": false,
-     "as_it_stands": false
+     "as_it_stands": true
     }
    },
    "IN-WB": {
@@ -153,57 +153,57 @@
   "IN-BR": {
    "cycles": {
     "2015": false,
-    "2020": false,
-    "2025": false
+    "2020": true,
+    "2025": true
    }
   },
   "IN-CT": {
    "cycles": {
     "2013": false,
     "2018": false,
-    "2023": false
+    "2023": true
    }
   },
   "IN-HR": {
    "cycles": {
     "2014": false,
-    "2019": false,
-    "2024": false
+    "2019": true,
+    "2024": true
    }
   },
   "IN-OD": {
    "cycles": {
     "2014": false,
-    "2019": false,
-    "2024": false
+    "2019": true,
+    "2024": true
    }
   },
   "IN-PB": {
    "cycles": {
     "2012": false,
-    "2017": false,
-    "2022": false
+    "2017": true,
+    "2022": true
    }
   },
   "IN-TN": {
    "cycles": {
     "2016": false,
-    "2021": false,
-    "2026": false
+    "2021": true,
+    "2026": true
    }
   },
   "IN-UP": {
    "cycles": {
     "2012": false,
-    "2017": false,
-    "2022": false
+    "2017": true,
+    "2022": true
    }
   },
   "IN-WB": {
    "cycles": {
-    "2016": false,
-    "2021": false,
-    "2026": false
+    "2016": true,
+    "2021": true,
+    "2026": true
    }
   }
  },
