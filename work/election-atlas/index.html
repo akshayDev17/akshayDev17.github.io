@@ -816,7 +816,7 @@ function buildResolved() {
   resolved = new Map();
   if (!currentYear) return;
   for (const [uid, c] of Object.entries(currentYear.constituencies)) {
-    resolved.set(uid, { p: c.p, vacant: false, byeCount: 0 });
+    resolved.set(uid, { p: c.p, vacant: false, unknown: false, byeCount: 0 });
   }
   if (!byeData || !byeData.seats) return;
   for (const seat of byeData.seats) {
@@ -827,7 +827,11 @@ function buildResolved() {
     if (tense !== 'stands') continue;
     const last = seat.events[seat.events.length - 1];
     if (last && last.type === 'vacated') { r.p = null; r.vacant = true; }
-    else if (byes.length) r.p = byes[byes.length - 1].winner.p;
+    else if (byes.length) {
+      const w = byes[byes.length - 1].winner;
+      r.p = w ? w.p : null;
+      r.unknown = !w;
+    }
   }
 }
 function buildSeatMaps() {
@@ -842,13 +846,14 @@ function buildSeatMaps() {
     if (r.p) standsSeats.set(r.p, (standsSeats.get(r.p) || 0) + 1);
   }
   deltaByParty = new Map();
-  for (const [p, n] of standsSeats) {
-    const d = n - (electedSeats.get(p) || 0);
-    if (d) deltaByParty.set(p, d);
+  if (!currentYear) return;
+  for (const [uid, c] of Object.entries(currentYear.constituencies)) {
+    const r = resolved.get(uid);
+    if (!r || r.unknown || r.p === c.p) continue;
+    deltaByParty.set(c.p, (deltaByParty.get(c.p) || 0) - 1);
+    if (r.p) deltaByParty.set(r.p, (deltaByParty.get(r.p) || 0) + 1);
   }
-  for (const [p, n] of electedSeats) {
-    if (!standsSeats.has(p)) deltaByParty.set(p, -n);
-  }
+  for (const [p, d] of deltaByParty) if (!d) deltaByParty.delete(p);
 }
 
 /* One GeoJSON collection per party, built from the constituency features that
@@ -1049,7 +1054,9 @@ const NAT_MIN_SHARE = 0.005;
 function nationalRows(filtered = true) {
   const total = agg ? agg.totalVotes : 0;
   const stands = tense === 'stands';
-  let rows = [...(agg ? agg.national : new Map())]
+  const parties = new Map(agg ? agg.national : []);
+  if (stands) for (const code of standsSeats.keys()) if (!parties.has(code)) parties.set(code, { seats: 0, votes: 0 });
+  let rows = [...parties]
     .map(([code, v]) => ({
       code,
       seats: stands ? (standsSeats.get(code) || 0) : v.seats,
@@ -1101,6 +1108,10 @@ function renderNational() {
         `<td>${r.seats}${dTxt ? `<span class="d">${dTxt}</span>` : ''}</td>` +
         `<td>${nf(r.votes)}</td><td>${pc1(r.share)}</td></tr>`;
     }).join('');
+    const unknown = [...resolved.values()].filter(r => r.unknown).length;
+    if (unknown && natPage === pageCount - 1) {
+      natBody.innerHTML += `<tr><td colspan="4" style="text-align:left;color:var(--muted)">${unknown} seat${unknown === 1 ? '' : 's'}: by-election result not available yet</td></tr>`;
+    }
   }
   // the whole tbody dims its left-out rows, so the table and the map agree
   natBody.classList.toggle('has-sel', selection.size > 0);
@@ -1305,7 +1316,7 @@ const yearCache = new Map();
 let tense = 'elected';                 // 'elected' | 'stands'
 let byeData = null;                    // by-election doc for the cycle, when added
 let cabinet = { elected: null, stands: null }; // roster docs: as sworn in, as it stands
-let resolved = new Map();              // uid -> { p, vacant, byeCount }
+let resolved = new Map();              // uid -> { p, vacant, unknown, byeCount }
 let electedSeats = new Map();          // party -> seats as elected
 let standsSeats = new Map();           // party -> seats under the tense
 let deltaByParty = new Map();          // party -> net change (stands - elected)
@@ -1421,7 +1432,9 @@ function paintNote() {
     } else {
       const dates = seats.flatMap(s => s.events.map(e => e.date)).sort();
       const lastDate = dates.length ? dates[dates.length - 1] : '';
-      txt = `As it stands · ${byes} by-election${byes === 1 ? '' : 's'} · ${vacant} vacant · as of ${lastDate}`;
+      const unknown = seats.reduce((n, s) => n + s.events.filter(e => e.type === 'bye' && !e.winner).length, 0);
+      const unknownTxt = unknown ? ` (${unknown} result${unknown === 1 ? '' : 's'} not available yet)` : '';
+      txt = `As it stands · ${byes} by-election${byes === 1 ? '' : 's'}${unknownTxt} · ${vacant} vacant · as of ${lastDate}`;
     }
   }
   /* A query that dims every seat must say so — a fully washed map under a line
@@ -1493,7 +1506,7 @@ function renderBelt() {
   const members = doc.members;
   beltAsof.textContent = tense === 'elected'
     ? `as sworn in · ${doc.swornIn}`
-    : `as it stands · fetched ${doc.fetchedAt}`;
+    : `as it stands · ${doc.asOf ? `as of ${doc.asOf}` : `fetched ${doc.fetchedAt}`}`;
   const order = { pm: 0, cm: 0, cabinet: 1, 'mos-ic': 2, mos: 3 };
   const sorted = [...members].sort((a, b) =>
     (order[a.rank] ?? 9) - (order[b.rank] ?? 9) || (a.name || '').localeCompare(b.name || ''));

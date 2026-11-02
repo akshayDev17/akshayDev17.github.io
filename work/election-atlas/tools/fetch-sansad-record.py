@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Fetch one MP's parliamentary record from the Sansad / Lok Sabha API and write it to
-data/parliament/<STATE>/<constituency_key>.json — curl-only; stdlib + vendored
-pypdf (tools/vendor/, for the PDF reply fallback).
+data/parliament/<STATE>/<constituency_key>.json — curl-only; stdlib + pypdf
+(pinned in work/election-atlas/requirements.txt, for the PDF reply fallback).
 
 Covers: profile (name, DOB, party, constituency), attendance (per session, summed),
 questions (metadata + official PDF/DOCX URLs), bills (Private Members', filtered by
@@ -38,10 +38,6 @@ try:
 except Exception:
     SSL_CTX = ssl.create_default_context()
 
-# Vendored pypdf (tools/vendor/) — build-time dependency for PDF reply extraction.
-_VENDOR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vendor")
-if os.path.isdir(_VENDOR) and _VENDOR not in sys.path:
-    sys.path.insert(0, _VENDOR)
 
 BASE = "https://sansad.in"
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
@@ -141,7 +137,7 @@ def extract_reply_from_pdf(raw):
     PDF text is line-wrapped, so we split into lines, find the ANSWER marker, and
     take everything after it up to the trailing '***' footer — same contract as
     `extract_reply`, just noisier line structure."""
-    from pypdf import PdfReader  # vendored (tools/vendor/)
+    from pypdf import PdfReader  # pinned in requirements.txt
     reader = PdfReader(io.BytesIO(raw))
     text = "\n".join((page.extract_text() or "") for page in reader.pages)
     lines = [l.strip() for l in text.splitlines() if l.strip()]

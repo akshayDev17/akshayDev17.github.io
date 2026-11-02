@@ -109,6 +109,23 @@ geometry carries it*, so they join to `data/geo/ac/{STATE}.json` with no lookup
 table. Each file has the same shape as its Lok Sabha counterpart: `{cycle}.json`
 holds `p`, `v` and `o` per seat, `{cycle}-detail.json` holds `c`, every candidate.
 
+An AC the report carries no result for (a poll countermanded and held later)
+is absent from `constituencies` and listed in the file's `no_result`.
+
+```json
+// IN-UP/2022.json  (constituencies)
+{ "1": { "p": "SP", "v": 134513,
+         "o": { "BJP": 96633, "BSP": 45075, "INC": 1632, "AAP": 1162, "NOTA": 1117, "IND": 1241 } } }
+
+// IN-UP/2022-detail.json  (constituencies)
+{ "1": { "ac": "Behat",
+         "c": [ { "n": "Umar Ali Khan", "p": "SP",  "v": 134513 },
+                { "n": "Naresh Saini",  "p": "BJP", "v": 96633 } ] } }
+```
+
+`o` is every other party's votes in the AC, summed by party code (NOTA included),
+as in the Lok Sabha files.
+
 ---
 
 ## Provenance
@@ -119,6 +136,15 @@ Commission with an https `url` on its site. `tools/check_provenance.py` fails th
 build for any file that does not, and for any metadata that calls itself
 synthetic, dummy, invented, placeholder, fake or mock.
 
+Harvested files also carry the fetched file's `sha256` and `fetched_at` in
+`source`. `tools/validate_records.py` runs in every harvester before it writes,
+and refuses a record whose provenance, publisher, host or sha256 is wrong:
+
+| path | harvested by | cross-checked against |
+| --- | --- | --- |
+| `ac/` | `tools/harvest-ac-results.py`, from each report's table 10 | its tables 5 and 9 |
+| `ls/byel/` | `tools/harvest-ls-byel.py`, from ECI's by-election index cards | the PC geometry |
+
 ---
 
 ## Coverage
@@ -127,9 +153,26 @@ synthetic, dummy, invented, placeholder, fake or mock.
 | --- | --- | --- | --- | --- |
 | Lok Sabha — colouring | yes | yes | yes | yes |
 | Lok Sabha — hover card | **no** | **no** | yes | yes |
-| Lok Sabha — by-elections | not yet | not yet | not yet | not yet |
+| Lok Sabha — by-elections | not yet | yes | yes | yes |
 
-Assembly results are not added for any cycle yet. Boundaries exist for eight
+Published assembly cycles (colouring and hover card), from ECI spreadsheets:
+
+| state | cycles |
+| --- | --- |
+| IN-UP | 2017, 2022 |
+| IN-WB | 2016, 2021, 2026 |
+| IN-BR | 2020, 2025 |
+| IN-TN | 2021, 2026 |
+| IN-OD | 2019, 2024 |
+| IN-PB | 2017, 2022 |
+| IN-CT | 2023 |
+| IN-HR | 2019, 2024 |
+
+Not yet harvested: the cycles ECI publishes only as PDF (UP 2012, PB 2012,
+HR 2014, OD 2014, BR 2015, CT 2013, CT 2018), and TN 2016, whose report's
+table 5 disagrees with its own table 10.
+
+Boundaries exist for eight
 states only (`IN-BR IN-CT IN-HR IN-OD IN-PB IN-TN IN-UP IN-WB`, see
 `data/geo/ac/coverage.json`); every other state has no assembly geometry and
 therefore no assembly results.
@@ -150,7 +193,9 @@ in `tools/`, not new work.
 ## Rules this directory follows
 
 1. **Absolute counts only.** No file stores a percentage, a share, or a leading
-   party. Every one of those is computed in the page.
+   party. Every one of those is computed in the page. The one exception is a
+   by-election event's `turnout`, which the pages read directly; the `electors`
+   and `polled` counts it is computed from are stored beside it.
 2. **Codes, never names.** Files carry region codes and party codes. A name that
    appears anywhere came from `data/regions.json` or `data/parties.json`.
 3. **Every file says where it came from.** `provenance` is `"published"` and

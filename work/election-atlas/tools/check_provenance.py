@@ -30,6 +30,9 @@ from urllib.parse import urlparse
 ALLOWED_HOSTS = {
     'eci.gov.in', 'old.eci.gov.in', 'presidentofindia.gov.in', 'pmindia.gov.in',
     'pib.gov.in', 'sansad.in', 'upcmo.up.nic.in', 'mplads.mospi.gov.in',
+    # The President's Secretariat archive for 2017-22 (Ram Nath Kovind's term),
+    # where its press releases on the 2017-19 Union reshuffles are published.
+    'ramnathkovind.nic.in',
 }
 FORBIDDEN = re.compile(r'\b(synthetic|dummy|invented|placeholder|fake|mock)', re.I)
 METADATA_KEY = re.compile(r'^(note.*|source.*|_note|caveat|provenance)$', re.I)

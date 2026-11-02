@@ -3,6 +3,45 @@
 Build scripts for the election atlas.
 Run from `work/election-atlas/` (paths below are relative to it).
 
+## Setup
+
+- Python dependencies are pinned in `requirements.txt`:
+  `python3 -m venv .venv && .venv/bin/pip install -r requirements.txt`,
+  then run the scripts with `.venv/bin/python`.
+
+## Published-data harvesters
+
+Every file these write carries `"provenance": "published"` and a `source`
+(`publisher`, `url`, `sha256`, `fetched_at`) for each file it was read from.
+Downloads are kept in `_research/harvest/` (gitignored; move it with `--cache`),
+and each harvester runs `validate_records.py` over its output before writing.
+Each stops with an error on a source shape it does not expect.
+
+| script | writes | source |
+| --- | --- | --- |
+| `harvest-ac-results.py` | `data/results/ac/{STATE}/{cycle}.json` + `-detail.json` | ECI statistical reports, table 10 (cross-checked against tables 5 and 9) |
+| `harvest-ls-byel.py` | `data/results/ls/byel/{2014,2019,2024}.json` | ECI by-election index cards |
+| `harvest-union-cabinet.py` | `data/cabinet/union/{2014,2024}.json` and `{2014,2024}-sworn-in.json` | President's Secretariat releases, PM India, PIB (2024 `changes`), Sansad |
+| `harvest-up-cabinet.py` | `data/cabinet/state/IN-UP/2022.json` | Chief Minister's Office, Uttar Pradesh |
+
+- run: `.venv/bin/python tools/harvest-ac-results.py` (each takes `--dry-run`)
+- `validate_records.py`: the per-record gate each harvester runs before writing
+  (`check_provenance.py` below is the repository-wide gate CI runs). `python3 tools/validate_records.py
+  [--cache DIR] <files or dirs>` exits non-zero and lists every record that is not
+  published, names a publisher or host off the allow-list, has a sha256 that does
+  not match the cached source, or has synthetic/dummy wording in its metadata.
+  `python3 tools/test_validate_records.py` shows it failing on such records.
+  Without `--cache` it checks sha256 against `_research/harvest/` when that exists,
+  and prints `sha256 NOT checked` for any source that cache does not hold (or when
+  there is no cache); with `--cache` every source must be in it.
+- `python3 tools/test_harvest_ac_results.py` and `python3 tools/test_harvest_ls_byel.py`:
+  party codes, assembly colour entries (winner plus other parties' votes), and
+  by-election term assembly.
+- `node --test tools/test_stands.mjs`: the state page's "as it stands" seat tally
+  (`state/stands.js`) adds up to each state's seat count.
+- `node --test tools/test_card.mjs`: the state page's hover card (`state/card.js`)
+  shows only the hovered seat, including an AC listed in a file's `no_result`.
+
 ## Succession
 
 1. `build-ls-results.py`

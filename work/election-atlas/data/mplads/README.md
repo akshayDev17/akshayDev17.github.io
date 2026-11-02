@@ -160,7 +160,7 @@ and `signed_days/total_days` — never stored.
 `reply_text` is extracted in a second pass — `fetch-sansad-record.py --replies` —
 that reads the DOCX first (clean paragraph text) and falls back to the always-present
 PDF (line-wrapped text) for the ~46 questions whose DOCX is absent or is a binary
-OLE `.doc`. The PDF reader is **vendored pypdf** at `tools/vendor/` (a pure-Python
+OLE `.doc`. The PDF reader is **pypdf**, pinned in `requirements.txt` (a pure-Python
 build-time dependency, no external service).
 
 ### v1 JSON (one file per person)
