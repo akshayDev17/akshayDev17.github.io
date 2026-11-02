@@ -12,7 +12,7 @@ holds.
 
 Starting from every page (*.html outside tools/, data/ and _research/), it follows
 the relative imports in <script> blocks (`from '...'`, `import '...'`,
-`import('...')`) and module `<script src>` tags, then in each imported module.
+`import('...')`), then in each imported module.
 Versions are computed leaves first: a module's version is the sha256 of its text
 after its own imports have been versioned, so a change to any module changes the
 URL of every module and page that reaches it. Never edit a `?v=` by hand.
@@ -32,9 +32,6 @@ SPECIFIER = re.compile(
 # A root-absolute specifier: versioning it would need the site root, so refuse it.
 ABSOLUTE = re.compile(r"""(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s*)['"]/[^'"]*\.m?js['"]""")
 SCRIPT_BLOCK = re.compile(r'(<script\b[^>]*>)(.*?)(</script>)', re.S | re.I)
-SCRIPT_SRC = re.compile(
-    r"""(?P<lead>\bsrc\s*=\s*)(?P<q>['"])(?P<path>(?![a-z]+:|/)[^'"?#\s]+?\.m?js)(?:\?v=[0-9a-f]*)?(?P=q)""",
-    re.I)
 
 
 def find_pages(root):
@@ -55,11 +52,11 @@ def resolve_module(root, importer, spec):
     return target
 
 
-def rewrite_specifiers(text, pattern, versioned_url):
-    """Replace each specifier `pattern` matches with versioned_url(path)."""
+def rewrite_specifiers(text, versioned_url):
+    """Replace each relative module specifier with versioned_url(path)."""
     def stamp(m):
         return f"{m['lead']}{m['q']}{versioned_url(m['path'])}{m['q']}"
-    return pattern.sub(stamp, text)
+    return SPECIFIER.sub(stamp, text)
 
 
 def refuse_absolute(root, path, text):
@@ -81,7 +78,7 @@ def versioned_texts(root):
         if path not in versions:
             text = path.read_text(encoding='utf-8')
             refuse_absolute(root, path, text)
-            texts[path] = rewrite_specifiers(text, SPECIFIER, url_for(path, (*chain, path)))
+            texts[path] = rewrite_specifiers(text, url_for(path, (*chain, path)))
             versions[path] = content_version(texts[path])
         return versions[path]
 
@@ -97,10 +94,8 @@ def versioned_texts(root):
 
         def rewrite_script(m):
             tag, body, end = m.groups()
-            if re.search(r'\btype\s*=\s*["\']?module', tag, re.I):
-                tag = rewrite_specifiers(tag, SCRIPT_SRC, to_url)
             refuse_absolute(root, page, body)
-            return tag + rewrite_specifiers(body, SPECIFIER, to_url) + end
+            return tag + rewrite_specifiers(body, to_url) + end
 
         texts[page] = SCRIPT_BLOCK.sub(rewrite_script, html)
     return texts

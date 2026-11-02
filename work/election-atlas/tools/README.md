@@ -146,19 +146,6 @@ Each stops with an error on a source shape it does not expect.
 - verify: `python3 tools/version_modules.py --check` (CI runs this)
 - tests: `python3 tools/test_version_modules.py`
 
-### smoke/ (full-page browser sweep)
-
-- loads every national, state, assembly-cycle, MP and linked MLA page in headless
-  Chrome (`chrome-devtools-axi`) and checks each against the data: no page errors,
-  data drawn where a file exists and "not available yet" where it does not, member
-  cards as party-colour initials with a "View official photo on sansad.in" link
-  (Lok Sabha: the member's biography; Rajya Sabha ministers: the ministers list),
-  and no request under `data/photos/ls` or `data/photos/cabinet`
-- run from the repository root (not in CI):
-  `python3 work/election-atlas/tools/smoke/serve.py . 8791 <non-200 log>` in one shell, then
-  `python3 work/election-atlas/tools/smoke/smoke.py . http://127.0.0.1:8791/work/election-atlas/ <out dir>`;
-  it prints the page counts and every problem, and writes `summary.json` to the out dir
-
 ## Data file conventions
 
 - each tense of a council of ministers is its own file: `{cycle}.json` is the

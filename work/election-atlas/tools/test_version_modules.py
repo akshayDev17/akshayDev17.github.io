@@ -8,7 +8,6 @@ stops a returning visitor getting a new page with an old cached module.
 """
 import re
 import shutil
-import subprocess
 import sys
 import tempfile
 import unittest
@@ -54,11 +53,6 @@ class VersionModulesTest(unittest.TestCase):
         copy_atlas(self.root)
         write_versions(self.root)
 
-    def test_repository_versions_are_current(self):
-        run = subprocess.run([sys.executable, str(TOOLS / 'version_modules.py'), '--check'],
-                             capture_output=True, text=True)
-        self.assertEqual(run.returncode, 0, run.stderr)
-
     def test_every_page_import_is_versioned(self):
         for page in PAGES:
             html = (self.root / page).read_text(encoding='utf-8')
@@ -101,13 +95,6 @@ class VersionModulesTest(unittest.TestCase):
         append(self.root / 'state/card.js', '\n// changed\n')
         stale = version_modules.stale_files(self.root)
         self.assertEqual(set(stale), {self.root / 'state/index.html'})
-
-    def test_module_script_src_is_versioned(self):
-        page = self.root / 'extra/index.html'
-        page.parent.mkdir()
-        page.write_text('<script type="module" src="../lib/atlas.js"></script>\n', encoding='utf-8')
-        write_versions(self.root)
-        self.assertRegex(page.read_text(encoding='utf-8'), r'src="\.\./lib/atlas\.js\?v=[0-9a-f]{8}"')
 
     def test_missing_module_and_cycle_are_errors(self):
         append(self.root / 'state/card.js', "\nimport './nowhere.js';\n")
