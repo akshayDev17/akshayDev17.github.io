@@ -1,10 +1,12 @@
 {
  "schema": 2,
+ "provenance": "published",
  "election": "ls",
  "year": 2024,
  "note": "PUBLISHED RESULT. Every value here is an ABSOLUTE COUNT. No percentage is stored anywhere: the page derives every share from these numbers. `electors` is the registered electorate. state totals are the exact sum of the constituency file above; electors come from the ECI's state-wise table. Election Commission of India, General Election 2024 (18th Lok Sabha) — statistical reports, tables 17 and 33.",
  "source": {
   "publisher": "Election Commission of India",
+  "url": "https://www.eci.gov.in/eci-backend/public/all_files/GE-2024-statistical-report/17-State-Wise-Seat-Won-&-Valid-Votes-Polled-by-Political-Parties.xls",
   "table": "ls2024_statistical/17-State-Wise-Seat-Won-&-Valid-Votes-Polled-by-Political-Parties.xls",
   "detail_table": "ls2024_statistical/33-Constituency-Wise-Detailed-Result.xls",
   "derivation": "constituency"

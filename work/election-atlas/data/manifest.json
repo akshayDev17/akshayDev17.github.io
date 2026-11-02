@@ -4,7 +4,8 @@
   "note": "Declares the level tree and the path template for each level's geometry and results. File granularity matches map granularity: one file per year nationally, per region per year one level down, per city per year at ward level. A template that resolves to a missing file means that level is not published yet, not that the data is broken.",
   "registries": {
     "regions": "regions.json",
-    "parties": "parties.json"
+    "parties": "parties.json",
+    "availability": "availability.json"
   },
   "geometryFormat": "topojson",
   "note_geometryFormat": "Every level's geometry file is TopoJSON. Each level names the object inside its topology that holds that level's geometries, and the property its features carry the region code's own name in, so a reader joins on a declared key rather than guessing one.",
@@ -35,8 +36,8 @@
         "regions": 543
       },
       "note": "One national file of all 543 constituencies. Its geometry is the source the state layer above is dissolved from, so a state's outline is exactly the union of its constituencies and the two layers cannot disagree.",
-      "note_results": "SYNTHETIC as published. Each state's party seat and vote totals are distributed across that state's constituencies. The Election Commission's own constituency-wise results exist for 2019 and 2024 and are the intended replacement.",
-      "note_detail": "Constituency-level candidate detail. For the Lok Sabha the 2019 and 2024 files are the Commission's own published counts. For the assembly, no published candidate-level source was available and the names are generated."
+      "note_results": "Published Election Commission of India constituency results for every year in elections.ls. Each file names the Commission's report it was taken from in its own note and source.",
+      "note_detail": "Constituency-level candidate detail, from the Commission's constituency-wise detailed result. For the Lok Sabha it covers 2019 and 2024. Assembly candidate detail is added per state and cycle from the Commission's statistical reports; availability.json lists which cycles are present."
     },
     {
       "id": "assembly",
@@ -45,8 +46,8 @@
       "geometry": "geo/ac/{region}.json",
       "topologyObject": "constituencies",
       "geometryKey": "AC_NAME",
-      "results": "results/ac/{region}/{year}.json",
-      "note": "Assembly constituency boundaries and results. The boundary set covers only the states where it was validated against the current assembly size and the parliamentary nesting; the rest are absent on purpose. Candidate-level results for this level are synthetic."
+      "results": "results/ac/{region}/{cycle}.json",
+      "note": "Assembly constituency boundaries and results. The boundary set covers only the states where it was validated against the current assembly size and the parliamentary nesting; the rest are absent on purpose. Results are keyed by each state's own assembly cycles (elections.ac.cycles). A cycle whose file is absent has not been added yet; availability.json says which are present."
     },
     {
       "id": "ward",
@@ -72,11 +73,49 @@
     "ac": {
       "label": "Legislative Assembly",
       "level": "assembly",
-      "years": [
-        2014,
-        2019,
-        2024
-      ]
+      "note_cycles": "The last three general elections to each mapped state's legislative assembly, as of 2026-11-02. Assembly polls run on each state's own calendar, so there is no single year list.",
+      "cycles": {
+        "IN-BR": [
+          2015,
+          2020,
+          2025
+        ],
+        "IN-CT": [
+          2013,
+          2018,
+          2023
+        ],
+        "IN-HR": [
+          2014,
+          2019,
+          2024
+        ],
+        "IN-OD": [
+          2014,
+          2019,
+          2024
+        ],
+        "IN-PB": [
+          2012,
+          2017,
+          2022
+        ],
+        "IN-TN": [
+          2016,
+          2021,
+          2026
+        ],
+        "IN-UP": [
+          2012,
+          2017,
+          2022
+        ],
+        "IN-WB": [
+          2016,
+          2021,
+          2026
+        ]
+      }
     },
     "ward": {
       "label": "Municipal",

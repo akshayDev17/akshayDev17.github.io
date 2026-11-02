@@ -13,6 +13,10 @@ Run from `work/election-atlas/` (paths below are relative to it).
    - fetches the Union Council of Ministers
 4. `join-sansad.py`
    - enriches the cabinet with party / state / constituency / photo
+5. `build-availability.py`
+   - rewrites `data/availability.json` after any data file is added or removed
+6. `check_provenance.py`
+   - the provenance gate; must pass before anything is published
 
 ## Scripts
 
@@ -49,6 +53,37 @@ Run from `work/election-atlas/` (paths below are relative to it).
 - adds: party, state, constituency, photo
 - run: `python3 tools/join-sansad.py --cycle 2024 --in <fetched.json> --out <enriched.json>`
 - options: `--photo-dir`, `--no-download`, `--dry-run`
+
+### build-availability.py
+
+- writes `data/availability.json`: which optional files exist (by-elections,
+  cabinet rosters per tense, assembly cycles per state, Sansad records, MPLADS
+  files, portraits), so the pages show "not available yet" instead of probing
+- reads years from `manifest.elections.ls.years` and assembly cycles from
+  `manifest.elections.ac.cycles`
+- run: `python3 tools/build-availability.py`
+- verify: `python3 tools/build-availability.py --check` (CI runs this)
+
+### check_provenance.py
+
+- fails if anything but published data is in `data/`:
+  - every `results/**` and `cabinet/**` file must carry `"provenance": "published"`
+    and an https source URL on a government publisher's host
+  - no metadata field (`note*`, `source*`, `_note`, `caveat`, `provenance`)
+    may say synthetic, dummy, invented, placeholder, fake or mock
+  - the four pages, `lib/atlas.js` and `manifest.json` never say "synthetic"
+  - the removed dummy files never come back, by path or by bytes
+- run: `python3 tools/check_provenance.py data`
+- negative tests: `python3 -m unittest discover -s tools -p 'test_*.py'`
+- CI: `.github/workflows/atlas-provenance.yml` at the repository root
+
+## Data file conventions
+
+- each tense of a council of ministers is its own file: `{cycle}.json` is the
+  council as it stands, `{cycle}-sworn-in.json` the council as sworn in
+- a state council is keyed by the state's assembly cycle, not a Lok Sabha year
+- an assembly cycle needs both `results/ac/{S}/{cycle}.json` and
+  `{cycle}-detail.json` before the pages draw it
 
 ## Notes
 

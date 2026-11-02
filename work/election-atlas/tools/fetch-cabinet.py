@@ -187,6 +187,7 @@ def parse_communique(page, url):
 def build_doc(cycle, members, communiques):
     return {
         "schema": 2,
+        "provenance": "published",
         "scope": "union",
         "cycle": cycle,
         "term": TERMS.get(cycle, f"{cycle}"),
