@@ -279,6 +279,46 @@ def enrich(members, recs, regions):
     return members
 
 
+def name_tokens(name: str) -> frozenset:
+    """'B.L. Verma' and 'B. L. VERMA' -> {B, L, VERMA}; order is dropped so surname-first spellings meet."""
+    return frozenset(re.findall(r"[A-Z]+", re.sub(rf"^{TITLE}\s*", "", name.strip(), flags=re.I).upper()))
+
+
+def copy_sansad_ids(sworn, prior, directory):
+    """Give sworn-in ministers the `mpsno` / `house` the as-it-stands roster holds.
+
+    First by exact name; then, for a minister still without one, by a normalised
+    name (case, punctuation, initials and word order dropped, one spelling's words
+    all within the other's) against the roster and then the Lok Sabha directory,
+    copied only from a single unambiguous match. Returns the backfilled
+    (sworn name, matched name, ids) triples."""
+    sansad_id = {m["name"]: {k: m[k] for k in ("mpsno", "house") if m.get(k)}
+                 for m in prior if m.get("mpsno") or m.get("house")}
+    for m in sworn:  # same official name, same person: reuse the Sansad member number already held
+        for k, v in sansad_id.get(m["name"], {}).items():
+            m.setdefault(k, v)
+    sworn_names = {m["name"] for m in sworn}
+    held = {m["mpsno"] for m in sworn if m.get("mpsno")}
+    pools = [
+        [(nm, ids) for nm, ids in sansad_id.items() if nm not in sworn_names and ids.get("mpsno") not in held],
+        [(r.get("mpFirstLastName") or f"{r.get('firstName', '')} {r.get('lastName', '')}", {"mpsno": r["mpsno"]})
+         for r in directory if r.get("mpsno") and r["mpsno"] not in held],
+    ]
+    backfilled = []
+    for m in sworn:
+        if m.get("mpsno") or m.get("house"):
+            continue
+        mine = name_tokens(m["name"])
+        for pool in pools:
+            hits = [(nm, ids) for nm, ids in pool
+                    if len(mine & name_tokens(nm)) >= 2 and (mine <= name_tokens(nm) or name_tokens(nm) <= mine)]
+            if len(hits) == 1:
+                m.update(hits[0][1])
+                backfilled.append((m["name"], hits[0][0], hits[0][1]))
+                break
+    return backfilled
+
+
 # ── main ─────────────────────────────────────────────────────────────────────
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Harvest the Union Council of Ministers, sworn in and as it stands.")
@@ -364,11 +404,8 @@ def main(argv=None) -> int:
                                "refresh it with fetch-cabinet.py and join-sansad.py first")
     dir18_got, recs18 = sansad_directory(18, cache)
     enrich(sworn24, recs18, regions)
-    sansad_id = {m["name"]: {k: m[k] for k in ("mpsno", "house") if m.get(k)}
-                 for m in prior if m.get("mpsno") or m.get("house")}
-    for m in sworn24:  # same official name, same person: reuse the Sansad member number already held
-        for k, v in sansad_id.get(m["name"], {}).items():
-            m.setdefault(k, v)
+    for name, matched, ids in copy_sansad_ids(sworn24, prior, recs18):
+        print(f"2024 sworn in: {name} <- {matched} {ids}")
     pib_got = fetch(PIB_2024, cache)
     pib_text = plain(pib_got["bytes"].decode("utf-8", "replace"))
     for ch in CHANGES_2024:
