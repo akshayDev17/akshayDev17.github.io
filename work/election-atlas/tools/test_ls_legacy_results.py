@@ -14,7 +14,9 @@ import importlib.util
 import json
 import re
 import sys
+import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -204,6 +206,27 @@ class PublishedStateFiles(unittest.TestCase):
             self.assertEqual(doc["regions"]["IN-JK"]["unopposed"], [
                 {"no": 2, "constituency": "SRINAGAR", "party": "JKN", "report_page": page}])
 
+
+
+class CheckMode(unittest.TestCase):
+    def test_check_downloads_nothing_and_names_a_missing_input(self):
+        with tempfile.TemporaryDirectory() as research, \
+                mock.patch.object(builder, "RESEARCH", research), \
+                mock.patch.object(builder, "fetch", side_effect=AssertionError("network")), \
+                mock.patch.object(sys, "argv", ["build-ls-results.py", "--year", "1991", "--check"]):
+            with self.assertRaises(SystemExit) as stop:
+                builder.main()
+            self.assertIn("eci_pdfs/general-election-1991-vol-i-ii_part1.pdf", str(stop.exception))
+            self.assertEqual(list(Path(research).iterdir()), [])
+
+    def test_check_accepts_inputs_already_present(self):
+        cfg = builder.YEARS[1991]
+        with tempfile.TemporaryDirectory() as research, \
+                mock.patch.object(builder, "RESEARCH", research):
+            for rel in builder.source_inputs(1991, cfg):
+                (Path(research) / rel).parent.mkdir(parents=True, exist_ok=True)
+                (Path(research) / rel).write_bytes(b"x")
+            self.assertIsNone(builder.require_inputs(1991, cfg))
 
 if __name__ == "__main__":
     unittest.main()

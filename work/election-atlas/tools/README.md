@@ -86,6 +86,8 @@ Each stops with an error on a source shape it does not expect.
   report and the three party lists it reads into `_research/harvest/` and records
   each file's `url`, `sha256` and `fetched_at` in the state file's `source` /
   `sources`, so `validate_records.py` passes for them
+  - `--check` downloads nothing: it reads those inputs from `_research/eci/` and stops,
+    naming the file, if one is not there
   - a seat the report records as returned unopposed (its one candidate, no votes)
     still counts, and the region lists it under `unopposed` with the report's PDF page
 

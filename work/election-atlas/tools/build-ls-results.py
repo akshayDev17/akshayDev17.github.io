@@ -816,16 +816,29 @@ def state_from_table(states, ix, geo, log):
     return out
 
 
+def source_inputs(year, cfg):
+    """Every file a pre-2008 year reads: its report and the party lists it borrows."""
+    return [cfg["pdf_detailed"]] + [c["parties"][0] for k, c in YEARS.items()
+                                    if k != year and c.get("parties")]
+
+
+def require_inputs(year, cfg):
+    """--check reads what is already in _research/eci/ and downloads nothing."""
+    missing = [rel for rel in source_inputs(year, cfg)
+               if not os.path.exists(os.path.join(RESEARCH, rel))]
+    if missing:
+        raise SystemExit(f"--check {year}: input not in {RESEARCH} (run without --check "
+                         f"to download it): " + ", ".join(missing))
+
+
 def fetch_sources(year, cfg, cache=DEFAULT_CACHE):
     """Download every input a pre-2008 year reads, and return a source block for each.
 
     The bytes are fetched once into the harvest cache (where validate_records.py checks
     each sha256) and copied to the _research/eci/ path the readers open, so the file
     that is parsed is the file whose hash is recorded."""
-    inputs = [cfg["pdf_detailed"]] + [c["parties"][0] for k, c in YEARS.items()
-                                      if k != year and c.get("parties")]
     blocks = []
-    for rel in inputs:
+    for rel in source_inputs(year, cfg):
         got = fetch(SOURCE_URLS[rel], cache)
         dest = os.path.join(RESEARCH, rel)
         os.makedirs(os.path.dirname(dest), exist_ok=True)
@@ -1116,7 +1129,9 @@ def propose_party_additions(years):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--year", type=int, action="append")
-    ap.add_argument("--check", action="store_true", help="report only, do not write")
+    ap.add_argument("--check", action="store_true",
+                    help="report only, do not write; reads inputs already in _research/eci "
+                         "and downloads nothing")
     ap.add_argument("--propose", action="store_true",
                     help="list parties that win seats but are missing from parties.json")
     args = ap.parse_args()
@@ -1134,7 +1149,11 @@ def main():
     for y in years:
         cfg = YEARS[y]
         log = {"year": y}
-        sources = fetch_sources(y, cfg) if cfg.get("state_only") else None
+        sources = None
+        if cfg.get("state_only") and args.check:
+            require_inputs(y, cfg)
+        elif cfg.get("state_only"):
+            sources = fetch_sources(y, cfg)
         ix = build_party_index(cfg, parties_doc,
                                borrow_from=[c for k, c in YEARS.items() if k != y])
         states = build_state_rows(cfg, geo, log)
