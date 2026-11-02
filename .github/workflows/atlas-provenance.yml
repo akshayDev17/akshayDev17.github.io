@@ -2,8 +2,9 @@ name: Atlas provenance gate
 
 # Fails the build if anything but published data reaches the Election Atlas:
 # work/election-atlas/tools/check_provenance.py over the atlas data, its negative
-# tests (the gate must fail on planted dummy data), and a check that
-# data/availability.json matches the files present.
+# tests (the gate must fail on planted dummy data), a check that
+# data/availability.json matches the files present, and a check that every JS
+# module URL the pages load carries its current content-hash version.
 
 on:
   pull_request:
@@ -39,3 +40,5 @@ jobs:
         run: python3 -m unittest discover -s tools -p 'test_*.py' -v
       - name: availability.json matches the files present
         run: python3 work/election-atlas/tools/build-availability.py --check
+      - name: JS module URLs carry current content-hash versions
+        run: python3 work/election-atlas/tools/version_modules.py --check

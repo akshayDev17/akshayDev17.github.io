@@ -131,6 +131,21 @@ Each stops with an error on a source shape it does not expect.
 - negative tests: `python3 -m unittest discover -s tools -p 'test_*.py'`
 - CI: `.github/workflows/atlas-provenance.yml` at the repository root
 
+### version_modules.py
+
+- stamps every JS module URL the pages load with a content hash, e.g.
+  `../lib/atlas.js?v=89698364`, in the pages' `<script>` imports and in the modules'
+  own imports (`vendor/d3-geo.js` -> `d3-array.js` -> `internmap.js`)
+- why: the live site caches the pages for 10 minutes but `.js` files for 4 hours, so
+  an unversioned module lets a returning visitor run a new page against an old module
+  (a missing export is a SyntaxError and the page stops)
+- versions are computed leaves first, so a change to any module changes the URL in
+  every module and page that reaches it
+- run after editing any page's imports or any `.js` file under `lib/`, `state/` or
+  `vendor/`: `python3 tools/version_modules.py`; never edit a `?v=` by hand
+- verify: `python3 tools/version_modules.py --check` (CI runs this)
+- tests: `python3 tools/test_version_modules.py`
+
 ## Data file conventions
 
 - each tense of a council of ministers is its own file: `{cycle}.json` is the
