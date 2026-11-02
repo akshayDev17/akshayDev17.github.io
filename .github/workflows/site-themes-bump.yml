@@ -1,0 +1,79 @@
+# Opens a PR that bumps the pinned site-themes tag when a newer vX.Y.Z tag
+# lands in akshayDev17/site-themes. Dependabot and Renovate can bump the tag in
+# package.json, but not regenerate the copies this static site serves, so this
+# workflow does both: npm install the new tag, then `npm run themes:sync`.
+#
+# Creating the PR with GITHUB_TOKEN needs the repository setting
+# Settings > Actions > General > "Allow GitHub Actions to create and approve
+# pull requests". Without it the branch is still pushed and the run fails with
+# a compare link. PRs opened with GITHUB_TOKEN do not trigger other workflows,
+# so this job runs the drift check itself before pushing.
+name: site-themes bump
+
+on:
+  schedule:
+    - cron: '23 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: site-themes-bump
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Compare the pinned tag with the newest release tag
+        id: tags
+        run: |
+          pinned=$(node -p "require('./package.json').dependencies['site-themes'].split('#')[1]")
+          latest=$(gh api --paginate repos/akshayDev17/site-themes/tags --jq '.[].name' \
+            | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1)
+          echo "pinned=$pinned latest=$latest"
+          if [ -z "$latest" ] || [ "$(printf '%s\n%s\n' "$pinned" "$latest" | sort -V | tail -n 1)" = "$pinned" ]; then
+            echo "Already on the newest tag."
+            exit 0
+          fi
+          branch="site-themes/bump-$latest"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
+            echo "$branch already exists; leaving it alone."
+            exit 0
+          fi
+          { echo "latest=$latest"; echo "pinned=$pinned"; echo "branch=$branch"; } >> "$GITHUB_OUTPUT"
+
+      - name: Install the new tag and regenerate the copies
+        if: steps.tags.outputs.latest
+        run: |
+          npm install "github:akshayDev17/site-themes#${{ steps.tags.outputs.latest }}"
+          npm run themes:sync
+          npm run themes:check
+
+      - name: Push the branch and open the PR
+        if: steps.tags.outputs.latest
+        env:
+          LATEST: ${{ steps.tags.outputs.latest }}
+          PINNED: ${{ steps.tags.outputs.pinned }}
+          BRANCH: ${{ steps.tags.outputs.branch }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c "$BRANCH"
+          git add -A
+          git commit -m "chore(deps): bump site-themes from $PINNED to $LATEST"
+          git push origin "$BRANCH"
+          body="Bumps the pinned [site-themes](https://github.com/akshayDev17/site-themes) tag from \`$PINNED\` to \`$LATEST\` ([release](https://github.com/akshayDev17/site-themes/releases/tag/$LATEST)), and regenerates the inlined boot script and \`assets/site-themes/$LATEST/\` with \`npm run themes:sync\`. The drift check passed in the bump run. Merging deploys the new themes; nothing is fetched at runtime."
+          if ! gh pr create --base "${{ github.event.repository.default_branch }}" --head "$BRANCH" \
+              --title "chore(deps): bump site-themes from $PINNED to $LATEST" --body "$body"; then
+            echo "::error::Could not open the PR (is 'Allow GitHub Actions to create and approve pull requests' enabled?). Open it by hand: ${{ github.server_url }}/${{ github.repository }}/compare/$BRANCH?expand=1"
+            exit 1
+          fi
