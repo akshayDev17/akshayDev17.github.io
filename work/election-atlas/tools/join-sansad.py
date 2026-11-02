@@ -23,7 +23,6 @@ import json
 import re
 import subprocess
 import sys
-import difflib
 from pathlib import Path
 
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -34,12 +33,19 @@ RS_URL = "https://sansad.in/api_rs/member/in-council-of-ministers?lang=en"
 
 # Manual aliases: cabinet name (normalised) -> Sansad name (normalised).
 # These are the few where the two official sources genuinely disagree on
-# spelling, initials, or word order, and no generic rule recovers them.
+# spelling, initials, or word order. A minister matched neither exactly nor
+# through an alias is left unjoined: no state, constituency or id, and only a
+# party already on its own record.
 ALIASES = {
     "C R PATIL": "CHANDRAKANT RAGHUNATH PATIL",
     "KRISHAN PAL": "KRISHAN PAL GURJAR",
     "PANKAJ CHAUDHARY": "PANKAJ CHOUDHARY",
-    "BHUPATHI RAJU SRINIVASA VARMA": "SRINIVASA VARMA BHUPATHIRAJU",
+    "BHUPATHI RAJU SRINIVASA VARMA": "SRINIVASA VARMA B J P VARMA BHUPATHIRAJU",
+    "SUBRAHMANYAM JAISHANKAR": "S JAISHANKAR",
+    "PIYUSH GOYAL": "PIYUSH VEDPRAKASH GOYAL",
+    "PRATAPRAO JADHAV": "PRATAPRAO GANPATRAO JADHAV",
+    "RAMDAS ATHAWALE": "RAMDAS BANDU ATHAWALE",
+    "DURGADAS UIKEY": "DURGADAS D D UIKEY",
 }
 
 # Sansad party code -> atlas party code. Unmapped codes stay as-is and render
@@ -85,20 +91,20 @@ def norm_state(name):
 
 
 def build_lookup():
-    """Return {norm_name: record} and {no_space_name: record} plus a record list."""
+    """Return {norm_name: record} and {no_space_name: record}."""
     records = []
     ls = fetch_json(LS_URL)
     for m in ls.get("membersDtoList", []):
         if m.get("status") != "Sitting":
             continue
-        name = m.get("mpFirstLastName") or f"{m.get('firstName','')} {m.get('lastName','')}"
+        name = m.get("mpFirstLastName") or f"{m.get('firstName') or ''} {m.get('lastName') or ''}"
         records.append({"house": "ls", "name": norm(name),
                         "party": m.get("partySname"), "state": m.get("stateName"),
                         "const": m.get("constName"),
                         "id": m.get("mpsno")})
     rs = fetch_json(RS_URL)
     for m in rs.get("records", []):
-        name = f"{m.get('firstName','')} {m.get('lastName','')}"
+        name = f"{m.get('firstName') or ''} {m.get('lastName') or ''}"
         records.append({"house": "rs", "name": norm(name),
                         "party": m.get("partyCode"), "state": m.get("stateName"),
                         "const": None,
@@ -107,10 +113,11 @@ def build_lookup():
     for r in records:
         by_norm.setdefault(r["name"], r)
         by_nospace.setdefault(no_space(r["name"]), r)
-    return records, by_norm, by_nospace
+    return by_norm, by_nospace
 
 
-def match_member(cab_name, records, by_norm, by_nospace):
+def match_member(cab_name, by_norm, by_nospace):
+    """The directory record for a cabinet name, exactly or through ALIASES; else None."""
     key = norm(cab_name)
     # 1. exact
     if key in by_norm:
@@ -125,15 +132,7 @@ def match_member(cab_name, records, by_norm, by_nospace):
             return by_norm[t]
         if no_space(t) in by_nospace:
             return by_nospace[no_space(t)]
-    # 4. last-name anchored, best similarity
-    last = key.split()[-1] if key.split() else ""
-    subs = [r for r in records if r["name"].split() and r["name"].split()[-1] == last]
-    if len(subs) == 1:
-        return subs[0]
-    if subs:
-        return max(subs, key=lambda r: difflib.SequenceMatcher(None, key, r["name"]).ratio())
-    # 5. global best similarity
-    return max(records, key=lambda r: difflib.SequenceMatcher(None, key, r["name"]).ratio())
+    return None
 
 
 def slug(name):
@@ -165,7 +164,7 @@ def main():
             members.insert(0, pm)
         doc = {"members": members}
 
-    records, by_norm, by_nospace = build_lookup()
+    by_norm, by_nospace = build_lookup()
     regions = json.load(open(Path(__file__).parent.parent / "data" / "regions.json", encoding="utf-8"))
     state_to_code = {}
     for r in regions["regions"]:
@@ -173,7 +172,13 @@ def main():
             state_to_code[norm_state(s)] = r["code"]
 
     for m in doc["members"]:
-        rec = match_member(m["name"], records, by_norm, by_nospace)
+        rec = match_member(m["name"], by_norm, by_nospace)
+        if rec is None:
+            for k in ("state", "constituency", "mpsno", "house"):
+                m.pop(k, None)
+            m["_match"] = None
+            print(f"unmatched, left without a link: {m['name']}")
+            continue
         m["party"] = PARTY_MAP.get(rec["party"], rec["party"])
         m["state"] = state_to_code.get(norm_state(rec["state"]))
         m["constituency"] = rec["const"]
@@ -184,7 +189,7 @@ def main():
             m["house"] = "rs"  # the atlas links Rajya Sabha ministers to the RS list of ministers
 
     doc["_join"] = {"source": "Parliament of India (Sansad) member directory",
-                    "matched": sum(1 for m in doc["members"] if m.get("party")),
+                    "matched": sum(1 for m in doc["members"] if m.get("_match")),
                     "total": len(doc["members"])}
     # drop the internal match field for the final file? keep it for audit.
     out = args.out or f"data/cabinet/union/{args.cycle}.json"

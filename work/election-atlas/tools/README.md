@@ -95,6 +95,9 @@ Each stops with an error on a source shape it does not expect.
   - Rajya Sabha: `https://sansad.in/api_rs/member/in-council-of-ministers`
 - adds: party, state, constituency, and `mpsno` (Lok Sabha) or `house: "rs"` (Rajya Sabha);
   no portrait is downloaded
+- matches a minister only by exact name or an entry in its `ALIASES`; a minister
+  matched neither way is printed and left without state, constituency or id (no
+  sansad.in link), keeping only a party already on its own record
 - run: `python3 tools/join-sansad.py --cycle 2024 --in <fetched.json> --out <enriched.json>`
 - options: `--dry-run`
 

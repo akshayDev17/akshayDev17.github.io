@@ -86,5 +86,74 @@ class CopySansadIds(unittest.TestCase):
         self.assertEqual(sorted(n for n, m in members.items() if not party(m)), ["GEORGE KURIAN", "RAVNEET SINGH"])
 
 
+def directory_first_last(name):
+    """'Jadhav, Shri Prataprao Ganpatrao' -> 'Shri Prataprao Ganpatrao Jadhav'."""
+    last, _, first = name.partition(", ")
+    return f"{first} {last}" if first else last
+
+
+def same_person(minister, directory_name):
+    """An exact or ALIASES match (join-sansad), or the harvester's normalised-name match."""
+    fl = directory_first_last(directory_name)
+    key = huc.js.norm(minister)
+    if huc.js.no_space(fl) in {huc.js.no_space(key), huc.js.no_space(huc.js.ALIASES.get(key, key))}:
+        return True
+    a, b = huc.name_tokens(minister), huc.name_tokens(fl)
+    return len(a & b) >= 2 and (a <= b or b <= a)
+
+
+class RosterLinksPointAtTheMinister(unittest.TestCase):
+    """Every Lok Sabha member number on a 2024 roster is that minister's own seat
+    in data/members/ls/2024.json, with the same state and constituency."""
+
+    def setUp(self):
+        seats = json.loads((HERE.parent / "data" / "members" / "ls" / "2024.json").read_text(encoding="utf-8"))
+        self.by_mpsno = {m["mpsno"]: m for m in seats["members"].values()}
+        regions = json.loads((HERE.parent / "data" / "regions.json").read_text(encoding="utf-8"))["regions"]
+        self.state_code = {huc.js.norm_state(n): r["code"] for r in regions for n in [r["name"], *r.get("sourceNames", [])]}
+
+    def audit(self, roster):
+        members = json.loads((UNION / roster).read_text(encoding="utf-8"))["members"]
+        for m in members:
+            if "mpsno" not in m:
+                continue
+            with self.subTest(roster=roster, minister=m["name"]):
+                seat = self.by_mpsno.get(m["mpsno"])
+                self.assertIsNotNone(seat, f"mpsno {m['mpsno']} is no 2024 Lok Sabha member")
+                self.assertTrue(same_person(m["name"], seat["name"]), f"mpsno {m['mpsno']} is {seat['name']}")
+                self.assertEqual(m.get("state"), self.state_code.get(huc.js.norm_state(seat["state"])))
+                self.assertEqual(m.get("constituency"), seat["seat"])
+        return sorted(m["name"] for m in members if not (m.get("mpsno") or m.get("house")))
+
+    def test_as_it_stands_roster(self):
+        self.assertEqual(self.audit("2024.json"), ["L. MURUGAN"])
+
+    def test_sworn_in_roster(self):
+        self.assertEqual(self.audit("2024-sworn-in.json"), ["GEORGE KURIAN", "L. MURUGAN", "RAVNEET SINGH"])
+
+    def test_the_audit_rejects_another_members_number(self):
+        self.assertFalse(same_person("BHUPATHI RAJU SRINIVASA VARMA", self.by_mpsno[5711]["name"]))
+        self.assertTrue(same_person("BHUPATHI RAJU SRINIVASA VARMA", self.by_mpsno[5745]["name"]))
+
+
+class JoinSansadMatch(unittest.TestCase):
+    """join-sansad joins a minister only by exact name or ALIASES, never by likeness."""
+
+    @staticmethod
+    def lookup(*names):
+        recs = [{"name": huc.js.norm(n), "id": i} for i, n in enumerate(names, 1)]
+        return {r["name"]: r for r in recs}, {huc.js.no_space(r["name"]): r for r in recs}
+
+    def test_a_near_name_is_not_joined(self):
+        by_norm, by_nospace = self.lookup("Kota Srinivasa Poojary", "Ramdas Athawale Kumar")
+        self.assertIsNone(huc.js.match_member("BHUPATHI RAJU SRINIVASA VARMA", by_norm, by_nospace))
+        self.assertIsNone(huc.js.match_member("RAMDAS ATHAWALE", by_norm, by_nospace))
+
+    def test_exact_and_alias_names_are_joined(self):
+        by_norm, by_nospace = self.lookup("Kota Srinivasa Poojary", "Srinivasa Varma B J P Varma Bhupathiraju", "Rajnath Singh")
+        self.assertEqual(huc.js.match_member("BHUPATHI RAJU SRINIVASA VARMA", by_norm, by_nospace)["id"], 2)
+        self.assertEqual(huc.js.match_member("RAJ NATH SINGH", by_norm, by_nospace)["id"], 3)
+
+
 if __name__ == "__main__":
     unittest.main()

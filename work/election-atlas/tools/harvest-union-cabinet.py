@@ -267,7 +267,7 @@ def sansad_directory(term_no, cache):
 def directory_entries(recs, regions):
     """Lok Sabha directory records -> roster-shaped entries: name, party, state, constituency, mpsno."""
     state_code = {js.norm_state(s): r["code"] for r in regions for s in [r["name"], *r.get("sourceNames", [])]}
-    return [{"name": r.get("mpFirstLastName") or f"{r.get('firstName', '')} {r.get('lastName', '')}",
+    return [{"name": r.get("mpFirstLastName") or f"{r.get('firstName') or ''} {r.get('lastName') or ''}",
              "party": js.PARTY_MAP.get(r.get("partySname"), r.get("partySname")),
              "state": state_code.get(js.norm_state(r.get("stateName"))),
              "constituency": r.get("constName"),
