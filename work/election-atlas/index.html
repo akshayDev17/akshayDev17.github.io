@@ -26,7 +26,7 @@
   /* The table's measure is fixed, not proportional: a table whose columns move
      as the window changes is a table the reader has to re-read every time. */
   --table-w:clamp(16.5rem,20vw,19rem);
-  /* The belt's two knobs: how wide each portrait card is, and how many rows
+  /* The belt's two knobs: how wide each member card is, and how many rows
      stack before the strip continues right. */
   --belt-card-w:9.25rem;
   --belt-rows:3;
@@ -465,7 +465,6 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
   font-family:var(--serif);font-size:1.4rem;color:var(--muted);letter-spacing:.02em;
   overflow:hidden;
 }
-.belt-face img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 50%}
 .belt-name{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.8125rem;line-height:1.25;font-weight:500;color:#2E3440;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .belt-role{font-family:var(--mono);font-size:.75rem;line-height:1.4;letter-spacing:.02em;color:var(--muted);margin:0;display:flex;align-items:baseline;gap:4px;min-width:0}
 .belt-role-main{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -478,7 +477,7 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 #card .min-list li{padding:4px 0;border-top:1px solid var(--rule)}
 #card .min-list li:first-child{border-top:0}
 
-/* ── not available yet, portraits, credits ────────────────────────────── *
+/* ── not available yet, monograms, credits ────────────────────────────── *
  * A view whose data has not been added says so in one quiet sentence inside a
  * hairline box: never a number, a name or a zero standing in for the data. */
 .void{display:flex;align-items:center;justify-content:center;min-height:8rem;
@@ -492,11 +491,11 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
   text-decoration-thickness:1px}
 .tense-opt[aria-disabled="true"]:hover{color:var(--rule-3)}
 .monogram{display:flex;align-items:center;justify-content:center;width:100%;height:100%;
-  background:var(--paper-2);color:var(--muted);font-family:var(--serif);letter-spacing:.02em}
-.photo-credit{display:block;font-family:var(--mono);font-size:.5625rem;line-height:1.4;
+  background:var(--mono-bg,var(--paper-2));color:var(--mono-ink,var(--muted));font-family:var(--serif);letter-spacing:.02em}
+.photo-link{display:block;font-family:var(--mono);font-size:.5625rem;line-height:1.4;
   color:var(--muted);letter-spacing:.02em}
-.photo-credit a{color:inherit;text-decoration:underline;text-underline-offset:2px}
-.photo-credit a:hover{color:var(--ink)}
+.photo-link a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.photo-link a:hover{color:var(--ink)}
 .credits{flex:0 0 auto;padding:var(--s2) var(--pad) var(--s3);font-family:var(--mono);
   font-size:.5625rem;line-height:1.5;letter-spacing:.04em;color:var(--muted)}
 .credits a{color:inherit;text-decoration:underline;text-underline-offset:2px}
@@ -607,7 +606,7 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
     </section>
   </section>
 </main>
-<footer class="credits"><p>Portraits: Parliament of India (sansad.in). Party symbols: Wikimedia Commons contributors (<a href="data/parties-symbols.json">licences listed</a>).</p></footer>
+<footer class="credits"><p>Member photos: linked to sansad.in, not stored here. Party symbols: Wikimedia Commons contributors (<a href="data/parties-symbols.json">licences listed</a>).</p></footer>
 
 
 <div id="card" role="status" aria-live="polite"></div>
@@ -615,12 +614,11 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 var
 <script type="module">
 import {
   fetchOptional, loadAvailability, byelAvailable, unionRoster, notAvailable, PRESIDENT,
-  portraitHTML, monogramHTML, photoCreditHTML, photoMember, installPortraitFallback,
+  monogramHTML, officialPhotoHTML,
 } from './lib/atlas.js';
 const NS = 'http://www.w3.org/2000/svg';
 const $ = s => document.querySelector(s);
 const el = (t, c) => { const n = document.createElement(t); if (c) n.className = c; return n; };
-installPortraitFallback();
 const nf = n => Math.round(n).toLocaleString('en-IN');
 const pc1 = n => (n * 100).toFixed(1) + '%';
 const titleCase = s => (s || '').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
@@ -1517,11 +1515,8 @@ function renderBelt() {
     const seat = seatLabel
       ? `<span class="belt-seat">${partyMark(m.party)}${seatLabel}</span>`
       : '';
-    const ph = photoMember(m.photo);
-    const face = m.photo
-      ? `<div class="belt-face">${portraitHTML(`data/photos/cabinet/${m.photo}`, m.name)}</div>` +
-        photoCreditHTML(ph.house, ph.id)
-      : `<div class="belt-face">${monogramHTML(m.name)}</div>`;
+    const face = `<div class="belt-face">${monogramHTML(m.name, colour(m.party))}</div>` +
+      officialPhotoHTML(m.house, m.mpsno);
     const role = cp.main
       ? `<p class="belt-role"><span class="belt-role-main">${cp.main}</span>${cp.plus ? `<span class="belt-plus" aria-hidden="true">+${cp.plus}</span>` : ''}</p>`
       : '';
@@ -1600,7 +1595,7 @@ beltScroll.addEventListener('pointerover', e => {
   const c = e.target.closest('.belt-card');
   if (!c) return;
   /* The float card is a readout of the *text* (name, ministry, seat), not a
-     reaction to the portrait. Hovering the photo would otherwise fire it on
+     reaction to the monogram. Hovering the face would otherwise fire it on
      every pass across the strip, which is noise. Over the face, hide it. */
   if (e.target.closest('.belt-face')) { card.classList.remove('on'); return; }
   const m = beltSorted[+c.dataset.idx];

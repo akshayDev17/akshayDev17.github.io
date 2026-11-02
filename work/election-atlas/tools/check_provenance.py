@@ -5,7 +5,7 @@
 
 Checks, each listed in full before the exit:
 
-1. Every JSON file under results/ and cabinet/ declares top-level
+1. Every JSON file under results/, cabinet/ and members/ declares top-level
    "provenance": "published" and names its source by an https URL on a
    government publisher's host (source.url, or every sources[].url).
 2. No JSON file anywhere under the data directory carries a forbidden word
@@ -36,7 +36,7 @@ ALLOWED_HOSTS = {
 }
 FORBIDDEN = re.compile(r'\b(synthetic|dummy|invented|placeholder|fake|mock)', re.I)
 METADATA_KEY = re.compile(r'^(note.*|source.*|_note|caveat|provenance)$', re.I)
-PROVENANCE_DIRS = ('results', 'cabinet')
+PROVENANCE_DIRS = ('results', 'cabinet', 'members')
 PAGES = ('index.html', 'state/index.html', 'mp/index.html', 'mla/index.html', 'lib/atlas.js')
 
 # The 53 files that held dummy data until they were deleted, with the sha256 of

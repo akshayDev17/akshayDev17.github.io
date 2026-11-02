@@ -45,9 +45,9 @@ One switch, one meaning, three surfaces (map, party table, cabinet belt). It is 
 - One belt, many rows: cards flow **down first** (`grid-auto-flow: column`) then
   continue right with horizontal scroll. Fade gradients on both ends, shown only where
   overflow exists.
-- Portrait slot (monogram fallback on `--paper-2` — portraits drop in when sourced),
-  name in Newsreader, portfolio in IBM Plex Mono, constituency muted with the 9px party
-  swatch.
+- Portrait slot (initials monogram in party colour; no stored portraits, see
+  `work/election-atlas/data/photos/README.md`), name in Newsreader, portfolio in
+  IBM Plex Mono, constituency muted with the 9px party swatch.
 - Level 1: the belt occupies the field's trailing space (third `1fr` track — land the
   height-bound map can never use). Level 2: full-width band, same belt, wider.
 - The belt obeys the tense: `members` as elected, `members + changes` as it stands.
@@ -84,8 +84,8 @@ collapses transitions as on the rest of the page.
 
 ## IMAGERY
 
-None (monogram placeholders only) until portraits are sourced. Decided: the belt must
-not depend on photos to be correct.
+None: initials monograms only, plus a "View official photo on sansad.in" link.
+Decided: the belt must not depend on photos to be correct.
 
 ## SIGNATURE
 

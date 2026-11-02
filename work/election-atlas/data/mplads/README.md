@@ -170,8 +170,7 @@ build-time dependency, no external service).
   "schema": 1,
   "person": "gorakhpur",
   "profile": {
-    "dateOfBirth": "1969-07-17",              // age computed at render, never stored
-    "photo": "photos/ls/2024/S24_64.jpg"      // official Sansad photo
+    "dateOfBirth": "1969-07-17"               // age computed at render, never stored
   },
   "loksabha": 18,
   "attendance": { "signedDays": 108, "totalDays": 156 },

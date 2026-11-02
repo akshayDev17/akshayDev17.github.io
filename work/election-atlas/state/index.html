@@ -160,14 +160,13 @@ h1{margin:0;font-weight:400}
 #card .sub{font-family:var(--mono);font-size:.5625rem;letter-spacing:.13em;text-transform:uppercase;
   color:var(--muted);margin:0 0 2px}
 #card h3{margin:0;font-size:1.0625rem;font-weight:400;line-height:1.2;letter-spacing:-.01em}
-/* the winner's portrait sits top-right, level with the eyebrow */
+/* the winner's monogram sits top-right, level with the eyebrow */
 #card .top{display:flex;align-items:flex-start;gap:13px}
 #card .who{flex:1 1 auto;min-width:0}
 #card .face{
   flex:0 0 auto;width:68px;height:85px;border-radius:var(--r2);overflow:hidden;
   border:1px solid var(--rule-2);background:var(--paper);
 }
-#card .face img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
 #card .meta{font-family:var(--mono);font-size:.6875rem;color:var(--muted);
   margin:5px 0 10px;line-height:1.45}
 #card .meta span{display:block}
@@ -337,14 +336,13 @@ td .d{font-weight:500;letter-spacing:.02em}
   font-family:var(--serif);font-size:1.4rem;color:var(--muted);letter-spacing:.02em;
   overflow:hidden;
 }
-.belt-face img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 50%}
 .belt-name{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.8125rem;line-height:1.25;font-weight:500;color:#2E3440;margin:0}
 .belt-role{font-family:var(--mono);font-size:.75rem;line-height:1.4;letter-spacing:.02em;color:var(--muted);margin:0}
 .belt-seat{font-family:var(--mono);font-size:.75rem;line-height:1.35;color:var(--muted);margin:0;display:flex;align-items:center;gap:6px}
 .belt .sw{width:9px;height:9px;border-radius:2px;flex:0 0 auto;background:var(--c);box-shadow:inset 0 0 0 1px rgba(15,18,32,.2)}
 .belt .belt-sym{flex:0 0 auto;max-width:18px;max-height:18px;width:auto;height:auto;display:block}
 
-/* ── not available yet, portraits, credits ────────────────────────────── */
+/* ── not available yet, monograms, credits ────────────────────────────── */
 /* A year with no data stays in its row, quieter, and still answers a click
    with the "not available yet" state rather than an error. */
 .year.na{color:var(--rule-3);text-decoration:line-through;text-decoration-thickness:1px}
@@ -356,13 +354,13 @@ td .d{font-weight:500;letter-spacing:.02em}
 .belt .void{min-height:7rem}
 .void[hidden],.find[hidden],.belt-view[hidden],.belt[hidden]{display:none}
 .monogram{display:flex;align-items:center;justify-content:center;width:100%;height:100%;
-  background:var(--paper-2);color:var(--muted);font-family:var(--serif);letter-spacing:.02em}
+  background:var(--mono-bg,var(--paper-2));color:var(--mono-ink,var(--muted));font-family:var(--serif);letter-spacing:.02em}
 #card .face .monogram{font-size:1.4rem}
-.photo-credit{display:block;font-family:var(--mono);font-size:.5625rem;line-height:1.4;
+.photo-link{display:block;font-family:var(--mono);font-size:.5625rem;line-height:1.4;
   color:var(--muted);letter-spacing:.02em}
-.photo-credit a{color:inherit;text-decoration:underline;text-underline-offset:2px}
-.photo-credit a:hover{color:var(--ink)}
-#card .photo-credit{margin-top:3px;text-align:right}
+.photo-link a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.photo-link a:hover{color:var(--ink)}
+#card .photo-link{margin-top:3px;text-align:right}
 #card .portrait{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end}
 .credits{flex:0 0 auto;padding:var(--s3) var(--pad) var(--s4);font-family:var(--mono);
   font-size:.5625rem;line-height:1.5;letter-spacing:.04em;color:var(--muted);border-top:1px solid var(--rule)}
@@ -467,21 +465,19 @@ td .d{font-weight:500;letter-spacing:.02em}
     </section>
   </div>
 </main>
-<footer class="credits"><p>Portraits: Parliament of India (sansad.in). Party symbols: Wikimedia Commons contributors (<a href="../data/parties-symbols.json">licences listed</a>).</p></footer>
+<footer class="credits"><p>Member photos: linked to sansad.in, not stored here. Party symbols: Wikimedia Commons contributors (<a href="../data/parties-symbols.json">licences listed</a>).</p></footer>
 
 <div id="card" role="status" aria-live="polite"></div>
 
 <script type="module">
 import {
   fetchOptional, loadAvailability, byelAvailable, lsDetailAvailable, stateRoster, acCycles, notAvailable, voidHTML,
-  ECI, CMO_UP, markUnavailable, hasPhoto, portraitHTML, monogramHTML, photoCreditHTML,
-  photoMember, installPortraitFallback,
+  ECI, CMO_UP, markUnavailable, membersAvailable, monogramHTML, officialPhotoHTML,
 } from '../lib/atlas.js';
 import { resolveSeat, tallyStands } from './stands.js';
 import { cardBody } from './card.js';
 const NS = 'http://www.w3.org/2000/svg';
 const $ = s => document.querySelector(s);
-installPortraitFallback();
 const nf = n => Math.round(n).toLocaleString('en-IN');
 const pc1 = n => (n * 100).toFixed(1) + '%';
 const titleCase = s => (s || '').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
@@ -922,22 +918,20 @@ function buildYears(container, years, initial, onPick, isAvailable = () => true)
 }
 
 const uidToSeat = new Map(pcs.features.map(f => [f.properties.unique_id, String(f.properties.ls_seat_code)]));
-// the portrait directory is keyed by geometry unique_id; the card is keyed by ls_seat_code
+// the member record is keyed by geometry unique_id; the card is keyed by ls_seat_code
 const seatToUid = new Map();
 for (const [uid, seat] of uidToSeat) if (!seatToUid.has(seat)) seatToUid.set(seat, uid);
-// portraits are filed per seat for the term a member currently sits in, so 2024 only
-const PHOTO_YEAR = 2024;
-const creditsRes = await fetchOptional(`../data/photos/ls/${PHOTO_YEAR}/credits.json`);
-const photoCredits = (creditsRes.ok && creditsRes.doc.credits) || {};
-function faceFor(which, key, winner) {
-  if (which !== 'pc' || !lastPC || lastPC.year !== PHOTO_YEAR) return '';
+// the Sansad member numbers hold for the term members currently sit in, so 2024 only
+const MEMBER_YEAR = 2024;
+const membersRes = membersAvailable(avail, String(MEMBER_YEAR))
+  ? await fetchOptional(`../data/members/ls/${MEMBER_YEAR}.json`) : { ok: false };
+const lsMembers = (membersRes.ok && membersRes.doc.members) || {};
+function faceFor(which, key, winner, party) {
+  if (which !== 'pc' || !lastPC || lastPC.year !== MEMBER_YEAR) return '';
   const uid = seatToUid.get(key);
   if (!uid) return '';
-  const face = hasPhoto(avail, String(PHOTO_YEAR), uid)
-    ? portraitHTML(`../data/photos/ls/${PHOTO_YEAR}/${uid}.jpg`, winner)
-    : monogramHTML(winner);
-  return `<div class="portrait"><div class="face">${face}</div>` +
-    (hasPhoto(avail, String(PHOTO_YEAR), uid) ? photoCreditHTML('ls', (photoCredits[uid] || {}).mpsno || '') : '') + `</div>`;
+  return `<div class="portrait"><div class="face">${monogramHTML(winner, colour(party))}</div>` +
+    officialPhotoHTML('ls', (lsMembers[uid] || {}).mpsno) + `</div>`;
 }
 const acNums = acs ? new Set(acs.features.map(f => String(f.properties.no))) : new Set();
 
@@ -1197,11 +1191,8 @@ function renderBelt() {
     const seat = seatLabel
       ? `<span class="belt-seat">${partyMark(m.party)}${seatLabel}</span>`
       : '';
-    const ph = photoMember(m.photo);
-    const face = m.photo
-      ? `<div class="belt-face">${portraitHTML(`../data/photos/cabinet/${m.photo}`, m.name)}</div>` +
-        photoCreditHTML(ph.house, ph.id)
-      : `<div class="belt-face">${monogramHTML(m.name)}</div>`;
+    const face = `<div class="belt-face">${monogramHTML(m.name, colour(m.party))}</div>` +
+      officialPhotoHTML(m.house, m.mpsno);
     return `<div class="belt-card">` +
       face +
       `<p class="belt-name">${titleCase(m.name)}</p>` +

@@ -17,8 +17,8 @@ python3 .atlas-cutover/inventory.py --ref 4c64517 --live https://akshayprabhakan
 
 | kind | rows | what |
 |---|---|---|
-| `file` | 1,263 | tracked files Jekyll publishes byte-for-byte |
-| `retired` | 56 | published files that held dummy data (53) or a party image Wikipedia carries only under fair use (3: DMK, LJSP, RJD); expected to answer **404** once they are deleted, and listed so that 404 is not read as a regression |
+| `file` | 650 | tracked files Jekyll publishes byte-for-byte |
+| `retired` | 669 | published files that held dummy data (53), a party image Wikipedia carries only under fair use (3: DMK, LJSP, RJD), or a stored copy of an official member portrait with its credits (613: everything under `data/photos/ls/2024/` and `data/photos/cabinet/2024/`, retired by the owner's decision to show initials plus a sansad.in link); expected to answer **404** once they are deleted, and listed so that 404 is not read as a regression |
 | `page` | 5 | directory URLs with the trailing slash (`/`, the atlas and its `state/`, `mp/`, `mla/`) |
 | `redirect` | 4 | the four atlas directory URLs without the slash; Pages answers 301 to the slash |
 | `deeplink` | 1,991 | page URLs with the query strings the pages read: `?y=` and `&t=stands` on the national page, `state/?s=&y=` (with and without `&t=stands`) for every state and Lok Sabha year, `mp/?s=&c=` for every MPLADS constituency, `mla/?s=&c=` for every mapped assembly constituency |

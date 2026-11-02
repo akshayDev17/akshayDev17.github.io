@@ -21,7 +21,7 @@ export function cardBody(seat, fmt) {
          <p class="sub">${which === 'ac' ? 'Assembly constituency' : 'Lok Sabha constituency'}</p>
          <h3>${nm}</h3>
          <p class="meta"><span>${cands.length} candidates</span><span>${nf(total)} votes polled</span></p>
-       </div>${faceFor(which, key, cands[0] && cands[0].n)}</div>
+       </div>${faceFor(which, key, cands[0] && cands[0].n, cands[0] && cands[0].p)}</div>
        <table><thead><tr><th>Party</th><th>Candidate</th><th>Votes</th><th>Share</th></tr></thead><tbody>` +
       cands.slice(0, 6).map(c =>
         `<tr><td><span class="cell"><i class="sw" style="--c:${colour(c.p)}"></i>${c.p}</span></td>` +
