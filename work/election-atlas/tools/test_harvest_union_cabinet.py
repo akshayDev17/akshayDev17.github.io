@@ -6,6 +6,7 @@ even when the communique spells their name differently, and never a guessed one.
 """
 import importlib.util
 import json
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -34,7 +35,7 @@ class CopySansadIds(unittest.TestCase):
     def test_communique_spellings_meet_the_roster(self):
         sworn = [{"name": "JADHAV PRATAPRAO GANPATRAO"}, {"name": "B.L. VERMA"},
                  {"name": "RAVNEET SINGH"}, {"name": "GEORGE KURIAN"}, {"name": "AMIT SHAH"}]
-        log = huc.copy_sansad_ids(sworn, self.prior, [])
+        log = huc.copy_sansad_ids(sworn, self.prior)
         by = {m["name"]: ids(m) for m in sworn}
         self.assertEqual(by["JADHAV PRATAPRAO GANPATRAO"], {"mpsno": 4373})
         self.assertEqual(by["B.L. VERMA"], {"house": "rs"})
@@ -50,31 +51,15 @@ class CopySansadIds(unittest.TestCase):
         self.assertEqual({(n, m) for n, m, _ in log},
                          {("JADHAV PRATAPRAO GANPATRAO", "PRATAPRAO JADHAV"), ("B.L. VERMA", "B. L. VERMA")})
 
-    def test_directory_fills_a_name_the_roster_lacks(self):
-        sworn = [{"name": "GEORGE KURIAN"}]
-        directory = huc.directory_entries([{"mpFirstLastName": "Kurian George", "mpsno": 9999,
-                                            "partySname": "BJP", "constName": "Somewhere"}], [])
-        huc.copy_sansad_ids(sworn, self.prior, directory)
-        self.assertEqual(ids(sworn[0]), {"mpsno": 9999})
-        self.assertEqual((party(sworn[0]), sworn[0]["constituency"]), ("BJP", "Somewhere"))
-
-    def test_an_ambiguous_match_copies_nothing(self):
-        sworn = [{"name": "RAVNEET SINGH"}]
-        directory = huc.directory_entries([{"mpFirstLastName": "Ravneet Singh Bittu", "mpsno": 1},
-                                           {"mpFirstLastName": "Ravneet Singh Sidhu", "mpsno": 2}], [])
-        self.assertEqual(huc.copy_sansad_ids(sworn, self.prior, directory), [])
-        self.assertEqual(ids(sworn[0]), {})
-        self.assertIsNone(party(sworn[0]))
+    def test_a_near_spelling_without_an_alias_copies_nothing(self):
+        sworn = [{"name": "JADHAV PRATAPRAO"}, {"name": "B L VERMA"}, {"name": "SHAH AMIT"}]
+        self.assertEqual(huc.copy_sansad_ids(sworn, self.prior), [])
+        self.assertEqual([(ids(m), party(m)) for m in sworn], [({}, None)] * 3)
 
     def test_a_party_already_held_is_kept(self):
         sworn = [{"name": "AMIT SHAH", "party": "XYZ"}]
-        huc.copy_sansad_ids(sworn, self.prior, [])
+        huc.copy_sansad_ids(sworn, self.prior)
         self.assertEqual((party(sworn[0]), sworn[0]["mpsno"]), ("XYZ", 5021))
-
-    def test_an_id_already_held_is_not_given_twice(self):
-        sworn = [{"name": "PRATAPRAO JADHAV"}, {"name": "JADHAV PRATAPRAO GANPATRAO"}]
-        huc.copy_sansad_ids(sworn, self.prior, [])
-        self.assertEqual([ids(m) for m in sworn], [{"mpsno": 4373}, {}])
 
     def test_committed_sworn_in_roster_carries_the_backfilled_ids(self):
         members = {m["name"]: m for m in
@@ -87,19 +72,21 @@ class CopySansadIds(unittest.TestCase):
 
 
 def directory_first_last(name):
-    """'Jadhav, Shri Prataprao Ganpatrao' -> 'Shri Prataprao Ganpatrao Jadhav'."""
+    """'Karandlaje, Km. Shobha' -> 'Shobha Karandlaje' (the honorific dropped)."""
     last, _, first = name.partition(", ")
+    first = re.sub(r"^(?:Shri|Smt|Km|Kumari|Sushri|Sadhvi|Dr|Prof|Adv|Col)\.?\s+", "", first)
     return f"{first} {last}" if first else last
 
 
 def same_person(minister, directory_name):
-    """An exact or ALIASES match (join-sansad), or the harvester's normalised-name match."""
-    fl = directory_first_last(directory_name)
-    key = huc.js.norm(minister)
-    if huc.js.no_space(fl) in {huc.js.no_space(key), huc.js.no_space(huc.js.ALIASES.get(key, key))}:
-        return True
-    a, b = huc.name_tokens(minister), huc.name_tokens(fl)
-    return len(a & b) >= 2 and (a <= b or b <= a)
+    """The directory name is the minister's own, exactly or through the explicit
+    aliases: SWORN_ALIASES (communique -> roster), then join-sansad's ALIASES."""
+    fl = huc.js.no_space(directory_first_last(directory_name))
+    for name in {minister, huc.SWORN_ALIASES.get(minister, minister)}:
+        key = huc.js.norm(name)
+        if fl in {huc.js.no_space(key), huc.js.no_space(huc.js.ALIASES.get(key, key))}:
+            return True
+    return False
 
 
 class RosterLinksPointAtTheMinister(unittest.TestCase):

@@ -28,7 +28,7 @@ Party, state and constituency come from the Sansad Lok Sabha directory, only
 where a minister's name matches a member exactly; Rajya Sabha ministers and
 non-matches carry none of the three rather than a guessed one. A 2024 sworn-in
 minister also takes them, with the Sansad member number, from the as-it-stands
-roster entry for the same minister (exact or single unambiguous normalised name).
+roster entry for the same minister (exact name, or an entry in SWORN_ALIASES).
 
 Usage (from work/election-atlas/):
     python3 tools/harvest-union-cabinet.py
@@ -124,6 +124,12 @@ CHANGES_2024 = [
     {"date": "2026-07-25", "kind": "portfolio", "name": "PRALHAD JOSHI", "to": "Ministry of Education",
      "sentence": "Shri Pralhad Joshi, Cabinet Minister, be assigned the charge of the Ministry of Education"},
 ]
+
+# 2024 communique spelling -> the as-it-stands roster's spelling of the same minister.
+SWORN_ALIASES = {
+    "JADHAV PRATAPRAO GANPATRAO": "PRATAPRAO JADHAV",
+    "B.L. VERMA": "B. L. VERMA",
+}
 
 TITLE = r"(?:Shri|Smt\.?|Sushri|Kumari|Dr\.?|General|Gen\.|Col\.|Prof\.|Sadhvi|Sant)"
 NAME_LINE = re.compile(rf"^(?:{TITLE}\s*\S|Rao\s+\S)")
@@ -286,47 +292,26 @@ def enrich(members, recs, regions):
     return members
 
 
-def name_tokens(name: str) -> frozenset:
-    """'B.L. Verma' and 'B. L. VERMA' -> {B, L, VERMA}; order is dropped so surname-first spellings meet."""
-    return frozenset(re.findall(r"[A-Z]+", re.sub(rf"^{TITLE}\s*", "", name.strip(), flags=re.I).upper()))
-
-
-def copy_sansad_ids(sworn, prior, directory):
-    """Give sworn-in ministers what the published entry for the same minister holds:
-    party, state, constituency and `mpsno` / `house`, filling only fields still empty.
-
-    First from the as-it-stands roster by exact name; then, for a minister still
-    without an id, by a normalised name (case, punctuation, initials and word order
-    dropped, one spelling's words all within the other's) against the roster and
-    then the Lok Sabha directory entries, copied only from a single unambiguous
-    match. Returns the backfilled (sworn name, matched name, copied fields) triples."""
+def copy_sansad_ids(sworn, prior):
+    """Give sworn-in ministers what the as-it-stands roster entry for the same
+    minister holds: party, state, constituency and `mpsno` / `house`, filling only
+    fields still empty. The entry is found by exact name, or through SWORN_ALIASES
+    where the communique spells the name differently. Returns the aliased
+    (sworn name, roster name, copied fields) triples."""
     def carried(entry):
         return {k: entry[k] for k in ("party", "state", "constituency", "mpsno", "house") if entry.get(k)}
 
-    def fill(m, fields):
-        m.update({k: v for k, v in fields.items() if not m.get(k)})
-
     roster = {m["name"]: m for m in prior}
-    for m in sworn:  # same official name, same person
-        if m["name"] in roster:
-            fill(m, carried(roster[m["name"]]))
-    sworn_names = {m["name"] for m in sworn}
-    held = {m["mpsno"] for m in sworn if m.get("mpsno")}
-    pools = [[e for e in prior if e["name"] not in sworn_names and e.get("mpsno") not in held],
-             [e for e in directory if e.get("mpsno") and e["mpsno"] not in held]]
-    backfilled = []
+    aliased = []
     for m in sworn:
-        if m.get("mpsno") or m.get("house"):
+        target = SWORN_ALIASES.get(m["name"], m["name"])
+        if target not in roster:
             continue
-        mine = name_tokens(m["name"])
-        for pool in pools:
-            hits = [e for e in pool if len(mine & name_tokens(e["name"])) >= 2
-                    and (mine <= name_tokens(e["name"]) or name_tokens(e["name"]) <= mine)]
-            if len(hits) == 1:
-                fill(m, carried(hits[0]))
-                backfilled.append((m["name"], hits[0]["name"], carried(hits[0])))
-                break
-    return backfilled
+        fields = carried(roster[target])
+        m.update({k: v for k, v in fields.items() if not m.get(k)})
+        if target != m["name"]:
+            aliased.append((m["name"], target, fields))
+    return aliased
 
 
 # ── main ─────────────────────────────────────────────────────────────────────
@@ -414,7 +399,7 @@ def main(argv=None) -> int:
                                "refresh it with fetch-cabinet.py and join-sansad.py first")
     dir18_got, recs18 = sansad_directory(18, cache)
     enrich(sworn24, recs18, regions)
-    for name, matched, fields in copy_sansad_ids(sworn24, prior, directory_entries(recs18, regions)):
+    for name, matched, fields in copy_sansad_ids(sworn24, prior):
         print(f"2024 sworn in: {name} <- {matched} {fields}")
     pib_got = fetch(PIB_2024, cache)
     pib_text = plain(pib_got["bytes"].decode("utf-8", "replace"))
@@ -432,7 +417,7 @@ def main(argv=None) -> int:
                  "10.06.2024 (oath 09.06.2024). Party, state, constituency and Sansad member number "
                  "come from the Sansad 18th Lok Sabha directory by exact name, and from the as-it-stands "
                  "roster (data/cabinet/union/2024.json, PM India joined to Sansad) for the same minister "
-                 "by exact or normalised name; a minister matched in neither carries none."),
+                 "by exact name or an explicit alias; a minister matched in neither carries none."),
         "swornIn": doc24["swornIn"], "allocated": "2024-06-10", "fetchedAt": sworn24_got["fetched_at"][:10],
         "members": sworn24,
     }
