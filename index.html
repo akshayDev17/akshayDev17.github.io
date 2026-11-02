@@ -743,6 +743,17 @@ site-theme-picker{font-family:var(--mono);font-size:.75rem;letter-spacing:.02em;
   addEventListener('scroll', markCurrent, { passive: true });
   addEventListener('resize', markCurrent, { passive: true });
 
+  const root = document.documentElement;
+  let screenTheme = null;
+  addEventListener('beforeprint', () => {
+    screenTheme = root.getAttribute('data-theme');
+    root.setAttribute('data-theme', 'classic-light');
+  });
+  addEventListener('afterprint', () => {
+    if (screenTheme !== null) root.setAttribute('data-theme', screenTheme);
+    screenTheme = null;
+  });
+
   // ── cursor wash ───────────────────────────────────────────────────────
   // One delegated listener per grid, and the PREVIOUS card is cleared before
   // the new one is lit — otherwise every card the pointer crosses keeps
