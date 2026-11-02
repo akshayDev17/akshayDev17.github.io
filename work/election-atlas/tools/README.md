@@ -37,6 +37,10 @@ Each stops with an error on a source shape it does not expect.
 - `python3 tools/test_harvest_ac_results.py` and `python3 tools/test_harvest_ls_byel.py`:
   party codes, assembly colour entries (winner plus other parties' votes), and
   by-election term assembly.
+- `python3 tools/test_ls_legacy_results.py`: the 1980-2004 Lok Sabha state files put
+  Delhi and Goa, Daman & Diu in their own regions, read a winner whose long name runs
+  into the party column (Dhenkanal 1991, INC), and count Srinagar's unopposed return
+  (1980 and 1989, JKN) with its report page.
 - `node --test tools/test_stands.mjs`: the state page's "as it stands" seat tally
   (`state/stands.js`) adds up to each state's seat count.
 - `node --test tools/test_card.mjs`: the state page's hover card (`state/card.js`)
@@ -82,6 +86,8 @@ Each stops with an error on a source shape it does not expect.
   report and the three party lists it reads into `_research/harvest/` and records
   each file's `url`, `sha256` and `fetched_at` in the state file's `source` /
   `sources`, so `validate_records.py` passes for them
+  - a seat the report records as returned unopposed (its one candidate, no votes)
+    still counts, and the region lists it under `unopposed` with the report's PDF page
 
 ### eci_pdf.py
 

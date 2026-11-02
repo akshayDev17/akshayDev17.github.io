@@ -139,6 +139,7 @@ YEARS = {
 ECI_OLD_STATE_NAMES = [
     "Orissa", "Pondicherry", "Delhi", "Andaman & Nicobar Islands",
     "Dadra & Nagar Haveli", "Daman & Diu", "Uttaranchal", "NCT of Delhi",
+    "National Capital Territory of Delhi", "Goa, Daman & Diu",
 ]
 
 ARCHIVE_STATE_ONLY = {
@@ -385,6 +386,8 @@ class GeoIndex:
         self.state_alias = {
             "andaman nicobar islands": "Andaman & Nicobar",
             "nct delhi": "Delhi",
+            "national capital territory delhi": "Delhi",
+            "goa daman diu": "Goa",
             "delhi": "Delhi",
             "jammu kashmir": "Jammu & Kashmir",
             "dadra nagar haveli daman diu": "Dadra and Nagar Haveli and Daman and Diu",
@@ -687,6 +690,11 @@ def build_state_only_from_pdf(cfg, ix: PartyIndex, geo: GeoIndex, log):
         out[f"{region}#{st_hdr}#{no}#{name}"] = dict(
             st=region, p=win_code, v=win_votes, o=others,
             _name=name, _eci_state=st_hdr, _electors=blk.get("electors"))
+        # The report prints a seat returned unopposed as its one candidate with no
+        # votes; the seat counts, and the state file names it with the report page.
+        if len(cands) == 1 and win_votes == 0:
+            out[f"{region}#{st_hdr}#{no}#{name}"]["_unopposed"] = dict(
+                no=no, constituency=name, party=win_code, report_page=blk["page"])
     log["state_unmatched"] = dict(unmatched)
     log["state_count"] = len(out)
     return out
@@ -754,11 +762,14 @@ def state_from_pcs(pcs, states, ix, geo):
     'Independent'."""
     agg = collections.defaultdict(collections.Counter)
     seats = collections.defaultdict(collections.Counter)
+    unopposed = collections.defaultdict(list)
     for c in pcs.values():
         if "v" not in c:
             continue
         agg[c["st"]][c["p"]] += c["v"]
         seats[c["st"]][c["p"]] += 1
+        if c.get("_unopposed"):
+            unopposed[c["st"]].append(c["_unopposed"])
         for k, v in (c.get("o") or {}).items():
             agg[c["st"]][k] += v
     electors = {}
@@ -782,6 +793,8 @@ def state_from_pcs(pcs, states, ix, geo):
             electors=electors.get(region),
             parties=[{"code": k, "seats": seats[region].get(k, 0), "votes": v}
                      for k, v in parties.most_common()])
+        if unopposed[region]:
+            out[region]["unopposed"] = unopposed[region]
     return out
 
 
@@ -864,7 +877,10 @@ def emit(year, cfg, pcs, states, ix, geo, log, sources=None):
         region_data = state_from_pcs(pcs, states, ix, geo)
         src_note = ("state totals are the exact sum of every constituency in this "
                     "election's published detailed result. No constituency file is "
-                    "written for this year: its boundaries predate the atlas geometry")
+                    "written for this year: its boundaries predate the atlas geometry. "
+                    "A region's `unopposed` lists each seat the report records as returned "
+                    "unopposed (its one candidate, with no poll and so no votes), with the "
+                    "PDF page of the report that prints it")
     elif have_votes:
         region_data = state_from_pcs(pcs, states, ix, geo)
         src_note = ("state totals are the exact sum of the constituency file above; "
@@ -882,6 +898,8 @@ def emit(year, cfg, pcs, states, ix, geo, log, sources=None):
             "electors": d["electors"],
             "parties": d["parties"],
         }
+        if d.get("unopposed"):
+            regions[region]["unopposed"] = d["unopposed"]
     st_doc = {
         "schema": 2, "provenance": "published", "election": "ls", "year": year,
         "note": ("PUBLISHED RESULT. Every value here is an ABSOLUTE COUNT. No percentage is "
