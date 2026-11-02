@@ -163,6 +163,10 @@ not the *faces*. A proper pass would collapse the serif to ~4 steps and the mono
 
 ## COLOR
 
+The live values now come from the site-themes package; see the README's Themes section. The page
+keeps the names below as aliases, so this table records the intent behind each colour. The theme
+values themselves are owned by the package, not by this table.
+
 | token | value | job |
 |---|---|---|
 | `--paper` | `#F4F6FA` | ground — cool, blue-cast, never white |
@@ -190,7 +194,7 @@ with their own usage terms, and a portfolio does not need to redistribute them t
 ## DENSITY / INTERACTION / RESPONSIVE
 
 - **Density:** fact-dense but rule-light — many lines, few boxes. Nothing floats.
-- **Interaction:** rows are links. Hover darkens the row's ground and turns its number vermilion; the rail's active tick fills. Focus is a 2px ink outline, never removed.
+- **Interaction:** rows are links. Hover darkens the row's ground and turns its number vermilion; the rail's active tick fills. Focus is a 2px outline in the theme's focus colour, never removed.
 - **Responsive:** below 900px the rail becomes a horizontal sticky bar with a 2px progress rule beneath it — navigation survives the collapse, and the active item scrolls itself into view. The index and chronology become single-column stacks; the apparatus type floor rises to 11–12px. Nothing is hidden that carries meaning.
 
 ## MOTION
