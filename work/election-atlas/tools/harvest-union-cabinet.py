@@ -20,7 +20,9 @@ Sources (President's Secretariat and the Prime Minister's Office):
   - 2024 as it stands: the roster fetch-cabinet.py and join-sansad.py write to
     `members` of data/cabinet/union/2024.json (run them first), which is checked
     name-for-name and portfolio-for-portfolio against PM India's current
-    "Portfolios of the Union Council of Ministers" before it is stamped.
+    "Portfolios of the Union Council of Ministers" before it is stamped. Its
+    `changes` are transcribed from the PIB release of 25.07.2026; the harvester
+    stops if a change's sentence is not in the fetched release.
 
 Party, state and constituency come from the Sansad Lok Sabha directory, only
 where a minister's name matches a member exactly; Rajya Sabha ministers and
@@ -49,6 +51,7 @@ FULL_2017 = RNK + "pr030917_2.html"
 END_2014 = RNK + "pr240519.html"
 SWORN_2024 = PRES + "press_releases/press-communique-18"
 SANSAD_LS = "https://sansad.in/api_ls/member?loksabha={}&lang=en"
+PIB_2024 = "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2289455"
 
 # Changes after the 03.09.2017 full re-allocation, to the end of the 16th Lok
 # Sabha. Found by reading every release on ramnathkovind.nic.in from September
@@ -107,6 +110,14 @@ CHANGES_2014 = [
              ("add", "ARUN JAITLEY", "Minister of Finance"), ("add", "ARUN JAITLEY", "Minister of Corporate Affairs")]},
 ]
 END_2014_SENTENCE = "tendered his resignation along with the Council of Ministers"
+
+# Changes to the 2024 council, each with its release's own sentence.
+CHANGES_2024 = [
+    {"date": "2026-07-25", "kind": "resigned", "name": "DHARMENDRA PRADHAN",
+     "sentence": "accepted the resignation of Shri Dharmendra Pradhan from the Union Council of Ministers"},
+    {"date": "2026-07-25", "kind": "portfolio", "name": "PRALHAD JOSHI", "to": "Ministry of Education",
+     "sentence": "Shri Pralhad Joshi, Cabinet Minister, be assigned the charge of the Ministry of Education"},
+]
 
 TITLE = r"(?:Shri|Smt\.?|Sushri|Kumari|Dr\.?|General|Gen\.|Col\.|Prof\.|Sadhvi|Sant)"
 NAME_LINE = re.compile(rf"^(?:{TITLE}\s*\S|Rao\s+\S)")
@@ -345,9 +356,7 @@ def main(argv=None) -> int:
     pmi_got = fetch(fc.PMINDIA_PORTFOLIOS, cache)
     pmi_page = pmi_got["bytes"].decode("utf-8", "replace")
     current = ([fc.parse_pm(pmi_page)] if fc.parse_pm(pmi_page) else []) + fc.parse_portfolios(pmi_page)
-    # the roster as it stands is `members` of 2024.json (`as_it_stands` in files from
-    # before the one-file-per-tense layout)
-    prior = doc24.get("as_it_stands") or doc24["members"]
+    prior = doc24["members"]
     have = {(m["name"], m["rank"], m["portfolio"]) for m in prior}
     now = {(m["name"], m["rank"], m["portfolio"]) for m in current}
     if have != now:
@@ -359,9 +368,15 @@ def main(argv=None) -> int:
     for m in sworn24:  # same official name, same person: reuse the portrait already held
         if m["name"] in photo_of:
             m["photo"] = photo_of[m["name"]]
-    pmi_src, sworn24_src, sansad18 = (source_block("pmindia", pmi_got),
-                                      source_block("president-secretariat", sworn24_got),
-                                      source_block("sansad", dir18_got))
+    pib_got = fetch(PIB_2024, cache)
+    pib_text = plain(pib_got["bytes"].decode("utf-8", "replace"))
+    for ch in CHANGES_2024:
+        if ch["sentence"] not in pib_text:
+            raise SourceShapeError(f"{PIB_2024}: the transcribed sentence is not in the release: {ch['sentence'][:80]}")
+    pmi_src, sworn24_src, sansad18, pib_src = (source_block("pmindia", pmi_got),
+                                               source_block("president-secretariat", sworn24_got),
+                                               source_block("sansad", dir18_got),
+                                               source_block("pib", pib_got))
     outputs[Path(args.out) / "2024-sworn-in.json"] = {
         "schema": 2, "scope": "union", "cycle": 2024, "term": doc24["term"],
         "provenance": "published", "source": sworn24_src, "sources": [sworn24_src, sansad18],
@@ -373,12 +388,13 @@ def main(argv=None) -> int:
     }
     outputs[Path(args.out) / "2024.json"] = {
         "schema": 2, "scope": "union", "cycle": 2024, "term": doc24["term"],
-        "provenance": "published", "source": pmi_src, "sources": [pmi_src, sansad18],
+        "provenance": "published", "source": pmi_src, "sources": [pmi_src, sansad18, pib_src],
         "note": ("Union Council of Ministers as it stands: PM India's current portfolio list on `asOf`, "
-                 "joined to the Sansad directory for party, state, constituency and photo."),
+                 "joined to the Sansad directory for party, state, constituency and photo. `changes` "
+                 "are from the PIB release of 25.07.2026, each with its own sentence; `src` indexes `sources`."),
         "swornIn": doc24["swornIn"], "asOf": pmi_got["fetched_at"][:10], "fetchedAt": pmi_got["fetched_at"][:10],
         "members": prior,
-        "changes": doc24.get("changes", []),
+        "changes": [{**ch, "src": 2} for ch in CHANGES_2024],
     }
     print(f"2024: sworn in {len(sworn24)}, as it stands {len(prior)} (matches PM India)")
 
