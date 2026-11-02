@@ -41,9 +41,20 @@ function common() {
     falseNone: /no by-elections (on record|in )/i.test(document.body.innerText),
     badVoids: voids.filter(v => !/^Not available yet — .+ ha(s|ve) not been added from .+\.$/.test(v) && !STATIC_VOIDS.some(r => r.test(v))),
     voids,
-    footer: /Portraits: Parliament of India \(sansad\.in\)\. Party symbols: Wikimedia Commons contributors/.test(txt('footer.credits')),
+    footer: /^(Member photos: linked to sansad\.in, not stored here|Members are shown by initials)\. Party symbols: Wikimedia Commons contributors/.test(txt('footer.credits').trim()),
+    photoRequests: performance.getEntriesByType('resource').map(e => e.name).filter(n => /\/data\/photos\/(ls|cabinet)\//.test(n)),
   };
 }
+// Each member card: a party-colour initials monogram, and the href of its
+// "View official photo on sansad.in" link ('' when the card has none).
+const memberCards = (cardSel, faceSel) => [...document.querySelectorAll(cardSel)].map(c => {
+  const a = c.querySelector('.photo-link a');
+  return {
+    mono: !!c.querySelector(faceSel + ' .monogram') && !c.querySelector(faceSel + ' img'),
+    href: a ? a.getAttribute('href') : '',
+    linkText: a ? a.textContent.trim() : '',
+  };
+});
 const filled = sel => [...document.querySelectorAll(sel)].filter(p => getComputedStyle(p).fill !== PAPER2).length;
 const total = sel => document.querySelectorAll(sel).length;
 """
@@ -59,7 +70,7 @@ async (u) => {
     pcFilled: filled('#map .pc'), pcTotal: total('#map .pc'),
     rows: total('#ntable-body tr'),
     cards: total('#belt-scroll .belt-card'),
-    credits: total('#belt-scroll .photo-credit'),
+    members: memberCards('#belt-scroll .belt-card', '.belt-face'),
     beltVoid: visible(document.querySelector('#belt-void')) ? txt('#belt-void') : null,
     beltTitle: txt('#belt-title'),
   };
@@ -82,6 +93,7 @@ async (u) => {
     beltShown: visible(document.querySelector('#belt')),
     beltVoid: visible(document.querySelector('#belt-void')) ? txt('#belt-void') : null,
     cards: total('#belt-scroll .belt-card'),
+    members: memberCards('#belt-scroll .belt-card', '.belt-face'),
   };
 }
 """
@@ -91,8 +103,9 @@ async (u) => {
   const c = common();
   return { ...c,
     title: txt('#p-const'), name: txt('#p-name'), role: txt('#p-role'),
-    face: !!document.querySelector('#p-face img, #p-face .monogram'),
-    credit: txt('#p-credit'),
+    face: !!document.querySelector('#p-face .monogram') && !document.querySelector('#p-face img'),
+    photoHref: (document.querySelector('#p-credit .photo-link a') || { getAttribute: () => '' }).getAttribute('href'),
+    photoText: txt('#p-credit .photo-link a').trim(),
     fund: total('#fund .fstep'), lsStats: total('#ls-stats .ls-stat'),
     mpladsVoid: txt('#mplads-body .void'), lsVoid: txt('#ls-body .void'),
     mla: [...document.querySelectorAll('#ac-cross a')].map(a => a.getAttribute('href')),
@@ -185,7 +198,40 @@ def check_common(u, r):
     if r['badVoids']:
         bad(u, 'void with unexpected wording: ' + r['badVoids'][0][:120])
     if not r['footer']:
-        bad(u, 'image credit footer missing')
+        bad(u, 'credit footer missing (sansad.in photo link and party symbol credit)')
+    if r['photoRequests']:
+        bad(u, 'requested a stored portrait: ' + ', '.join(r['photoRequests'])[:200])
+
+
+SANSAD_RS_MINISTERS = 'https://sansad.in/rs/members/in-council-of-ministers'
+PHOTO_LINK_TEXT = 'View official photo on sansad.in ↗'
+
+
+def official_photo_href(house, mpsno):
+    """Where a member's photo link must point: a Lok Sabha member's biography by
+    Sansad member number, a Rajya Sabha minister the Rajya Sabha ministers list,
+    otherwise no link."""
+    if house == 'rs':
+        return SANSAD_RS_MINISTERS
+    return f'https://sansad.in/ls/members/biography/{mpsno}?locale=en' if re.fullmatch(r'\d+', str(mpsno or '')) else ''
+
+
+def check_member_cards(u, cards, members):
+    """Every card is an initials monogram; the photo links match the roster's members."""
+    if not all(c['mono'] for c in cards):
+        bad(u, f'{sum(not c["mono"] for c in cards)} of {len(cards)} member cards without an initials monogram')
+    if any(c['href'] and c['linkText'] != PHOTO_LINK_TEXT for c in cards):
+        bad(u, 'photo link without the "View official photo on sansad.in" text')
+    got = sorted(c['href'] for c in cards)
+    want = sorted(official_photo_href(m.get('house'), m.get('mpsno')) for m in members)
+    if got != want:
+        bad(u, f'sansad.in photo links do not match the roster: {len([h for h in got if h])} links, '
+               f'expected {len([h for h in want if h])}')
+
+
+def roster_members(scope, tense, cycle, region=None):
+    base = f'cabinet/{scope}/' + (f'{region}/' if region else '') + str(cycle)
+    return load(base + ('.json' if tense == 'stands' else '-sworn-in.json'))['members']
 
 
 def roster(kind, *keys):
@@ -215,8 +261,8 @@ for u, r in run_batch('national', nat_urls, NATIONAL, settle=2500).items():
     has_roster = ros['as_it_stands'] if want == 'stands' else ros['sworn_in']
     if has_roster and (not r['cards'] or r['beltVoid']):
         bad(u, 'cabinet roster exists but the belt shows no cards')
-    if has_roster and r['credits'] != r['cards']:
-        bad(u, f'{r["cards"]} cabinet cards but {r["credits"]} photo credits')
+    if has_roster:
+        check_member_cards(u, r['members'], roster_members('union', want, y))
     if not has_roster and (r['cards'] or not r['beltVoid']):
         bad(u, 'cabinet roster missing but the belt is not the void')
     if not byel and 'by-election record not available yet' not in r['note']:
@@ -264,6 +310,8 @@ for u, r in state_res.items():
             bad(u, 'state council belt hidden for a state with assembly cycles')
         elif has_roster == bool(r['beltVoid']):
             bad(u, 'state council belt: void/roster mismatch with availability.json')
+        elif has_roster:
+            check_member_cards(u, r['members'], roster_members('state', want, latest, s))
     elif s not in coverage:
         if r['beltShown']:
             bad(u, 'belt shown for a state without assembly cycles')
@@ -296,6 +344,7 @@ def keyify_state(name, abbr):
 
 
 mp_urls = []
+mp_seat = {}
 for s in sorted(avail.get('mplads', {})):
     idx = load(f'mplads/{s}/index.json')
     abbr = s.split('-')[1]
@@ -305,7 +354,9 @@ for s in sorted(avail.get('mplads', {})):
         key = by_name.get(keyify_state(g['properties']['ls_seat_name'], abbr))
         if key:
             mp_urls.append(f'mp/?s={s}&c={key}')
+            mp_seat[f'mp/?s={s}&c={key}'] = g['properties']['unique_id']
 mp_urls = sorted(set(mp_urls))
+ls_members = load(f'members/ls/{LS_YEARS[-1]}.json')['members'] if avail.get('members', {}).get('ls', {}).get(str(LS_YEARS[-1])) else {}
 mla_urls = set()
 for u, r in run_batch('mp', mp_urls, MP, settle=1800, workers=4).items():
     check_common(u, r)
@@ -317,7 +368,13 @@ for u, r in run_batch('mp', mp_urls, MP, settle=1800, workers=4).items():
     if not r['name'] or r['name'] in ('—', 'Result not available yet'):
         bad(u, f'no member name ({r["name"]!r})')
     if not r['face']:
-        bad(u, 'no portrait and no monogram')
+        bad(u, 'no initials monogram (or a stored portrait) for the member')
+    par = load(f'parliament/{s}/{c}.json') if has_par else {}
+    mpsno = par.get('mpsno') or ls_members.get(mp_seat.get(u), {}).get('mpsno')
+    if r['photoHref'] != official_photo_href('ls', mpsno):
+        bad(u, f'photo link {r["photoHref"]!r}, expected {official_photo_href("ls", mpsno)!r}')
+    if r['photoHref'] and r['photoText'] != PHOTO_LINK_TEXT:
+        bad(u, 'photo link without the "View official photo on sansad.in" text')
     if has_par != bool(r['lsStats']) or has_par == bool(r['lsVoid']):
         bad(u, f'Sansad record present={has_par} but stats={r["lsStats"]} void={bool(r["lsVoid"])}')
     if has_mplads != bool(r['fund']) or has_mplads == bool(r['mpladsVoid']):
