@@ -21,7 +21,7 @@ Each stops with an error on a source shape it does not expect.
 | --- | --- | --- |
 | `harvest-ac-results.py` | `data/results/ac/{STATE}/{cycle}.json` + `-detail.json` | ECI statistical reports, table 10 (cross-checked against tables 5 and 9) |
 | `harvest-ls-byel.py` | `data/results/ls/byel/{2014,2019,2024}.json` | ECI by-election index cards |
-| `harvest-union-cabinet.py` | `data/cabinet/union/{2014,2024}.json` and `{2014,2024}-sworn-in.json` | President's Secretariat releases, PM India, Sansad |
+| `harvest-union-cabinet.py` | `data/cabinet/union/{2014,2024}.json` and `{2014,2024}-sworn-in.json` | President's Secretariat releases, PM India, PIB (2024 `changes`), Sansad |
 | `harvest-up-cabinet.py` | `data/cabinet/state/IN-UP/2022.json` | Chief Minister's Office, Uttar Pradesh |
 
 - run: `.venv/bin/python tools/harvest-ac-results.py` (each takes `--dry-run`)
@@ -39,6 +39,8 @@ Each stops with an error on a source shape it does not expect.
   by-election term assembly.
 - `node --test tools/test_stands.mjs`: the state page's "as it stands" seat tally
   (`state/stands.js`) adds up to each state's seat count.
+- `node --test tools/test_card.mjs`: the state page's hover card (`state/card.js`)
+  shows only the hovered seat, including an AC listed in a file's `no_result`.
 
 ## Succession
 
