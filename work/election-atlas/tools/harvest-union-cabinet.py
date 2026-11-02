@@ -26,7 +26,9 @@ Sources (President's Secretariat and the Prime Minister's Office):
 
 Party, state and constituency come from the Sansad Lok Sabha directory, only
 where a minister's name matches a member exactly; Rajya Sabha ministers and
-non-matches carry none of the three rather than a guessed one.
+non-matches carry none of the three rather than a guessed one. A 2024 sworn-in
+minister also takes them, with the Sansad member number, from the as-it-stands
+roster entry for the same minister (exact or single unambiguous normalised name).
 
 Usage (from work/election-atlas/):
     python3 tools/harvest-union-cabinet.py
@@ -43,6 +45,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from harvest_common import DATA, DEFAULT_CACHE, SourceShapeError, fetch, source_block, write_json  # noqa: E402
 from validate_records import require_valid  # noqa: E402
+
+_spec = importlib.util.spec_from_file_location("join_sansad", Path(__file__).resolve().parent / "join-sansad.py")
+js = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(js)
 
 PRES = "https://www.presidentofindia.gov.in/"
 RNK = "https://ramnathkovind.nic.in/"
@@ -258,24 +264,25 @@ def sansad_directory(term_no, cache):
     return got, recs
 
 
+def directory_entries(recs, regions):
+    """Lok Sabha directory records -> roster-shaped entries: name, party, state, constituency, mpsno."""
+    state_code = {js.norm_state(s): r["code"] for r in regions for s in [r["name"], *r.get("sourceNames", [])]}
+    return [{"name": r.get("mpFirstLastName") or f"{r.get('firstName', '')} {r.get('lastName', '')}",
+             "party": js.PARTY_MAP.get(r.get("partySname"), r.get("partySname")),
+             "state": state_code.get(js.norm_state(r.get("stateName"))),
+             "constituency": r.get("constName"),
+             "mpsno": r.get("mpsno")} for r in recs]
+
+
 def enrich(members, recs, regions):
     """Party / state / constituency from exact name matches in the Lok Sabha directory."""
-    spec = importlib.util.spec_from_file_location("join_sansad", Path(__file__).parent / "join-sansad.py")
-    js = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(js)
     by_name = {}
-    for r in recs:
-        nm = r.get("mpFirstLastName") or f"{r.get('firstName', '')} {r.get('lastName', '')}"
-        by_name.setdefault(js.no_space(nm), []).append(r)
-    state_code = {js.norm_state(s): r["code"] for r in regions for s in [r["name"], *r.get("sourceNames", [])]}
+    for e in directory_entries(recs, regions):
+        by_name.setdefault(js.no_space(e["name"]), []).append(e)
     for m in members:
         hits = by_name.get(js.no_space(m["name"]), [])
         if len(hits) == 1:
-            r = hits[0]
-            m["party"] = js.PARTY_MAP.get(r.get("partySname"), r.get("partySname"))
-            m["state"] = state_code.get(js.norm_state(r.get("stateName")))
-            m["constituency"] = r.get("constName")
-            m["mpsno"] = r.get("mpsno")
+            m.update({k: hits[0][k] for k in ("party", "state", "constituency", "mpsno")})
     return members
 
 
@@ -285,36 +292,39 @@ def name_tokens(name: str) -> frozenset:
 
 
 def copy_sansad_ids(sworn, prior, directory):
-    """Give sworn-in ministers the `mpsno` / `house` the as-it-stands roster holds.
+    """Give sworn-in ministers what the published entry for the same minister holds:
+    party, state, constituency and `mpsno` / `house`, filling only fields still empty.
 
-    First by exact name; then, for a minister still without one, by a normalised
-    name (case, punctuation, initials and word order dropped, one spelling's words
-    all within the other's) against the roster and then the Lok Sabha directory,
-    copied only from a single unambiguous match. Returns the backfilled
-    (sworn name, matched name, ids) triples."""
-    sansad_id = {m["name"]: {k: m[k] for k in ("mpsno", "house") if m.get(k)}
-                 for m in prior if m.get("mpsno") or m.get("house")}
-    for m in sworn:  # same official name, same person: reuse the Sansad member number already held
-        for k, v in sansad_id.get(m["name"], {}).items():
-            m.setdefault(k, v)
+    First from the as-it-stands roster by exact name; then, for a minister still
+    without an id, by a normalised name (case, punctuation, initials and word order
+    dropped, one spelling's words all within the other's) against the roster and
+    then the Lok Sabha directory entries, copied only from a single unambiguous
+    match. Returns the backfilled (sworn name, matched name, copied fields) triples."""
+    def carried(entry):
+        return {k: entry[k] for k in ("party", "state", "constituency", "mpsno", "house") if entry.get(k)}
+
+    def fill(m, fields):
+        m.update({k: v for k, v in fields.items() if not m.get(k)})
+
+    roster = {m["name"]: m for m in prior}
+    for m in sworn:  # same official name, same person
+        if m["name"] in roster:
+            fill(m, carried(roster[m["name"]]))
     sworn_names = {m["name"] for m in sworn}
     held = {m["mpsno"] for m in sworn if m.get("mpsno")}
-    pools = [
-        [(nm, ids) for nm, ids in sansad_id.items() if nm not in sworn_names and ids.get("mpsno") not in held],
-        [(r.get("mpFirstLastName") or f"{r.get('firstName', '')} {r.get('lastName', '')}", {"mpsno": r["mpsno"]})
-         for r in directory if r.get("mpsno") and r["mpsno"] not in held],
-    ]
+    pools = [[e for e in prior if e["name"] not in sworn_names and e.get("mpsno") not in held],
+             [e for e in directory if e.get("mpsno") and e["mpsno"] not in held]]
     backfilled = []
     for m in sworn:
         if m.get("mpsno") or m.get("house"):
             continue
         mine = name_tokens(m["name"])
         for pool in pools:
-            hits = [(nm, ids) for nm, ids in pool
-                    if len(mine & name_tokens(nm)) >= 2 and (mine <= name_tokens(nm) or name_tokens(nm) <= mine)]
+            hits = [e for e in pool if len(mine & name_tokens(e["name"])) >= 2
+                    and (mine <= name_tokens(e["name"]) or name_tokens(e["name"]) <= mine)]
             if len(hits) == 1:
-                m.update(hits[0][1])
-                backfilled.append((m["name"], hits[0][0], hits[0][1]))
+                fill(m, carried(hits[0]))
+                backfilled.append((m["name"], hits[0]["name"], carried(hits[0])))
                 break
     return backfilled
 
@@ -404,8 +414,8 @@ def main(argv=None) -> int:
                                "refresh it with fetch-cabinet.py and join-sansad.py first")
     dir18_got, recs18 = sansad_directory(18, cache)
     enrich(sworn24, recs18, regions)
-    for name, matched, ids in copy_sansad_ids(sworn24, prior, recs18):
-        print(f"2024 sworn in: {name} <- {matched} {ids}")
+    for name, matched, fields in copy_sansad_ids(sworn24, prior, directory_entries(recs18, regions)):
+        print(f"2024 sworn in: {name} <- {matched} {fields}")
     pib_got = fetch(PIB_2024, cache)
     pib_text = plain(pib_got["bytes"].decode("utf-8", "replace"))
     for ch in CHANGES_2024:
@@ -417,10 +427,12 @@ def main(argv=None) -> int:
                                                source_block("pib", pib_got))
     outputs[Path(args.out) / "2024-sworn-in.json"] = {
         "schema": 2, "scope": "union", "cycle": 2024, "term": doc24["term"],
-        "provenance": "published", "source": sworn24_src, "sources": [sworn24_src, sansad18],
+        "provenance": "published", "source": sworn24_src, "sources": [sworn24_src, sansad18, pmi_src],
         "note": ("Union Council of Ministers as sworn in: the President's press communique of "
-                 "10.06.2024 (oath 09.06.2024), joined to the Sansad 18th Lok Sabha directory for "
-                 "party, state and constituency by exact name."),
+                 "10.06.2024 (oath 09.06.2024). Party, state, constituency and Sansad member number "
+                 "come from the Sansad 18th Lok Sabha directory by exact name, and from the as-it-stands "
+                 "roster (data/cabinet/union/2024.json, PM India joined to Sansad) for the same minister "
+                 "by exact or normalised name; a minister matched in neither carries none."),
         "swornIn": doc24["swornIn"], "allocated": "2024-06-10", "fetchedAt": sworn24_got["fetched_at"][:10],
         "members": sworn24,
     }
