@@ -126,9 +126,6 @@ is absent from `constituencies` and listed in the file's `no_result`.
 `o` is every other party's votes in the AC, summed by party code (NOTA included),
 as in the Lok Sabha files.
 
-An AC the report carries no result for (a poll countermanded and held later)
-is absent from `constituencies` and listed in the file's `no_result`.
-
 ---
 
 ## Provenance
