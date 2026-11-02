@@ -214,12 +214,12 @@ td:first-child{text-align:left;padding-right:var(--s4)}
 .info-tip b{font-weight:500}
 
 .face .monogram{display:flex;align-items:center;justify-content:center;width:100%;height:100%;
-  font-size:2rem;color:var(--muted);font-family:var(--serif);letter-spacing:.02em}
+  font-size:2rem;background:var(--mono-bg,transparent);color:var(--mono-ink,var(--muted));font-family:var(--serif);letter-spacing:.02em}
 .portrait{flex:0 0 9rem;display:flex;flex-direction:column;gap:4px;min-width:0}
 .portrait .face{flex:none;width:100%}
-.photo-credit{display:block;font-family:var(--mono);font-size:.5625rem;line-height:1.4;color:var(--muted);letter-spacing:.02em}
-.photo-credit a{color:inherit;text-decoration:underline;text-underline-offset:2px}
-.photo-credit a:hover{color:var(--ink)}
+.photo-link{display:block;font-family:var(--mono);font-size:.5625rem;line-height:1.4;color:var(--muted);letter-spacing:.02em}
+.photo-link a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.photo-link a:hover{color:var(--ink)}
 .credits{max-width:52rem;margin:var(--s6) auto 0;padding-top:var(--s3);border-top:1px solid var(--rule);
   font-family:var(--mono);font-size:.5625rem;line-height:1.5;letter-spacing:.04em;color:var(--muted)}
 .credits p{margin:0}
@@ -312,15 +312,14 @@ td:first-child{text-align:left;padding-right:var(--s4)}
     <div class="void"><p>No news yet — the news fetcher isn't built. This section will hold a bounded, sourced list per MP once it is.</p></div>
   </section>
 </div>
-<footer class="credits"><p>Portraits: Parliament of India (sansad.in). Party symbols: Wikimedia Commons contributors (<a href="../data/parties-symbols.json">licences listed</a>).</p></footer>
+<footer class="credits"><p>Member photos: linked to sansad.in, not stored here. Party symbols: Wikimedia Commons contributors (<a href="../data/parties-symbols.json">licences listed</a>).</p></footer>
 
 <script type="module">
 import {
-  fetchOptional, loadAvailability, listed, hasPhoto, lsDetailAvailable, voidHTML, ECI,
-  portraitHTML, monogramHTML, photoCreditHTML, installPortraitFallback,
+  fetchOptional, loadAvailability, listed, membersAvailable, lsDetailAvailable, voidHTML, ECI,
+  monogramHTML, officialPhotoHTML,
 } from '../lib/atlas.js';
 const $ = s => document.querySelector(s);
-installPortraitFallback();
 const nf = n => Math.round(n).toLocaleString('en-IN');
 const cr = v => '₹' + (v / 1e7).toFixed(2) + ' Cr';
 const tc = s => (s || '').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
@@ -337,7 +336,7 @@ const C = (qs.get('c') || 'gorakhpur').toLowerCase();
 const avail = await loadAvailability('../data/');
 const docOr = (res, fallback) => (res.ok ? res.doc : fallback);
 const none = Promise.resolve({ ok: false });
-const [parRes, mpladsRes, partiesRes, symRes, coverageRes, detailRes, pcRes, regionsRes, creditsRes] = await Promise.all([
+const [parRes, mpladsRes, partiesRes, symRes, coverageRes, detailRes, pcRes, regionsRes, membersRes] = await Promise.all([
   listed(avail, 'parliament', S, C) ? fetchOptional(`../data/parliament/${S}/${C}.json`) : none,
   listed(avail, 'mplads', S, C) ? fetchOptional(`../data/mplads/${S}/${C}.json`) : none,
   fetchOptional('../data/parties.json'),
@@ -346,7 +345,7 @@ const [parRes, mpladsRes, partiesRes, symRes, coverageRes, detailRes, pcRes, reg
   lsDetailAvailable(avail, 2024) ? fetchOptional('../data/results/ls/detail/2024.json') : none,
   fetchOptional(`../data/geo/ls/${S}.json`),
   fetchOptional('../data/regions.json'),
-  fetchOptional('../data/photos/ls/2024/credits.json'),
+  membersAvailable(avail, '2024') ? fetchOptional('../data/members/ls/2024.json') : none,
 ]);
 const par = docOr(parRes, null);
 const mplads = docOr(mpladsRes, null);
@@ -379,24 +378,21 @@ const seatKey = seatGeom ? seatGeom.properties.unique_id : '';
 const seatMatch = seatKey && results && results.constituencies[seatKey]
   ? [seatKey, results.constituencies[seatKey]] : null;
 const winner = seatMatch ? [...seatMatch[1].c].sort((a, b) => b.v - a.v)[0] : null;
-const credit = (docOr(creditsRes, { credits: {} }).credits || {})[seatKey] || {};
+const lsMember = (docOr(membersRes, { members: {} }).members || {})[seatKey] || {};
 
 const profile = (par && par.profile) || {};
 const constituency = profile.constituency || (seatGeom ? seatGeom.properties.ls_seat_name : C);
 const memberName = profile.name || (winner ? winner.n : '');
 const party = profile.party || (winner ? winner.p : '');
-const mpsno = (par && par.mpsno) || credit.mpsno || '';
+const mpsno = (par && par.mpsno) || lsMember.mpsno || '';
 
 document.title = `${constituency} — Election Atlas of India`;
 $('#p-const').textContent = constituency;
 $('#p-sub').textContent = `Parliamentary constituency · ${profile.state || stateName} · 18th Lok Sabha`;
 $('#back').href = `../state/?s=${S}`;
 
-const photo = seatKey && hasPhoto(avail, '2024', seatKey);
-$('#p-face').innerHTML = photo
-  ? portraitHTML(`../data/photos/ls/2024/${seatKey}.jpg`, memberName)
-  : (memberName ? monogramHTML(memberName) : '');
-$('#p-credit').innerHTML = photo ? photoCreditHTML('ls', mpsno) : '';
+$('#p-face').innerHTML = memberName ? monogramHTML(memberName, colour(party)) : '';
+$('#p-credit').innerHTML = memberName ? officialPhotoHTML('ls', mpsno) : '';
 
 if (party) {
   const sym = symFor(party);

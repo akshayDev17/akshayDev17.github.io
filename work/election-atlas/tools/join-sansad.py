@@ -5,7 +5,9 @@ Fills in, from the official Parliament of India member directory (.gov.in):
   - party (mapped to the atlas party code),
   - state (mapped to the atlas region code),
   - constituency (Lok Sabha only; Rajya Sabha members have none),
-  - photo (downloaded + credited).
+  - the Sansad member number: `mpsno` for a Lok Sabha member, or `house: "rs"`
+    for a Rajya Sabha member, so the pages can link each minister to their
+    official page on sansad.in. No portrait is downloaded or stored.
 
 Sources:
   - Lok Sabha:  https://sansad.in/api_ls/member            (all members, one call)
@@ -92,14 +94,14 @@ def build_lookup():
         name = m.get("mpFirstLastName") or f"{m.get('firstName','')} {m.get('lastName','')}"
         records.append({"house": "ls", "name": norm(name),
                         "party": m.get("partySname"), "state": m.get("stateName"),
-                        "const": m.get("constName"), "photo": m.get("imageUrl"),
+                        "const": m.get("constName"),
                         "id": m.get("mpsno")})
     rs = fetch_json(RS_URL)
     for m in rs.get("records", []):
         name = f"{m.get('firstName','')} {m.get('lastName','')}"
         records.append({"house": "rs", "name": norm(name),
                         "party": m.get("partyCode"), "state": m.get("stateName"),
-                        "const": None, "photo": m.get("imageUrl"),
+                        "const": None,
                         "id": m.get("mpCode")})
     by_norm, by_nospace = {}, {}
     for r in records:
@@ -144,9 +146,6 @@ def main():
     ap.add_argument("--in", dest="inp", default=None,
                     help="cabinet JSON from fetch-cabinet.py")
     ap.add_argument("--out", default=None)
-    ap.add_argument("--photo-dir", default=None,
-                    help="where to write portraits (default: data/photos/cabinet/<cycle>)")
-    ap.add_argument("--no-download", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -173,33 +172,16 @@ def main():
         for s in r.get("sourceNames", []):
             state_to_code[norm_state(s)] = r["code"]
 
-    photo_dir = args.photo_dir or f"data/photos/cabinet/{args.cycle}"
-    credits = {}
-    unmatched = []
     for m in doc["members"]:
         rec = match_member(m["name"], records, by_norm, by_nospace)
         m["party"] = PARTY_MAP.get(rec["party"], rec["party"])
         m["state"] = state_to_code.get(norm_state(rec["state"]))
         m["constituency"] = rec["const"]
         m["_match"] = rec["name"]
-        if rec["photo"] and not args.no_download:
-            ext = ".jpg"
-            fname = f"{rec['house']}-{rec['id']}{ext}"
-            path = Path(photo_dir) / fname
-            path.parent.mkdir(parents=True, exist_ok=True)
-            r = subprocess.run(["curl", "-sSL", "-m", "40", "-A", UA,
-                                rec["photo"], "-o", str(path)], capture_output=True)
-            if r.returncode == 0 and path.stat().st_size > 2000:
-                m["photo"] = f"{args.cycle}/{fname}"
-                credits[fname] = {"url": rec["photo"],
-                                  "authority": "Parliament of India (Sansad)"}
-            else:
-                m["photo"] = None
-                path.unlink(missing_ok=True)
-        else:
-            m["photo"] = None
-        if rec["house"] == "rs" and not m.get("constituency"):
-            pass  # RS members have no Lok Sabha constituency
+        if rec["house"] == "ls" and rec["id"]:
+            m["mpsno"] = int(rec["id"])
+        elif rec["house"] == "rs":
+            m["house"] = "rs"  # the atlas links Rajya Sabha ministers to the RS list of ministers
 
     doc["_join"] = {"source": "Parliament of India (Sansad) member directory",
                     "matched": sum(1 for m in doc["members"] if m.get("party")),
@@ -210,11 +192,7 @@ def main():
         print(json.dumps(doc, indent=2, ensure_ascii=False))
         return
     json.dump(doc, open(out, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
-    if credits:
-        json.dump(credits, open(Path(photo_dir) / "credits.json", "w", encoding="utf-8"),
-                  indent=2, ensure_ascii=False)
     print(f"enriched {len(doc['members'])} members -> {out}")
-    print(f"photos: {len(credits)} written to {photo_dir}")
 
 
 if __name__ == "__main__":

@@ -364,10 +364,11 @@ def main(argv=None) -> int:
                                "refresh it with fetch-cabinet.py and join-sansad.py first")
     dir18_got, recs18 = sansad_directory(18, cache)
     enrich(sworn24, recs18, regions)
-    photo_of = {m["name"]: m["photo"] for m in prior if m.get("photo")}
-    for m in sworn24:  # same official name, same person: reuse the portrait already held
-        if m["name"] in photo_of:
-            m["photo"] = photo_of[m["name"]]
+    sansad_id = {m["name"]: {k: m[k] for k in ("mpsno", "house") if m.get(k)}
+                 for m in prior if m.get("mpsno") or m.get("house")}
+    for m in sworn24:  # same official name, same person: reuse the Sansad member number already held
+        for k, v in sansad_id.get(m["name"], {}).items():
+            m.setdefault(k, v)
     pib_got = fetch(PIB_2024, cache)
     pib_text = plain(pib_got["bytes"].decode("utf-8", "replace"))
     for ch in CHANGES_2024:
@@ -390,7 +391,7 @@ def main(argv=None) -> int:
         "schema": 2, "scope": "union", "cycle": 2024, "term": doc24["term"],
         "provenance": "published", "source": pmi_src, "sources": [pmi_src, sansad18, pib_src],
         "note": ("Union Council of Ministers as it stands: PM India's current portfolio list on `asOf`, "
-                 "joined to the Sansad directory for party, state, constituency and photo. `changes` "
+                 "joined to the Sansad directory for party, state, constituency and Sansad member number. `changes` "
                  "are from the PIB release of 25.07.2026, each with its own sentence; `src` indexes `sources`."),
         "swornIn": doc24["swornIn"], "asOf": pmi_got["fetched_at"][:10], "fetchedAt": pmi_got["fetched_at"][:10],
         "members": prior,

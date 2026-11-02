@@ -21,7 +21,7 @@ Usage:
   python3 tools/fetch-cabinet.py --cycle 2024 --dry-run
 
 Notes / honest limits of this version:
-  - party / constituency / state / photo are NOT in the PM India list, so they
+  - party / constituency / state are NOT in the PM India list, so they
     are emitted as null and must be joined from the Sansad member directory or
     the results data (a follow-up step).
   - PIB prose parsing is heuristic. Every change carries its source sentence
@@ -201,7 +201,7 @@ def build_doc(cycle, members, communiques):
         "members": members,
         "changes": [c for cm in communiques for c in cm["changes"]],
         "_communiques": communiques,
-        "_note": ("party / constituency / state / photo are null: not present in the "
+        "_note": ("party / constituency / state are null: not present in the "
                   "PM India list; join from the Sansad member directory or results data."),
     }
 

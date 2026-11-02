@@ -72,7 +72,7 @@ a{color:var(--ink)}
   line-height:1.7;color:var(--muted);margin:0}
 
 .face .monogram{display:flex;align-items:center;justify-content:center;width:100%;height:100%;
-  color:var(--muted);font-family:var(--serif);letter-spacing:.02em}
+  background:var(--mono-bg,transparent);color:var(--mono-ink,var(--muted));font-family:var(--serif);letter-spacing:.02em}
 .credits{max-width:52rem;margin:var(--s6) auto 0;padding-top:var(--s3);border-top:1px solid var(--rule);
   font-family:var(--mono);font-size:.5625rem;line-height:1.5;letter-spacing:.04em;color:var(--muted)}
 .credits p{margin:0}
@@ -130,7 +130,7 @@ a{color:var(--ink)}
     <div class="void"><p>No news yet — the news fetcher isn't built.</p></div>
   </section>
 </div>
-<footer class="credits"><p>Portraits: Parliament of India (sansad.in). Party symbols: Wikimedia Commons contributors (<a href="../data/parties-symbols.json">licences listed</a>).</p></footer>
+<footer class="credits"><p>Members are shown by initials. Party symbols: Wikimedia Commons contributors (<a href="../data/parties-symbols.json">licences listed</a>).</p></footer>
 
 <script type="module">
 import { fetchOptional, loadAvailability, acCycles, voidHTML, ECI, monogramHTML } from '../lib/atlas.js';
@@ -203,7 +203,7 @@ if (winner) {
   $('#p-who').hidden = false;
   $('#p-name').textContent = tc(winner.n);
   $('#p-role').textContent = `MLA · ${shown.year} assembly election`;
-  $('#p-face').innerHTML = monogramHTML(winner.n);
+  $('#p-face').innerHTML = monogramHTML(winner.n, colour(winner.p));
   $('#p-face').hidden = false;
   $('#p-facts').innerHTML =
     `<div class="fact"><div class="k">Margin</div><div class="v">+${margin.toFixed(1)}%</div></div>` +

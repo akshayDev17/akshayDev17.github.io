@@ -41,6 +41,10 @@ Each stops with an error on a source shape it does not expect.
   (`state/stands.js`) adds up to each state's seat count.
 - `node --test tools/test_card.mjs`: the state page's hover card (`state/card.js`)
   shows only the hovered seat, including an AC listed in a file's `no_result`.
+- `node --test tools/test_member_link.mjs` and `python3 tools/test_no_stored_portraits.py`:
+  members are initials on the party colour plus a "View official photo on sansad.in"
+  link built from the Sansad member number; no page names a stored-portrait path and
+  none is committed.
 
 ## Succession
 
@@ -51,7 +55,7 @@ Each stops with an error on a source shape it does not expect.
 3. `fetch-cabinet.py`
    - fetches the Union Council of Ministers
 4. `join-sansad.py`
-   - enriches the cabinet with party / state / constituency / photo
+   - enriches the cabinet with party / state / constituency / Sansad member number
 5. `build-availability.py`
    - rewrites `data/availability.json` after any data file is added or removed
 6. `check_provenance.py`
@@ -89,15 +93,16 @@ Each stops with an error on a source shape it does not expect.
 - source: Parliament of India member directory
   - Lok Sabha: `https://sansad.in/api_ls/member`
   - Rajya Sabha: `https://sansad.in/api_rs/member/in-council-of-ministers`
-- adds: party, state, constituency, photo
+- adds: party, state, constituency, and `mpsno` (Lok Sabha) or `house: "rs"` (Rajya Sabha);
+  no portrait is downloaded
 - run: `python3 tools/join-sansad.py --cycle 2024 --in <fetched.json> --out <enriched.json>`
-- options: `--photo-dir`, `--no-download`, `--dry-run`
+- options: `--dry-run`
 
 ### build-availability.py
 
 - writes `data/availability.json`: which optional files exist (by-elections,
   cabinet rosters per tense, assembly cycles per state, Sansad records, MPLADS
-  files, portraits), so the pages show "not available yet" instead of probing
+  files, the Lok Sabha member record), so the pages show "not available yet" instead of probing
 - reads years from `manifest.elections.ls.years` and assembly cycles from
   `manifest.elections.ac.cycles`
 - run: `python3 tools/build-availability.py`
@@ -106,7 +111,7 @@ Each stops with an error on a source shape it does not expect.
 ### check_provenance.py
 
 - fails if anything but published data is in `data/`:
-  - every `results/**` and `cabinet/**` file must carry `"provenance": "published"`
+  - every `results/**`, `cabinet/**` and `members/**` file must carry `"provenance": "published"`
     and an https source URL on a government publisher's host
   - no metadata field (`note*`, `source*`, `_note`, `caveat`, `provenance`)
     may say synthetic, dummy, invented, placeholder, fake or mock
@@ -127,7 +132,7 @@ Each stops with an error on a source shape it does not expect.
 ## Notes
 
 - fetches use `curl` (this machine's Python SSL bundle is broken)
-- cabinet artifacts land in `data/cabinet/union/` + `data/photos/cabinet/`
+- cabinet artifacts land in `data/cabinet/union/`
 - party colours + symbol images have no `.gov.in` source; symbol names only:
   - `https://www.eci.gov.in/eci-backend/public/api/list-of-political-party`
   - `https://www.eci.gov.in/eci-backend/public/api/recognition-derecognition`
