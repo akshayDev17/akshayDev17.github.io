@@ -203,7 +203,7 @@ Editorial and quiet. 240ms, `cubic-bezier(.2,.7,.3,1)`.
 
 ## IMAGERY
 
-**none** — with one deliberate exception deferred to the case-study page. The home page must carry itself on typography, rules and composition. The election-atlas page will later get exactly one real map still at 16:9, because there the subject *is* cartographic. No stock imagery anywhere, no decorative SVG, no generated blobs.
+**none** — with one deliberate exception deferred to the case-study page. The home page must carry itself on typography, rules and composition. The Election Atlas case-study page will later get exactly one real map still at 16:9, because there the subject *is* cartographic. No stock imagery anywhere, no decorative SVG, no generated blobs.
 
 ## SIGNATURE
 

@@ -3,8 +3,8 @@
 Read this before the next design session. It exists so the next page starts from these decisions
 instead of rediscovering them.
 
-**This file covers the home page.** For `work/election-atlas/` read `.design/atlas-memory.md`,
-which carries the atlas tokens, its measurements, and what its critic pass caught.
+**This file covers the home page.** The Election Atlas of India now lives in its own repository,
+akshayDev17/election-atlas, served at `/elections/india/`; its design record moved with it.
 
 ## Tokens in use (`home-v1/index.html`)
 
@@ -159,7 +159,7 @@ plate**, which also removed one of five identical opener bands. Work's first row
 ## Open items
 
 - **Four routes and `/cv.pdf` do not exist**: `/work/harness-atlas/`, `/work/ml-engineering-atlas/`,
-  `/work/mcp-youtube-extract/`, `/work/election-atlas/`, `/work/`, `/cv.pdf`. The markup is correct
+  `/work/mcp-youtube-extract/`, `/work/`, `/cv.pdf`. The markup is correct
   for the final site; the pages are the next build. The side column labelling two of them `live`
   refers to the artifacts existing, not to the routes resolving.
 - Root-absolute paths (`/work/…`) are correct **because** the repo is `akshayDev17.github.io`, a user
