@@ -5,9 +5,9 @@ Phase 0 baseline for moving the Election Atlas off GitHub Pages. Every row is a
 URL a reader can request today, so a later host can be replayed against it:
 
   file      a tracked file Jekyll publishes byte-for-byte (no file has front matter)
-  retired   a published file that held dummy data or a fair-use party image; expected
-            to answer 404 once it is deleted, and listed so that 404 is not read as a
-            regression
+  retired   a published file that held dummy data, a fair-use party image or a stored
+            member portrait; expected to answer 404 once it is deleted, and listed so
+            that 404 is not read as a regression
   redirect  a directory URL without its trailing slash (Pages answers 301 to the slash)
   page      a directory URL with its slash, served from that directory's index.html
   deeplink  a page URL carrying the query string the atlas pages read (?s= ?y= ?t= ?c=)
@@ -51,6 +51,10 @@ DUMMY_MARK = re.compile(r'synthetic|dummy', re.I)
 # Party images Wikipedia carries only under fair use; dropped for the colour swatch.
 FAIR_USE = [f'{DATA}/photos/parties/{f}' for f in ('DMK.png', 'LJSP.jpg', 'RJD.jpg')]
 RETIRED_REASON = {**{p: 'dummy data' for p in RETIRED}, **{p: 'fair-use image' for p in FAIR_USE}}
+
+# Copies of official member portraits, with their credits. The owner's decision is
+# initials plus a sansad.in link, so every file under these directories is retired.
+PORTRAIT_DIRS = (f'{DATA}/photos/ls/2024/', f'{DATA}/photos/cabinet/2024/')
 
 # Text types GitHub Pages labels with a charset; everything else is bare.
 CT_OVERRIDES = {'.js': 'application/javascript', '.json': 'application/json',
@@ -137,8 +141,11 @@ def deeplinks(repo, ref):
 def build_rows(repo, ref):
     published = sorted(p for p in tracked_files(repo, ref) if jekyll_publishes(p))
     missing = [p for p in RETIRED_REASON if p not in published]
+    missing += [d for d in PORTRAIT_DIRS if not any(p.startswith(d) for p in published)]
     if missing:
         sys.exit(f'retired paths absent at {ref}: {missing}')
+    reasons = {**RETIRED_REASON,
+               **{p: 'stored portrait' for p in published if p.startswith(PORTRAIT_DIRS)}}
     for p in RETIRED:
         doc = blob_json(repo, ref, p)
         meta = ' '.join(str(doc.get(k, '')) for k in ('note', 'source'))
@@ -147,7 +154,7 @@ def build_rows(repo, ref):
     shas = blob_sha256(repo, ref, published)
     rows = []
     for p in published:
-        reason = RETIRED_REASON.get(p)
+        reason = reasons.get(p)
         kind = 'retired' if reason else 'file'
         expect = f'404 retired: {reason}' if reason else '200'
         rows.append({'kind': kind, 'url': '/' + p, 'expect': expect,
