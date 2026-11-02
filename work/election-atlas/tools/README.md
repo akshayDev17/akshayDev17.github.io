@@ -78,6 +78,10 @@ Each stops with an error on a source shape it does not expect.
 - output: `data/results/ls/pc/{year}.json` + state files
 - run: `python3 tools/build-ls-results.py --year 2024`
 - verify: `python3 tools/build-ls-results.py --year 2024 --check`
+- pre-2008 years (1980–2004, state level only): the script downloads each year's
+  report and the three party lists it reads into `_research/harvest/` and records
+  each file's `url`, `sha256` and `fetched_at` in the state file's `source` /
+  `sources`, so `validate_records.py` passes for them
 
 ### eci_pdf.py
 

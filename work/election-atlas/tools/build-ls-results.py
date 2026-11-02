@@ -34,6 +34,9 @@ import os
 import re
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from harvest_common import DEFAULT_CACHE, fetch  # noqa: E402
+
 try:
     import xlrd  # .xls  (BIFF) — the ECI files need ignore_workbook_corruption
 except ImportError:
@@ -146,6 +149,32 @@ ARCHIVE_STATE_ONLY = {
     1996: ("general-election-1996-vol-i-ii_part1.pdf", 543),
     2004: ("general-election-2004-vol-i-ii-iii_part1.pdf", 543),
 }
+# Where each input a pre-2008 year reads was downloaded from: that year's report
+# (Vol I) and the three ECI party lists build_party_index() borrows its
+# ABBREVIATION <-> NAME bridge from. fetch_sources() downloads them into the harvest
+# cache, so the state file can record the url, sha256 and fetched_at of each.
+ECI_OLD_FILES = "https://old.eci.gov.in/files/file/"
+SOURCE_URLS = {
+    "eci_pdfs/general-election-1980-vol-i-ii_part1.pdf":
+        ECI_OLD_FILES + "4117-general-election-1980-vol-i-ii/?do=download&r=9752&confirm=1&t=1",
+    "eci_pdfs/general-election-1984-vol-i-ii_part1.pdf":
+        ECI_OLD_FILES + "4118-general-election-1984-vol-i-ii/?do=download&r=9755&confirm=1&t=1",
+    "eci_pdfs/general-election-1989-vol-i-ii_part1.pdf":
+        ECI_OLD_FILES + "4120-general-election-1989-vol-i-ii/?do=download&r=9761&confirm=1&t=1",
+    "eci_pdfs/general-election-1991-vol-i-ii_part1.pdf":
+        ECI_OLD_FILES + "4121-general-election-1991-vol-i-ii/?do=download&r=9764&confirm=1&t=1",
+    "eci_pdfs/general-election-1996-vol-i-ii_part1.pdf":
+        ECI_OLD_FILES + "4123-general-election-1996-vol-i-ii/?do=download&r=9770&confirm=1&t=1",
+    "eci_pdfs/general-election-2004-vol-i-ii-iii_part1.pdf":
+        ECI_OLD_FILES + "4126-general-election-2004-vol-i-ii-iii/?do=download&r=9780&confirm=1&t=1",
+    "ls2024_statistical/3-List-Of-Political-Parties-Participated.xlsx":
+        ECI_GE2024 + "3-List-Of-Political-Parties-Participated.xlsx",
+    "eci_pdfs/GE2019_3-list-of-political-parties-participated_part1.xls":
+        ECI_OLD_FILES + "13599-3-list-of-political-parties-participated/?do=download&r=37907&confirm=1&t=1",
+    "eci_pdfs/GE2014_list-of-political-parties-participated_part2.xlsx":
+        ECI_OLD_FILES + "2844-list-of-political-parties-participated/?do=download&r=6612&confirm=1&t=1",
+}
+
 for _y, (_f, _seats) in ARCHIVE_STATE_ONLY.items():
     YEARS[_y] = dict(
         detailed=None, pdf_detailed=f"eci_pdfs/{_f}",
@@ -774,7 +803,28 @@ def state_from_table(states, ix, geo, log):
     return out
 
 
-def emit(year, cfg, pcs, states, ix, geo, log):
+def fetch_sources(year, cfg, cache=DEFAULT_CACHE):
+    """Download every input a pre-2008 year reads, and return a source block for each.
+
+    The bytes are fetched once into the harvest cache (where validate_records.py checks
+    each sha256) and copied to the _research/eci/ path the readers open, so the file
+    that is parsed is the file whose hash is recorded."""
+    inputs = [cfg["pdf_detailed"]] + [c["parties"][0] for k, c in YEARS.items()
+                                      if k != year and c.get("parties")]
+    blocks = []
+    for rel in inputs:
+        got = fetch(SOURCE_URLS[rel], cache)
+        dest = os.path.join(RESEARCH, rel)
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        if not os.path.exists(dest) or open(dest, "rb").read() != got["bytes"]:
+            with open(dest, "wb") as f:
+                f.write(got["bytes"])
+        blocks.append({"publisher": "eci", "url": got["url"], "sha256": got["sha256"],
+                       "fetched_at": got["fetched_at"], "file": rel})
+    return blocks
+
+
+def emit(year, cfg, pcs, states, ix, geo, log, sources=None):
     # ── constituency file ──
     constituencies = {}
     for uid, c in sorted(pcs.items()):
@@ -844,6 +894,12 @@ def emit(year, cfg, pcs, states, ix, geo, log):
                    "derivation": "constituency" if have_votes else "state_table"},
         "regions": regions,
     }
+    if sources:
+        # the report itself is the source; the party lists it borrows codes from follow
+        st_doc["source"] = {**sources[0], "table": None, "detail_table": cfg["pdf_detailed"],
+                            "derivation": st_doc["source"]["derivation"]}
+        st_doc["sources"] = sources[1:]
+        st_doc["regions"] = st_doc.pop("regions")
     sp = os.path.join(DATA, "results", "ls", f"{year}.json")
     json.dump(st_doc, open(sp, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     log["state_file"] = sp
@@ -1060,6 +1116,7 @@ def main():
     for y in years:
         cfg = YEARS[y]
         log = {"year": y}
+        sources = fetch_sources(y, cfg) if cfg.get("state_only") else None
         ix = build_party_index(cfg, parties_doc,
                                borrow_from=[c for k, c in YEARS.items() if k != y])
         states = build_state_rows(cfg, geo, log)
@@ -1079,7 +1136,7 @@ def main():
         log["top_unresolved"] = ix.unresolved.most_common(10)
         verify_numbers(cfg, geo, log, y)
         if not args.check:
-            emit(y, cfg, pcs, states, ix, geo, log)
+            emit(y, cfg, pcs, states, ix, geo, log, sources)
             if pcs and states:
                 reconcile(y, cfg, pcs, states, ix, geo, log)
             elif pcs:
