@@ -3,8 +3,8 @@
 Read this before the next design session. It exists so the next page starts from these decisions
 instead of rediscovering them.
 
-**This file covers the home page.** The Election Atlas of India now lives in its own repository,
-akshayDev17/election-atlas, served at `/elections/india/`; its design record moved with it.
+**This file covers the home page.** The Election Atlas now lives in its own repository,
+akshayDev17/election-atlas, served at `/elections/`; its design record moved with it.
 
 ## Tokens in use (`home-v1/index.html`)
 

@@ -83,8 +83,8 @@ Everything else is apparatus and stays small, mono, and grey.
 ## LAYOUT
 
 - One centred editorial column (1088px ceiling). The left rail was removed (2026-11): it took 124px, left most of its height empty and pushed the page off-centre.
-- Navigation is two plain lines, neither sticky. At the top, the **site path** shared by every app on the site (`akshayprabhakant.com / Portfolio  AI Digest  Quiz Room  Graph Notes  Election Atlas`), filled in by site-shell on the exact `/` (other spellings of the homepage, such as `/?utm_source=…` or `/index.html`, show no path); on a portrait phone it folds into a pill that opens a bottom sheet. Under the byline, a **contents line** of in-page links: Apps · Work · Research · Experience · Contact.
-- **Apps and Work are two-column grids of cards** at ≥901px, one column below. Apps holds the functional web apps; Work holds things built that are not apps. The Apps cards come from the site's app list (site-themes `src/apps.ts`) through site-shell, and carry the app's name and one line. Where site-shell does not compose the page, the page renders the same cards in the browser from site-shell's `/_site/apps.json`; an app behind Cloudflare Access carries a small lock after its name. Each Work card carries its index number, title, one-line description and a ruled footer of facts.
+- Navigation is two plain lines, neither sticky. At the top, the **site row** shared by every app on the site (`Home  AI Digest  Quiz Room  Graph Notes  Election Atlas`, the current app marked; an app's own page trail goes on its own line under it, and the homepage has none), filled in by site-shell on the exact `/` (other spellings of the homepage, such as `/?utm_source=…` or `/index.html`, show no row); on a portrait phone it stays one row that scrolls sideways, with the theme picker beside it. Under the byline, a **contents line** of in-page links: Apps · Work · Research · Experience · Contact.
+- **Apps and Work are two-column grids of cards** at ≥901px, one column below. Apps holds the functional web apps; Work holds things built that are not apps. The Apps cards come from the site's app list (site-themes `src/apps.ts`) through site-shell, and carry the app's name and one line. Where site-shell does not compose the page, the page renders the same cards in the browser from site-shell's `/_site/apps.json`; an app behind Cloudflare Access shows no lock, and its name carries a visually hidden "(sign-in required)" instead. Each Work card carries its index number, title, one-line description and a ruled footer of facts.
 - **Research is a column of cards.** Each paper is a spread at ≥1024px: journal, title, authors, citation count and links on the left; the abstract on the right.
 - **Experience is a column of cards.** Each company is a spread: a 16rem sticky meta rail (company, dates, location, tech chips) beside the roles and bullets, with a dot-and-line ladder when a company has more than one role.
 - Full-bleed hairline section rules reach the layout edges.
@@ -196,7 +196,7 @@ with their own usage terms, and a portfolio does not need to redistribute them t
 
 - **Density:** fact-dense but rule-light — many lines, few boxes. Nothing floats.
 - **Interaction:** rows are links. Hover darkens the row's ground and turns its number vermilion. Focus is a 2px outline in the theme's focus colour, never removed.
-- **Responsive:** navigation is the site path and the contents line (see LAYOUT); neither is sticky. The index and chronology become single-column stacks; the apparatus type floor rises to 11–12px. Nothing is hidden that carries meaning.
+- **Responsive:** navigation is the site row and the contents line (see LAYOUT); neither is sticky. The index and chronology become single-column stacks; the apparatus type floor rises to 11–12px. Nothing is hidden that carries meaning.
 
 ## MOTION
 
@@ -213,8 +213,7 @@ Editorial and quiet. 240ms, `cubic-bezier(.2,.7,.3,1)`.
 
 **The rail** was the signature: a numbered, labelled section index down the left edge that doubled
 as the entire navigation. It was removed at the owner's request on 2026-11-03 (see LAYOUT). The
-masthead now carries the owner-approved Portfolio path line and the slim contents line under the
-byline.
+masthead now carries the site row (see LAYOUT) and the slim contents line under the byline.
 
 ### Revision log — v5 → v6, from owner feedback
 

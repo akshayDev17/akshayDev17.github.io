@@ -7,10 +7,11 @@
 // site-shell composes only the exact / (its route pattern also matches the
 // query), so every other spelling of the homepage is GitHub Pages' page as
 // committed and must work on its own. Checked:
-// - / is composed by site-shell: the x-site-shell header, the site path, and
-//   Apps cards matching site-shell's /_site/apps.json (the listed apps from
-//   site-themes src/apps.ts, less the homepage). With --bare, / is checked like
-//   the others instead.
+// - / is composed by site-shell: the x-site-shell header, the site row (Home
+//   marked as the current page, no trail under it), and Apps cards matching
+//   site-shell's /_site/apps.json (the listed apps from site-themes
+//   src/apps.ts, less the homepage). No lock is drawn in either. With --bare, /
+//   is checked like the others instead.
 // - /?utm_source=x and /index.html (and, with --bare, / too) are loaded in
 //   headless Chrome (puppeteer-core, the system Chrome or CHROME_PATH) and
 //   checked by what they do on their own: a stored classic-dark choice gives
@@ -19,10 +20,13 @@
 //   module they load are the real ones; the theme picker is defined and shows
 //   its select; there is no rail and nothing sticky or fixed outside the
 //   Experience cards, at desktop and phone widths; and the Apps section shows
-//   the cards /_site/apps.json lists or, when it cannot be reached, the
-//   fallback line with its reload link.
+//   the cards /_site/apps.json lists, with no lock drawn and a gated app's name
+//   carrying a visually hidden " (sign-in required)", or, when it cannot be
+//   reached, the fallback line with its reload link.
 // With --bare every request to another origin is refused, so /_site/apps.json
-// cannot be reached and the fallback line is expected.
+// cannot be reached and the fallback line is expected; /index.html is then
+// loaded once more with /_site/apps.json answered by STUB_APPS below, so the
+// page's own Apps renderer is checked too.
 // --retries N waits and retries the whole check N times (60 s apart), for the
 // CDN cache to catch up after a deployment.
 
@@ -35,6 +39,17 @@ const option = (name, fallback) => {
 const BASE = option('--base', 'https://akshayprabhakant.com').replace(/\/$/, '');
 const BARE = flag('--bare');
 const RETRIES = Number(option('--retries', '0'));
+const APPS_JSON = 'https://akshayprabhakant.com/_site/apps.json';
+const GATED_NOTE = ' (sign-in required)';
+// What /_site/apps.json answers in the --bare stub run: synthetic entries in
+// its shape (not the real list, which lives only in site-themes src/apps.ts):
+// the homepage, which the cards leave out, then an open app and a gated one.
+const STUB_APPS = [
+  { id: 'home', label: 'Home', path: '/', blurb: 'Stub homepage', gated: false },
+  { id: 'stub-open', label: 'Stub Open', path: '/stub-open/', blurb: 'Stub open app', gated: false },
+  { id: 'stub-gated', label: 'Stub Gated', path: '/stub-gated/', blurb: 'Stub gated app', gated: true },
+];
+const cardsOf = (apps) => apps.filter((app) => app.id !== 'home').map((app) => ({ id: app.id, href: app.path, gated: Boolean(app.gated) }));
 
 async function get(path) {
   const res = await fetch(BASE + path, { redirect: 'follow', headers: { 'cache-control': 'no-cache' } });
@@ -64,9 +79,7 @@ async function listedApps(problems) {
     problems.push(`/_site/apps.json answers ${res.status}`);
     return null;
   }
-  return JSON.parse(res.body)
-    .filter((app) => app.id !== 'home')
-    .map((app) => ({ id: app.id, href: app.path, gated: Boolean(app.gated) }));
+  return cardsOf(JSON.parse(res.body));
 }
 
 /** The site-themes stylesheet and picker module the page uses, fetched and checked. */
@@ -119,6 +132,8 @@ function observePage() {
       href: li.querySelector('a')?.getAttribute('href') ?? null,
       gated: 'gated' in li.dataset,
       visible: li.checkVisibility(),
+      lockDrawn: Boolean(li.querySelector('svg, img')),
+      hiddenNote: li.querySelector('.site-apps-name .site-vh')?.textContent ?? null,
     })),
     fallbackShown: Boolean(fallback?.checkVisibility()),
     reloadsPage: Boolean(reload) && new URL(reload.href).pathname === location.pathname,
@@ -136,9 +151,12 @@ async function darkSurface(sheetPath) {
   return color;
 }
 
-/** apps: the cards /_site/apps.json lists, or null when it cannot be reached. */
-async function checkInBrowser(browser, path, apps, problems) {
-  const at = (msg) => problems.push(`${path}: ${msg}`);
+/**
+ * apps: the cards /_site/apps.json lists, or null when it cannot be reached.
+ * stub (--bare only): the body /_site/apps.json answers instead of being refused.
+ */
+async function checkInBrowser(browser, path, apps, problems, stub = null) {
+  const at = (msg) => problems.push(`${path}${stub ? ' (stubbed apps.json)' : ''}: ${msg}`);
   const page = await browser.newPage();
   try {
     await page.setViewport({ width: 1280, height: 900 });
@@ -151,7 +169,12 @@ async function checkInBrowser(browser, path, apps, problems) {
     });
     if (BARE) {
       await page.setRequestInterception(true);
-      page.on('request', (req) => (req.url().startsWith(BASE + '/') ? req.continue() : req.abort()));
+      page.on('request', (req) => {
+        if (req.url().startsWith(BASE + '/')) return req.continue();
+        if (stub && req.url() === APPS_JSON)
+          return req.respond({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(stub) });
+        return req.abort();
+      });
     }
     const res = await page.goto(BASE + path, { waitUntil: 'load' });
     if (res.status() !== 200) return at(`status ${res.status()}`);
@@ -180,6 +203,11 @@ async function checkInBrowser(browser, path, apps, problems) {
         at(`Apps cards are ${JSON.stringify(cards)}, /_site/apps.json lists ${JSON.stringify(apps)}`);
       if (seen.cards.some((c) => !c.visible)) at('some Apps cards are not visible');
       if (seen.fallbackShown) at('the Apps fallback line is shown next to the cards');
+      for (const c of seen.cards) {
+        if (c.lockDrawn) at(`the ${c.id} Apps card draws a lock`);
+        const note = c.gated ? GATED_NOTE : null;
+        if (c.hiddenNote !== note) at(`the ${c.id} Apps card's hidden note is ${JSON.stringify(c.hiddenNote)}, not ${JSON.stringify(note)}`);
+      }
     } else {
       if (seen.cards.length > 0) at(`${seen.cards.length} Apps cards rendered with /_site/apps.json unreachable`);
       if (!seen.fallbackShown) at('the Apps fallback line is not shown');
@@ -197,14 +225,14 @@ async function checkInBrowser(browser, path, apps, problems) {
   }
 }
 
-async function checkAllInBrowser(paths, apps, problems) {
+async function checkAllInBrowser(paths, apps, problems, stub = null) {
   const { default: puppeteer } = await import('puppeteer-core');
   const browser = await puppeteer.launch({
     ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : { channel: 'chrome' }),
     args: process.env.CI ? ['--no-sandbox'] : [],
   });
   try {
-    for (const path of paths) await checkInBrowser(browser, path, apps, problems);
+    for (const path of paths) await checkInBrowser(browser, path, apps, problems, stub);
   } finally {
     await browser.close();
   }
@@ -215,8 +243,15 @@ async function checkComposed(apps, problems) {
   const at = (msg) => problems.push(`/: ${msg}`);
   if (page.status !== 200) return at(`status ${page.status}`);
   if (!page.headers.get('x-site-shell')) at('not composed by site-shell (no x-site-shell header)');
-  if (!/<nav class="sp" aria-label="Site path">/.test(slot(page.body, 'site-path') ?? '')) at('the site path slot was not filled');
-  if (!(slot(page.body, 'site-apps') ?? '').startsWith('<style data-site-shell>')) at('the Apps slot was not filled');
+  const path = slot(page.body, 'site-path') ?? '';
+  const appsSlot = slot(page.body, 'site-apps') ?? '';
+  if (!/<nav class="sp" aria-label="Site"><ul class="sp-apps">/.test(path)) at('the site row slot was not filled');
+  else {
+    if (!/<a class="sp-app" href="\/" aria-current="page"><span class="sp-label">Home<\/span>/.test(path)) at('the site row does not mark Home as the current page');
+    if (/class="sp-trail"/.test(path)) at('the site row has a trail under it on the homepage');
+  }
+  if (!appsSlot.startsWith('<style data-site-shell>')) at('the Apps slot was not filled');
+  if (/<svg\b/.test(path + appsSlot)) at('the site row or the Apps cards draw a lock (an <svg>)');
   const cards = appCards(page.body);
   if (apps && JSON.stringify(cards) !== JSON.stringify(apps))
     at(`Apps cards are ${JSON.stringify(cards)}, /_site/apps.json lists ${JSON.stringify(apps)}`);
@@ -227,6 +262,7 @@ async function runOnce() {
   const problems = [];
   if (BARE) {
     await checkAllInBrowser(['/', '/?utm_source=x', '/index.html'], null, problems);
+    await checkAllInBrowser(['/index.html'], cardsOf(STUB_APPS), problems, STUB_APPS);
     return problems;
   }
   const apps = await listedApps(problems);
