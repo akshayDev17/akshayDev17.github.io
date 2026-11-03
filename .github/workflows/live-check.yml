@@ -2,11 +2,11 @@
 # - standalone, on every PR and push to main: a static copy of this repo, with
 #   no site-shell in front, must work on its own at /, /?utm_source=x and
 #   /index.html, checked in headless Chrome: stored theme applied, picker
-#   rendered, no left rail or sticky navigation, the Apps fallback line.
+#   rendered, no left rail or sticky navigation, no Apps section, sections
+#   numbered in order and linked from the contents line.
 # - published, after each GitHub Pages deployment of main (and by hand): the
 #   live site, where site-shell composes the exact / and every other spelling
-#   of the homepage is the page on its own, checked in headless Chrome with
-#   the Apps cards /_site/apps.json lists.
+#   of the homepage is the page on its own, checked in headless Chrome.
 name: live check
 
 on:
