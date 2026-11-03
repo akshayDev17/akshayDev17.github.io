@@ -3,15 +3,12 @@ Source code for personal portfolio website of Akshay Prabhakant
 
 The Election Atlas of India lives in its own repository, [akshayDev17/election-atlas](https://github.com/akshayDev17/election-atlas), and is served at [akshayprabhakant.com/elections/india/](https://akshayprabhakant.com/elections/india/).
 
-## Themes and navigation
+## Themes
 
-GitHub Pages serves `index.html` from this repository's root. At `akshayprabhakant.com/` the request goes through site-shell, the Cloudflare Worker in [akshayDev17/site-themes](https://github.com/akshayDev17/site-themes) (`shell/`), which composes the page as it streams out:
+Colours, elevation, card shape and fonts come from [akshayDev17/site-themes](https://github.com/akshayDev17/site-themes), pinned as a git tag in `package.json`. The site has no bundler, so `scripts/sync-site-themes.mjs` is its build step for themes. It inlines the package's boot script in the `<head>` of every page, so the first frame already has the visitor's theme, and copies `themes.css` and the picker modules into `assets/site-themes/<tag>/`. The site serves its own copy and fetches nothing from elsewhere for theming.
 
-- It adds the theme head block to `<head>`: the inline boot script (so the first frame already has the visitor's theme), the theme tokens, and the script that defines `<site-theme-picker>`.
-- It fills `<site-slot name="site-path">` with the site path shared by every app, and `<site-slot name="site-apps">` with the Apps cards. Both come from the site's one app list, site-themes `src/apps.ts`: adding, renaming, locking or hiding an app is a change there, not here.
+- After changing the pinned tag: `npm ci && npm run themes:sync`, then commit the result.
+- `npm run themes:check` fails if a committed copy differs from the pinned tag. CI runs it on every PR and push to `main`.
+- `.github/workflows/site-themes-bump.yml` checks daily for a newer site-themes tag and opens a bump PR with the copies regenerated. It can also be run by hand (`workflow_dispatch`). GitHub disables scheduled workflows after 60 days without repository activity, so every run calls the REST API (`PUT /repos/{owner}/{repo}/actions/workflows/site-themes-bump.yml/enable`) with `GITHUB_TOKEN` to keep the schedule enabled; this needs the `actions: write` permission the workflow grants.
 
-This repository has no build step and no dependencies. A theme or app-list change reaches the homepage when site-shell deploys, with no PR here.
-
-If site-shell is skipped (it fails open and serves Pages' page unchanged), the page still renders in Classic Light: the `:where(:root)` block at the top of the page's `<style>` is a copy of site-themes `shell/generated/fallback.css`, and the slots show what the page put inside them (nothing for the site path, a one-line note for the Apps list). There is no theme picker in that state.
-
-`index.html` keeps its own variable names (`--paper`, `--ink`, `--annot`, …) as aliases of the shared tokens. Do not define the shared names (`--surface`, `--accent`, `--card`, …) in a `:root` rule in page CSS: it would override every theme. The fallback block may define them only because `:where()` gives it zero specificity.
+`index.html` keeps its own variable names (`--paper`, `--ink`, `--annot`, …) as aliases of the package tokens. Do not define the package's own names (`--surface`, `--accent`, `--card`, …) in page CSS: a later `:root` rule would override every theme.
