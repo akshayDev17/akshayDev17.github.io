@@ -69,7 +69,7 @@
    - At akshayprabhakant.com/: site-shell adds the same boot script, tokens and
      picker first (the copies here then do nothing: the boot and the picker
      guard against running twice, and themes.css repeats the same values), and
-     replaces the two site-slot elements' contents with the site path and the
+     replaces the two site-slot elements' contents with the site row and the
      Apps cards from site-themes src/apps.ts.
    This page keeps its own names through the alias block below. Never define
    the shared names (--surface, --accent, --card, --shadow-rest, …) here: a
@@ -170,7 +170,7 @@ section::before{content:"";position:absolute;top:0;left:calc(-1 * var(--pad));ri
 /* ── title plate ──────────────────────────────────────── */
 .plate{padding:var(--s7) 0 var(--s6)}
 
-/* the top line: the site path (the site-path slot element, filled by
+/* the top line: the site row (the site-path slot element, filled by
    site-shell from the site-themes app list; empty when the page is not
    composed) and, on a portrait phone only, the theme picker at its right end */
 site-slot{display:block}
