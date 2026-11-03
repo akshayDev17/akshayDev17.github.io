@@ -82,9 +82,9 @@ Everything else is apparatus and stays small, mono, and grey.
 
 ## LAYOUT
 
-- Two columns: a **fixed left rail** (124px, sticky) and an offset editorial column. Never centred.
-- The rail is the *only* navigation — there is no top nav bar — and its one vertical rule marks the current section. No ticks, no progress meter.
-- **Apps and Work are two-column grids of cards** at ≥901px, one column below. Apps holds the functional web apps; Work holds things built that are not apps. Each card carries its index number, title, one-line description and a ruled footer of facts; an app behind Cloudflare Access carries a small lock after its title.
+- One centred editorial column (1088px ceiling). The left rail was removed (2026-11): it took 124px, left most of its height empty and pushed the page off-centre.
+- Navigation is two plain lines, neither sticky. At the top, the **site path** shared by every app on the site (`akshayprabhakant.com / Portfolio  AI Digest  Quiz Room  Graph Notes  Election Atlas`), filled in by site-shell; on a portrait phone it folds into a pill that opens a bottom sheet. Under the byline, a **contents line** of in-page links: Apps · Work · Research · Experience · Contact.
+- **Apps and Work are two-column grids of cards** at ≥901px, one column below. Apps holds the functional web apps; Work holds things built that are not apps. The Apps cards come from the site's app list (site-themes `src/apps.ts`) through site-shell, and carry the app's name and one line; an app behind Cloudflare Access carries a small lock after its name. Each Work card carries its index number, title, one-line description and a ruled footer of facts.
 - **Research is a column of cards.** Each paper is a spread at ≥1024px: journal, title, authors, citation count and links on the left; the abstract on the right.
 - **Experience is a column of cards.** Each company is a spread: a 16rem sticky meta rail (company, dates, location, tech chips) beside the roles and bullets, with a dot-and-line ladder when a company has more than one role.
 - Full-bleed hairline section rules reach the layout edges.
@@ -163,9 +163,9 @@ not the *faces*. A proper pass would collapse the serif to ~4 steps and the mono
 
 ## COLOR
 
-The live values now come from the site-themes package; see the README's Themes section. The page
-keeps the names below as aliases, so this table records the intent behind each colour. The theme
-values themselves are owned by the package, not by this table.
+The live values now come from site-themes, added to the page by site-shell; see the README's Themes
+section. The page keeps the names below as aliases, so this table records the intent behind each
+colour. The theme values themselves are owned by site-themes, not by this table.
 
 | token | value | job |
 |---|---|---|
