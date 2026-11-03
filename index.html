@@ -64,7 +64,8 @@
      site-shell's route does not cover): the theme comes from the pinned
      site-themes package, synced into this page by scripts/sync-site-themes.mjs
      (the inline boot script and themes.css above, the picker module below), and
-     the Apps section shows the static cards inside its slot.
+     the script at the end renders the Apps cards from site-shell's
+     /_site/apps.json into their slot.
    - At akshayprabhakant.com/: site-shell adds the same boot script, tokens and
      picker first (the copies here then do nothing: the boot and the picker
      guard against running twice, and themes.css repeats the same values), and
@@ -284,6 +285,8 @@ site-theme-picker{font-family:var(--mono);font-size:.75rem;letter-spacing:.02em;
 #apps .site-apps-name{font-size:1.25rem;line-height:1.25;letter-spacing:-.01em;color:var(--ink)}
 #apps .site-lock{width:.7em;height:.7em;margin-left:.3em;stroke:var(--muted);stroke-linecap:round;stroke-linejoin:round}
 #apps .site-apps-blurb{color:var(--muted);font-size:.9375rem;line-height:1.6}
+#apps .apps-fallback{max-width:var(--col);color:var(--muted)}
+#apps .apps-fallback a{color:var(--annot)}
 
 /* ── chips are tags: a pill, not a square inside a rounded card ── */
 .chip{display:inline-block;font-family:var(--mono);font-size:.6875rem;letter-spacing:.06em;
@@ -491,16 +494,12 @@ site-theme-picker{font-family:var(--mono);font-size:.75rem;letter-spacing:.02em;
   <section id="apps">
     <div class="shead"><span class="num">01</span><h2>Apps</h2></div>
     <site-slot name="site-apps">
-      <!-- Shown where site-shell does not compose the page (/?anything,
-           /index.html, a fail-open). On / it is replaced by the list from
-           site-themes src/apps.ts; keep this copy in step with that file. -->
+      <!-- On / site-shell replaces this with the list from site-themes
+           src/apps.ts. Elsewhere (/?anything, /index.html, a fail-open) the
+           script at the end of the page renders the same list from
+           site-shell's /_site/apps.json; this line shows only if that fails. -->
       <style>.site-apps{margin:0;padding:0;list-style:none}.site-apps a{display:flex;flex-direction:column;min-height:44px;color:inherit;text-decoration:none}.site-apps-name{display:inline-flex;align-items:center;color:var(--text)}.site-apps-blurb{color:var(--text-muted)}.site-vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}.site-lock{fill:none;stroke:currentColor;stroke-width:2;margin-left:.25em;flex:none}</style>
-      <ul class="site-apps">
-        <li data-app="chat"><a href="/chat-archives"><span class="site-apps-name">AI Digest</span><span class="site-apps-blurb">AI chat sessions filed as a newspaper</span></a></li>
-        <li data-app="quiz" data-gated=""><a href="/quiz"><span class="site-apps-name">Quiz Room<svg class="site-lock" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span class="site-vh"> (invite-only, sign-in required)</span></span><span class="site-apps-blurb">Timed multiple-choice quizzes</span></a></li>
-        <li data-app="graph" data-gated=""><a href="/graph/"><span class="site-apps-name">Graph Notes<svg class="site-lock" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span class="site-vh"> (invite-only, sign-in required)</span></span><span class="site-apps-blurb">Personal notes as a linked graph</span></a></li>
-        <li data-app="atlas"><a href="/elections/india/"><span class="site-apps-name">Election Atlas</span><span class="site-apps-blurb">Every Lok Sabha and assembly result</span></a></li>
-      </ul>
+      <p class="apps-fallback">The apps list did not load. <a href="">Reload the page</a></p>
     </site-slot>
   </section>
 
@@ -720,6 +719,47 @@ site-theme-picker{font-family:var(--mono);font-size:.75rem;letter-spacing:.02em;
 <!-- /site-themes:picker -->
 <script>
 (() => {
+  const slot = document.querySelector('site-slot[name="site-apps"]');
+  if (slot.querySelector('.site-apps')) return;
+  const fallback = slot.querySelector('.apps-fallback');
+  const LOCK = '<svg class="site-lock" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+  const el = (tag, className, text) => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text) node.textContent = text;
+    return node;
+  };
+  const card = (app) => {
+    const li = el('li');
+    li.dataset.app = app.id;
+    if (app.gated) li.dataset.gated = '';
+    const a = el('a');
+    a.setAttribute('href', app.path);
+    const name = el('span', 'site-apps-name', app.label);
+    if (app.gated) {
+      name.insertAdjacentHTML('beforeend', LOCK);
+      name.append(el('span', 'site-vh', ' (invite-only, sign-in required)'));
+    }
+    a.append(name, el('span', 'site-apps-blurb', app.blurb));
+    li.append(a);
+    return li;
+  };
+  fallback.hidden = true;
+  fetch('https://akshayprabhakant.com/_site/apps.json')
+    .then((res) => {
+      if (!res.ok) throw new Error(`apps.json answered ${res.status}`);
+      return res.json();
+    })
+    .then((apps) => {
+      const list = el('ul', 'site-apps');
+      list.append(...apps.filter((app) => app.id !== 'home').map(card));
+      fallback.replaceWith(list);
+    })
+    .catch(() => { fallback.hidden = false; });
+})();
+</script>
+<script>
+(() => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const root = document.documentElement;
   let screenTheme = null;
@@ -740,7 +780,7 @@ site-theme-picker{font-family:var(--mono);font-size:.75rem;letter-spacing:.02em;
   // inherits a tilt from wherever the mouse happened to be.
   const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
   if (fine && !reduce) {
-    document.querySelectorAll('.work-grid, .bib, #apps .site-apps').forEach(grid => {
+    document.querySelectorAll('.work-grid, .bib, #apps site-slot').forEach(grid => {
       let card = null, rect = null;
       const clear = () => {
         if (card) {

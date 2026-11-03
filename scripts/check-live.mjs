@@ -7,12 +7,14 @@
 // site-shell composes only the exact / (its route pattern also matches the
 // query), so every other spelling of the homepage is GitHub Pages' page as
 // committed and must work on its own. Checked:
-// - / is composed by site-shell: the x-site-shell header, the site path and the
-//   Apps list from site-themes src/apps.ts. With --bare, / is checked like the
-//   others instead.
+// - / is composed by site-shell: the x-site-shell header, the site path, and
+//   Apps cards matching site-shell's /_site/apps.json (the listed apps from
+//   site-themes src/apps.ts, less the homepage). With --bare, / is checked like
+//   the others instead.
 // - /?utm_source=x and /index.html carry, on their own: the inline theme boot
-//   script, a stylesheet that defines Classic Light and Classic Dark, the theme
-//   picker module, and the four Apps cards (locks on Quiz Room and Graph Notes).
+//   script, a stylesheet that defines Classic Light and Classic Dark, and the
+//   theme picker module. Their Apps cards are rendered in the browser from
+//   /_site/apps.json.
 // - None of them has the old left rail.
 // --retries N waits and retries the whole check N times (60 s apart), for the
 // CDN cache to catch up after a deployment.
@@ -26,13 +28,6 @@ const option = (name, fallback) => {
 const BASE = option('--base', 'https://akshayprabhakant.com').replace(/\/$/, '');
 const BARE = flag('--bare');
 const RETRIES = Number(option('--retries', '0'));
-
-const APPS = [
-  { id: 'chat', href: '/chat-archives', gated: false },
-  { id: 'quiz', href: '/quiz', gated: true },
-  { id: 'graph', href: '/graph/', gated: true },
-  { id: 'atlas', href: '/elections/india/', gated: false },
-];
 
 async function get(path) {
   const res = await fetch(BASE + path, { redirect: 'follow', headers: { 'cache-control': 'no-cache' } });
@@ -55,8 +50,16 @@ function appCards(html) {
   }));
 }
 
-function sameApps(cards) {
-  return JSON.stringify(cards) === JSON.stringify(APPS);
+/** The cards site-shell's /_site/apps.json says the homepage lists. */
+async function listedApps(at) {
+  const res = await get('/_site/apps.json');
+  if (res.status !== 200) {
+    at(`/_site/apps.json answers ${res.status}`);
+    return null;
+  }
+  return JSON.parse(res.body)
+    .filter((app) => app.id !== 'home')
+    .map((app) => ({ id: app.id, href: app.path, gated: Boolean(app.gated) }));
 }
 
 async function checkStandalone(path, problems) {
@@ -82,9 +85,6 @@ async function checkStandalone(path, problems) {
     if (mod.status !== 200 || !mod.body.includes('export function defineThemePicker')) at(`${picker[1]} is not the picker module`);
   }
   if (!/<site-theme-picker[\s>]/.test(page.body)) at('no <site-theme-picker> element');
-
-  const cards = appCards(page.body);
-  if (!sameApps(cards)) at(`Apps cards are ${JSON.stringify(cards)}, expected ${JSON.stringify(APPS)}`);
   if (/class="rail"/.test(page.body)) at('the left rail is back');
 }
 
@@ -95,9 +95,11 @@ async function checkComposed(problems) {
   if (!page.headers.get('x-site-shell')) at('not composed by site-shell (no x-site-shell header)');
   if (!/<nav class="sp" aria-label="Site path">/.test(slot(page.body, 'site-path') ?? '')) at('the site path slot was not filled');
   const apps = slot(page.body, 'site-apps') ?? '';
-  if (!apps.startsWith('<style data-site-shell>')) at('the Apps slot still holds the static fallback');
+  if (!apps.startsWith('<style data-site-shell>')) at('the Apps slot was not filled');
+  const expected = await listedApps(at);
   const cards = appCards(page.body);
-  if (!sameApps(cards)) at(`Apps cards are ${JSON.stringify(cards)}, expected ${JSON.stringify(APPS)}`);
+  if (expected && JSON.stringify(cards) !== JSON.stringify(expected))
+    at(`Apps cards are ${JSON.stringify(cards)}, /_site/apps.json lists ${JSON.stringify(expected)}`);
   if (/class="rail"/.test(page.body)) at('the left rail is back');
 }
 
