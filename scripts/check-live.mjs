@@ -18,7 +18,7 @@
 //   <html data-theme="classic-dark"> from the first frame and the Classic Dark
 //   surface as the page background; the site-themes stylesheet and picker
 //   module they load are the real ones; the theme picker is defined and shows
-//   its select; there is no rail and nothing sticky or fixed outside the
+//   its combobox; there is no rail and nothing sticky or fixed outside the
 //   Experience cards, at desktop and phone widths; and the Apps section shows
 //   the cards /_site/apps.json lists, with no lock drawn and a gated app's name
 //   carrying a visually hidden " (sign-in required)", or, when it cannot be
@@ -109,7 +109,13 @@ function observePage() {
   const pickers = [...document.querySelectorAll('site-theme-picker')]
     .filter((el) => el.checkVisibility())
     .map((el) => {
-      const select = el.shadowRoot?.querySelector('select');
+      // site-themes main renders a select-only combobox; v0.2.0 and earlier a native select.
+      const root = el.shadowRoot;
+      const options = [...(root?.querySelectorAll('[role="listbox"] [role="option"]') ?? [])];
+      const chosen = options.find((o) => o.getAttribute('aria-selected') === 'true');
+      if (root?.querySelector('[role="combobox"]') && chosen)
+        return { value: chosen.dataset.value, options: options.map((o) => o.dataset.value) };
+      const select = root?.querySelector('select');
       return select ? { value: select.value, options: [...select.options].map((o) => o.value) } : null;
     });
   const pinned = [...document.querySelectorAll('body *')]
@@ -196,7 +202,7 @@ async function checkInBrowser(browser, path, apps, problems, stub = null) {
     await checkThemeAssets(seen.sheet, seen.picker, at);
     if (!seen.pickerDefined) at('site-theme-picker is not defined');
     if (!seen.pickers.some((p) => p && p.options.includes('classic-dark') && p.value === 'classic-dark'))
-      at(`no visible theme picker shows its select set to classic-dark: ${JSON.stringify(seen.pickers)}`);
+      at(`no visible theme picker shows its combobox set to classic-dark: ${JSON.stringify(seen.pickers)}`);
     if (apps) {
       const cards = seen.cards.map(({ id, href, gated }) => ({ id, href, gated }));
       if (JSON.stringify(cards) !== JSON.stringify(apps))
