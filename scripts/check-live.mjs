@@ -16,6 +16,14 @@
 //   theme picker module. Their Apps cards are rendered in the browser from
 //   /_site/apps.json.
 // - None of them has the old left rail.
+// With --bare, all three pages are loaded in headless Chrome (puppeteer-core,
+// the system Chrome or CHROME_PATH), with every request to another origin
+// refused, and checked by what they do: a stored classic-dark choice gives
+// <html data-theme="classic-dark"> and the Classic Dark surface as the page
+// background; the theme picker is defined and shows its select; there is no
+// rail and nothing sticky or fixed outside the Experience cards, at desktop
+// and phone widths; and the Apps section shows the fallback line with its
+// reload link, since /_site/apps.json cannot be reached.
 // --retries N waits and retries the whole check N times (60 s apart), for the
 // CDN cache to catch up after a deployment.
 
@@ -62,30 +70,134 @@ async function listedApps(at) {
     .map((app) => ({ id: app.id, href: app.path, gated: Boolean(app.gated) }));
 }
 
+/** The site-themes stylesheet and picker module the page uses, fetched and checked. */
+async function checkThemeAssets(sheetPath, pickerPath, at) {
+  if (!sheetPath) at('no site-themes stylesheet');
+  else {
+    const sheet = await get(sheetPath);
+    if (sheet.status !== 200) at(`${sheetPath} answers ${sheet.status}`);
+    else if (!sheet.body.includes('[data-theme="classic-light"]') || !sheet.body.includes('[data-theme="classic-dark"]'))
+      at(`${sheetPath} does not define both Classic Light and Classic Dark`);
+  }
+  if (!pickerPath) at('no theme picker module');
+  else {
+    const mod = await get(pickerPath);
+    if (mod.status !== 200 || !mod.body.includes('export function defineThemePicker')) at(`${pickerPath} is not the picker module`);
+  }
+}
+
 async function checkStandalone(path, problems) {
   const page = await get(path);
   const at = (msg) => problems.push(`${path}: ${msg}`);
   if (page.status !== 200) return at(`status ${page.status}`);
   const head = page.body.slice(0, page.body.indexOf('</head>'));
   if (!/<script>\(function siteThemeBoot\(/.test(head)) at('no inline theme boot script in <head>');
-
   const css = /<link rel="stylesheet" href="(\/assets\/site-themes\/[^"]+\/themes\.css)">/.exec(head);
-  if (!css) at('no site-themes stylesheet link in <head>');
-  else {
-    const sheet = await get(css[1]);
-    if (sheet.status !== 200) at(`${css[1]} answers ${sheet.status}`);
-    else if (!sheet.body.includes('[data-theme="classic-light"]') || !sheet.body.includes('[data-theme="classic-dark"]'))
-      at(`${css[1]} does not define both Classic Light and Classic Dark`);
-  }
-
   const picker = /import \{ defineThemePicker \} from '([^']+)'; defineThemePicker\(\);/.exec(page.body);
-  if (!picker) at('no theme picker module');
-  else {
-    const mod = await get(picker[1]);
-    if (mod.status !== 200 || !mod.body.includes('export function defineThemePicker')) at(`${picker[1]} is not the picker module`);
-  }
+  await checkThemeAssets(css?.[1], picker?.[1], at);
   if (!/<site-theme-picker[\s>]/.test(page.body)) at('no <site-theme-picker> element');
   if (/class="rail"/.test(page.body)) at('the left rail is back');
+}
+
+/** What a loaded page shows: theme, picker, rail and pinned elements, the Apps section. */
+function observePage() {
+  const root = document.documentElement;
+  const sheet = document.querySelector('link[rel="stylesheet"][href*="/assets/site-themes/"]');
+  const picker = performance
+    .getEntriesByType('resource')
+    .map((e) => e.name)
+    .find((name) => name.includes('/assets/site-themes/') && name.endsWith('/picker.js'));
+  const pickers = [...document.querySelectorAll('site-theme-picker')]
+    .filter((el) => el.checkVisibility())
+    .map((el) => {
+      const select = el.shadowRoot?.querySelector('select');
+      return select ? { value: select.value, options: [...select.options].map((o) => o.value) } : null;
+    });
+  const pinned = [...document.querySelectorAll('body *')]
+    .filter((el) => ['sticky', 'fixed'].includes(getComputedStyle(el).position) && !el.closest('#experience'))
+    .map((el) => el.tagName.toLowerCase() + (el.getAttribute('class') ? `.${el.getAttribute('class')}` : ''));
+  const fallback = document.querySelector('#apps .apps-fallback');
+  const reload = fallback?.querySelector('a[href]');
+  return {
+    theme: root.dataset.theme ?? null,
+    background: getComputedStyle(root).backgroundColor,
+    sheet: sheet ? new URL(sheet.href).pathname : null,
+    picker: picker ? new URL(picker).pathname : null,
+    pickerDefined: Boolean(customElements.get('site-theme-picker')),
+    pickers,
+    rail: Boolean(document.querySelector('.rail')),
+    pinned,
+    cards: document.querySelectorAll('#apps .site-apps li').length,
+    fallbackShown: Boolean(fallback?.checkVisibility()),
+    reloadsPage: Boolean(reload) && new URL(reload.href).pathname === location.pathname,
+  };
+}
+
+/** The Classic Dark surface from the served site-themes catalogue, as a computed colour. */
+async function darkSurface(sheetPath) {
+  const { THEMES } = await import(new URL('themes.js', location.origin + sheetPath).href);
+  const probe = document.createElement('i');
+  probe.style.color = THEMES.find((t) => t.id === 'classic-dark').color.surface;
+  document.body.append(probe);
+  const color = getComputedStyle(probe).color;
+  probe.remove();
+  return color;
+}
+
+async function checkInBrowser(browser, path, problems) {
+  const at = (msg) => problems.push(`${path}: ${msg}`);
+  const page = await browser.newPage();
+  try {
+    await page.setViewport({ width: 1280, height: 900 });
+    await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }]);
+    await page.evaluateOnNewDocument(() => localStorage.setItem('site-theme', 'classic-dark'));
+    await page.setRequestInterception(true);
+    page.on('request', (req) => (req.url().startsWith(BASE + '/') ? req.continue() : req.abort()));
+    const res = await page.goto(BASE + path, { waitUntil: 'load' });
+    if (res.status() !== 200) return at(`status ${res.status()}`);
+    await page
+      .waitForFunction(
+        () => customElements.get('site-theme-picker') && document.querySelector('#apps .site-apps, #apps .apps-fallback:not([hidden])'),
+        { timeout: 15_000 },
+      )
+      .catch(() => {});
+
+    const seen = await page.evaluate(observePage);
+    if (seen.theme !== 'classic-dark') at(`a stored classic-dark choice gives data-theme ${JSON.stringify(seen.theme)}`);
+    if (seen.sheet) {
+      const dark = await page.evaluate(darkSurface, seen.sheet);
+      if (seen.background !== dark) at(`the page background is ${seen.background}, not the Classic Dark surface ${dark}`);
+    }
+    await checkThemeAssets(seen.sheet, seen.picker, at);
+    if (!seen.pickerDefined) at('site-theme-picker is not defined');
+    if (!seen.pickers.some((p) => p && p.options.includes('classic-dark') && p.value === 'classic-dark'))
+      at(`no visible theme picker shows its select set to classic-dark: ${JSON.stringify(seen.pickers)}`);
+    if (seen.cards > 0) at(`${seen.cards} Apps cards rendered with /_site/apps.json unreachable`);
+    if (!seen.fallbackShown) at('the Apps fallback line is not shown');
+    else if (!seen.reloadsPage) at('the Apps fallback line has no link that reloads the page');
+
+    for (const [width, height] of [[1280, 900], [390, 844]]) {
+      await page.setViewport({ width, height });
+      const { rail, pinned } = await page.evaluate(observePage);
+      if (rail) at(`the left rail is back at ${width}px`);
+      if (pinned.length) at(`sticky or fixed at ${width}px: ${pinned.join(', ')}`);
+    }
+  } finally {
+    await page.close();
+  }
+}
+
+async function checkAllInBrowser(problems) {
+  const { default: puppeteer } = await import('puppeteer-core');
+  const browser = await puppeteer.launch({
+    ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : { channel: 'chrome' }),
+    args: process.env.CI ? ['--no-sandbox'] : [],
+  });
+  try {
+    for (const path of ['/', '/?utm_source=x', '/index.html']) await checkInBrowser(browser, path, problems);
+  } finally {
+    await browser.close();
+  }
 }
 
 async function checkComposed(problems) {
@@ -105,8 +217,11 @@ async function checkComposed(problems) {
 
 async function runOnce() {
   const problems = [];
-  if (BARE) await checkStandalone('/', problems);
-  else await checkComposed(problems);
+  if (BARE) {
+    await checkAllInBrowser(problems);
+    return problems;
+  }
+  await checkComposed(problems);
   await checkStandalone('/?utm_source=x', problems);
   await checkStandalone('/index.html', problems);
   return problems;
@@ -115,7 +230,7 @@ async function runOnce() {
 for (let attempt = 0; ; attempt++) {
   const problems = await runOnce();
   if (problems.length === 0) {
-    console.log(`ok: ${BASE} (${BARE ? '/ standalone' : '/ composed'}, /?utm_source=x and /index.html standalone)`);
+    console.log(`ok: ${BASE} (${BARE ? 'in headless Chrome: /' : '/ composed'}, /?utm_source=x and /index.html standalone)`);
     break;
   }
   if (attempt >= RETRIES) {

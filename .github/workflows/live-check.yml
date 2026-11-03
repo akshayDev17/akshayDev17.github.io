@@ -1,7 +1,8 @@
 # Checks the homepage as served (scripts/check-live.mjs).
 # - standalone, on every PR and push to main: a static copy of this repo, with
 #   no site-shell in front, must work on its own at /, /?utm_source=x and
-#   /index.html: theme boot, stylesheet, picker, no left rail.
+#   /index.html, checked in headless Chrome: stored theme applied, picker
+#   rendered, no left rail or sticky navigation, the Apps fallback line.
 # - published, after each GitHub Pages deployment of main (and by hand): the
 #   live site, where site-shell composes the exact / and every other spelling
 #   of the homepage is the page on its own.
@@ -29,6 +30,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - run: npm ci
       - name: Serve the repository as GitHub Pages would
         run: |
           python3 -m http.server 8000 --bind 127.0.0.1 &
