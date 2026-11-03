@@ -1,0 +1,53 @@
+# Checks the homepage as served (scripts/check-live.mjs).
+# - standalone, on every PR and push to main: a static copy of this repo, with
+#   no site-shell in front, must work on its own at /, /?utm_source=x and
+#   /index.html, checked in headless Chrome: stored theme applied, picker
+#   rendered, no left rail or sticky navigation, the Apps fallback line.
+# - published, after each GitHub Pages deployment of main (and by hand): the
+#   live site, where site-shell composes the exact / and every other spelling
+#   of the homepage is the page on its own, checked in headless Chrome with
+#   the Apps cards /_site/apps.json lists.
+name: live check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_run:
+    workflows: ["pages build and deployment"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  standalone:
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - name: Serve the repository as GitHub Pages would
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 &
+          for i in $(seq 1 20); do curl -fs -o /dev/null http://127.0.0.1:8000/ && break; sleep 0.5; done
+      - run: node scripts/check-live.mjs --base http://127.0.0.1:8000 --bare
+
+  published:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      # GitHub Pages' CDN caches pages for up to 10 minutes after a deployment.
+      - run: node scripts/check-live.mjs --retries 12
