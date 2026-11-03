@@ -7,6 +7,6 @@
     "themes:check": "node scripts/sync-site-themes.mjs --check"
   },
   "dependencies": {
-    "site-themes": "github:akshayDev17/site-themes#v0.1.0"
+    "site-themes": "github:akshayDev17/site-themes#v0.2.0"
   }
 }
