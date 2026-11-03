@@ -5,7 +5,8 @@
 #   rendered, no left rail or sticky navigation, the Apps fallback line.
 # - published, after each GitHub Pages deployment of main (and by hand): the
 #   live site, where site-shell composes the exact / and every other spelling
-#   of the homepage is the page on its own.
+#   of the homepage is the page on its own, checked in headless Chrome with
+#   the Apps cards /_site/apps.json lists.
 name: live check
 
 on:
@@ -47,5 +48,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - run: npm ci
       # GitHub Pages' CDN caches pages for up to 10 minutes after a deployment.
       - run: node scripts/check-live.mjs --retries 12

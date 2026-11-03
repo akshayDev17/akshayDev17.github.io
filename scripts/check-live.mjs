@@ -11,19 +11,18 @@
 //   Apps cards matching site-shell's /_site/apps.json (the listed apps from
 //   site-themes src/apps.ts, less the homepage). With --bare, / is checked like
 //   the others instead.
-// - /?utm_source=x and /index.html carry, on their own: the inline theme boot
-//   script, a stylesheet that defines Classic Light and Classic Dark, and the
-//   theme picker module. Their Apps cards are rendered in the browser from
-//   /_site/apps.json.
-// - None of them has the old left rail.
-// With --bare, all three pages are loaded in headless Chrome (puppeteer-core,
-// the system Chrome or CHROME_PATH), with every request to another origin
-// refused, and checked by what they do: a stored classic-dark choice gives
-// <html data-theme="classic-dark"> and the Classic Dark surface as the page
-// background; the theme picker is defined and shows its select; there is no
-// rail and nothing sticky or fixed outside the Experience cards, at desktop
-// and phone widths; and the Apps section shows the fallback line with its
-// reload link, since /_site/apps.json cannot be reached.
+// - /?utm_source=x and /index.html (and, with --bare, / too) are loaded in
+//   headless Chrome (puppeteer-core, the system Chrome or CHROME_PATH) and
+//   checked by what they do on their own: a stored classic-dark choice gives
+//   <html data-theme="classic-dark"> from the first frame and the Classic Dark
+//   surface as the page background; the site-themes stylesheet and picker
+//   module they load are the real ones; the theme picker is defined and shows
+//   its select; there is no rail and nothing sticky or fixed outside the
+//   Experience cards, at desktop and phone widths; and the Apps section shows
+//   the cards /_site/apps.json lists or, when it cannot be reached, the
+//   fallback line with its reload link.
+// With --bare every request to another origin is refused, so /_site/apps.json
+// cannot be reached and the fallback line is expected.
 // --retries N waits and retries the whole check N times (60 s apart), for the
 // CDN cache to catch up after a deployment.
 
@@ -59,10 +58,10 @@ function appCards(html) {
 }
 
 /** The cards site-shell's /_site/apps.json says the homepage lists. */
-async function listedApps(at) {
+async function listedApps(problems) {
   const res = await get('/_site/apps.json');
   if (res.status !== 200) {
-    at(`/_site/apps.json answers ${res.status}`);
+    problems.push(`/_site/apps.json answers ${res.status}`);
     return null;
   }
   return JSON.parse(res.body)
@@ -86,19 +85,6 @@ async function checkThemeAssets(sheetPath, pickerPath, at) {
   }
 }
 
-async function checkStandalone(path, problems) {
-  const page = await get(path);
-  const at = (msg) => problems.push(`${path}: ${msg}`);
-  if (page.status !== 200) return at(`status ${page.status}`);
-  const head = page.body.slice(0, page.body.indexOf('</head>'));
-  if (!/<script>\(function siteThemeBoot\(/.test(head)) at('no inline theme boot script in <head>');
-  const css = /<link rel="stylesheet" href="(\/assets\/site-themes\/[^"]+\/themes\.css)">/.exec(head);
-  const picker = /import \{ defineThemePicker \} from '([^']+)'; defineThemePicker\(\);/.exec(page.body);
-  await checkThemeAssets(css?.[1], picker?.[1], at);
-  if (!/<site-theme-picker[\s>]/.test(page.body)) at('no <site-theme-picker> element');
-  if (/class="rail"/.test(page.body)) at('the left rail is back');
-}
-
 /** What a loaded page shows: theme, picker, rail and pinned elements, the Apps section. */
 function observePage() {
   const root = document.documentElement;
@@ -119,6 +105,7 @@ function observePage() {
   const fallback = document.querySelector('#apps .apps-fallback');
   const reload = fallback?.querySelector('a[href]');
   return {
+    firstFrameTheme: window.__firstFrameTheme ?? null,
     theme: root.dataset.theme ?? null,
     background: getComputedStyle(root).backgroundColor,
     sheet: sheet ? new URL(sheet.href).pathname : null,
@@ -127,7 +114,12 @@ function observePage() {
     pickers,
     rail: Boolean(document.querySelector('.rail')),
     pinned,
-    cards: document.querySelectorAll('#apps .site-apps li').length,
+    cards: [...document.querySelectorAll('#apps .site-apps li')].map((li) => ({
+      id: li.dataset.app,
+      href: li.querySelector('a')?.getAttribute('href') ?? null,
+      gated: 'gated' in li.dataset,
+      visible: li.checkVisibility(),
+    })),
     fallbackShown: Boolean(fallback?.checkVisibility()),
     reloadsPage: Boolean(reload) && new URL(reload.href).pathname === location.pathname,
   };
@@ -144,15 +136,23 @@ async function darkSurface(sheetPath) {
   return color;
 }
 
-async function checkInBrowser(browser, path, problems) {
+/** apps: the cards /_site/apps.json lists, or null when it cannot be reached. */
+async function checkInBrowser(browser, path, apps, problems) {
   const at = (msg) => problems.push(`${path}: ${msg}`);
   const page = await browser.newPage();
   try {
     await page.setViewport({ width: 1280, height: 900 });
     await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }]);
-    await page.evaluateOnNewDocument(() => localStorage.setItem('site-theme', 'classic-dark'));
-    await page.setRequestInterception(true);
-    page.on('request', (req) => (req.url().startsWith(BASE + '/') ? req.continue() : req.abort()));
+    await page.evaluateOnNewDocument(() => {
+      localStorage.setItem('site-theme', 'classic-dark');
+      requestAnimationFrame(() => {
+        window.__firstFrameTheme = document.documentElement.dataset.theme ?? null;
+      });
+    });
+    if (BARE) {
+      await page.setRequestInterception(true);
+      page.on('request', (req) => (req.url().startsWith(BASE + '/') ? req.continue() : req.abort()));
+    }
     const res = await page.goto(BASE + path, { waitUntil: 'load' });
     if (res.status() !== 200) return at(`status ${res.status()}`);
     await page
@@ -163,6 +163,8 @@ async function checkInBrowser(browser, path, problems) {
       .catch(() => {});
 
     const seen = await page.evaluate(observePage);
+    if (seen.firstFrameTheme !== 'classic-dark')
+      at(`a stored classic-dark choice gives data-theme ${JSON.stringify(seen.firstFrameTheme)} on the first frame`);
     if (seen.theme !== 'classic-dark') at(`a stored classic-dark choice gives data-theme ${JSON.stringify(seen.theme)}`);
     if (seen.sheet) {
       const dark = await page.evaluate(darkSurface, seen.sheet);
@@ -172,9 +174,17 @@ async function checkInBrowser(browser, path, problems) {
     if (!seen.pickerDefined) at('site-theme-picker is not defined');
     if (!seen.pickers.some((p) => p && p.options.includes('classic-dark') && p.value === 'classic-dark'))
       at(`no visible theme picker shows its select set to classic-dark: ${JSON.stringify(seen.pickers)}`);
-    if (seen.cards > 0) at(`${seen.cards} Apps cards rendered with /_site/apps.json unreachable`);
-    if (!seen.fallbackShown) at('the Apps fallback line is not shown');
-    else if (!seen.reloadsPage) at('the Apps fallback line has no link that reloads the page');
+    if (apps) {
+      const cards = seen.cards.map(({ id, href, gated }) => ({ id, href, gated }));
+      if (JSON.stringify(cards) !== JSON.stringify(apps))
+        at(`Apps cards are ${JSON.stringify(cards)}, /_site/apps.json lists ${JSON.stringify(apps)}`);
+      if (seen.cards.some((c) => !c.visible)) at('some Apps cards are not visible');
+      if (seen.fallbackShown) at('the Apps fallback line is shown next to the cards');
+    } else {
+      if (seen.cards.length > 0) at(`${seen.cards.length} Apps cards rendered with /_site/apps.json unreachable`);
+      if (!seen.fallbackShown) at('the Apps fallback line is not shown');
+      else if (!seen.reloadsPage) at('the Apps fallback line has no link that reloads the page');
+    }
 
     for (const [width, height] of [[1280, 900], [390, 844]]) {
       await page.setViewport({ width, height });
@@ -187,50 +197,48 @@ async function checkInBrowser(browser, path, problems) {
   }
 }
 
-async function checkAllInBrowser(problems) {
+async function checkAllInBrowser(paths, apps, problems) {
   const { default: puppeteer } = await import('puppeteer-core');
   const browser = await puppeteer.launch({
     ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : { channel: 'chrome' }),
     args: process.env.CI ? ['--no-sandbox'] : [],
   });
   try {
-    for (const path of ['/', '/?utm_source=x', '/index.html']) await checkInBrowser(browser, path, problems);
+    for (const path of paths) await checkInBrowser(browser, path, apps, problems);
   } finally {
     await browser.close();
   }
 }
 
-async function checkComposed(problems) {
+async function checkComposed(apps, problems) {
   const page = await get('/');
   const at = (msg) => problems.push(`/: ${msg}`);
   if (page.status !== 200) return at(`status ${page.status}`);
   if (!page.headers.get('x-site-shell')) at('not composed by site-shell (no x-site-shell header)');
   if (!/<nav class="sp" aria-label="Site path">/.test(slot(page.body, 'site-path') ?? '')) at('the site path slot was not filled');
-  const apps = slot(page.body, 'site-apps') ?? '';
-  if (!apps.startsWith('<style data-site-shell>')) at('the Apps slot was not filled');
-  const expected = await listedApps(at);
+  if (!(slot(page.body, 'site-apps') ?? '').startsWith('<style data-site-shell>')) at('the Apps slot was not filled');
   const cards = appCards(page.body);
-  if (expected && JSON.stringify(cards) !== JSON.stringify(expected))
-    at(`Apps cards are ${JSON.stringify(cards)}, /_site/apps.json lists ${JSON.stringify(expected)}`);
+  if (apps && JSON.stringify(cards) !== JSON.stringify(apps))
+    at(`Apps cards are ${JSON.stringify(cards)}, /_site/apps.json lists ${JSON.stringify(apps)}`);
   if (/class="rail"/.test(page.body)) at('the left rail is back');
 }
 
 async function runOnce() {
   const problems = [];
   if (BARE) {
-    await checkAllInBrowser(problems);
+    await checkAllInBrowser(['/', '/?utm_source=x', '/index.html'], null, problems);
     return problems;
   }
-  await checkComposed(problems);
-  await checkStandalone('/?utm_source=x', problems);
-  await checkStandalone('/index.html', problems);
+  const apps = await listedApps(problems);
+  await checkComposed(apps, problems);
+  await checkAllInBrowser(['/?utm_source=x', '/index.html'], apps, problems);
   return problems;
 }
 
 for (let attempt = 0; ; attempt++) {
   const problems = await runOnce();
   if (problems.length === 0) {
-    console.log(`ok: ${BASE} (${BARE ? 'in headless Chrome: /' : '/ composed'}, /?utm_source=x and /index.html standalone)`);
+    console.log(`ok: ${BASE} (${BARE ? '/, ' : '/ composed; '}/?utm_source=x and /index.html in headless Chrome)`);
     break;
   }
   if (attempt >= RETRIES) {
