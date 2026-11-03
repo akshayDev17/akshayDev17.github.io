@@ -185,9 +185,8 @@ site-slot{display:block}
 
 /* the theme picker (<site-theme-picker>, from site-themes). One
    sits at the right end of the status line; at 640px and below, where the
-   site path folds into its pill and the status pill needs the whole width, a
-   second one sits at the right end of the top line instead, so neither adds a
-   line. */
+   status pill needs the whole width, a second one sits at the right end of the
+   top line instead, beside the site row, so neither adds a line. */
 site-theme-picker{font-family:var(--mono);font-size:.75rem;letter-spacing:.02em;color:var(--muted)}
 .topline site-theme-picker{display:none;flex:none}
 .statusbar{margin-top:var(--s4)}
@@ -265,9 +264,6 @@ site-theme-picker{font-family:var(--mono);font-size:.75rem;letter-spacing:.02em;
 .work-main h3{font-size:1.25rem;font-weight:400;line-height:1.25;letter-spacing:-.01em;
   transition:color .24s var(--ease)}
 .work-main .desc{margin-top:var(--s2);color:var(--muted);font-size:.9375rem;line-height:1.6}
-/* gated apps (behind Cloudflare Access) carry a small lock after the title */
-.work-main h3 .lock{width:.7em;height:.7em;margin-left:.3em;vertical-align:baseline;
-  fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .work-main .foot{margin-top:auto;padding-top:var(--s4);border-top:1px solid var(--rule);
   display:flex;flex-wrap:wrap;align-items:baseline;gap:6px var(--s3);
   font-family:var(--mono);font-size:.6875rem;letter-spacing:.06em;color:var(--muted)}
@@ -283,7 +279,6 @@ site-theme-picker{font-family:var(--mono);font-size:.75rem;letter-spacing:.02em;
 #apps .site-apps a{display:flex;flex-direction:column;gap:var(--s2);width:100%;
   padding:var(--s4) var(--s5);color:var(--ink);text-decoration:none;overflow:hidden}
 #apps .site-apps-name{font-size:1.25rem;line-height:1.25;letter-spacing:-.01em;color:var(--ink)}
-#apps .site-lock{width:.7em;height:.7em;margin-left:.3em;stroke:var(--muted);stroke-linecap:round;stroke-linejoin:round}
 #apps .site-apps-blurb{color:var(--muted);font-size:.9375rem;line-height:1.6}
 #apps .apps-fallback{max-width:var(--col);color:var(--muted)}
 #apps .apps-fallback a{color:var(--annot)}
@@ -414,7 +409,8 @@ site-theme-picker{font-family:var(--mono);font-size:.75rem;letter-spacing:.02em;
   .rung::before{left:calc(-1 * var(--s4))}
   .links{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-/* the site path's pill form (site-themes shell/nav.ts) starts at 640px */
+/* on a portrait phone the theme picker moves up beside the site row, which
+   scrolls sideways in what is left of the line (site-themes shell/nav.ts) */
 @media (max-width:640px){
   .topline site-theme-picker{display:block}
   .statusbar site-theme-picker{display:none}
@@ -498,7 +494,7 @@ site-theme-picker{font-family:var(--mono);font-size:.75rem;letter-spacing:.02em;
            src/apps.ts. Elsewhere (/?anything, /index.html, a fail-open) the
            script at the end of the page renders the same list from
            site-shell's /_site/apps.json; this line shows only if that fails. -->
-      <style>.site-apps{margin:0;padding:0;list-style:none}.site-apps a{display:flex;flex-direction:column;min-height:44px;color:inherit;text-decoration:none}.site-apps-name{display:inline-flex;align-items:center;color:var(--text)}.site-apps-blurb{color:var(--text-muted)}.site-vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}.site-lock{fill:none;stroke:currentColor;stroke-width:2;margin-left:.25em;flex:none}</style>
+      <style>.site-apps{margin:0;padding:0;list-style:none}.site-apps a{display:flex;flex-direction:column;min-height:44px;color:inherit;text-decoration:none}.site-apps-name{display:inline-flex;align-items:center;color:var(--text)}.site-apps-blurb{color:var(--text-muted)}.site-vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}</style>
       <p class="apps-fallback">The apps list did not load. <a href="">Reload the page</a></p>
     </site-slot>
   </section>
@@ -722,7 +718,6 @@ site-theme-picker{font-family:var(--mono);font-size:.75rem;letter-spacing:.02em;
   const slot = document.querySelector('site-slot[name="site-apps"]');
   if (slot.querySelector('.site-apps')) return;
   const fallback = slot.querySelector('.apps-fallback');
-  const LOCK = '<svg class="site-lock" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
   const el = (tag, className, text) => {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -736,10 +731,8 @@ site-theme-picker{font-family:var(--mono);font-size:.75rem;letter-spacing:.02em;
     const a = el('a');
     a.setAttribute('href', app.path);
     const name = el('span', 'site-apps-name', app.label);
-    if (app.gated) {
-      name.insertAdjacentHTML('beforeend', LOCK);
-      name.append(el('span', 'site-vh', ' (invite-only, sign-in required)'));
-    }
+    // No lock is drawn; a screen reader hears that the app needs a sign-in.
+    if (app.gated) name.append(el('span', 'site-vh', ' (sign-in required)'));
     a.append(name, el('span', 'site-apps-blurb', app.blurb));
     li.append(a);
     return li;
