@@ -26,7 +26,7 @@ small text on a light ground.
 
 **Type** — two families, strictly separated jobs.
 - `--serif`: **Newsreader** (variable, optical size). Everything you read.
-- `--mono`: **IBM Plex Mono**. Everything that is apparatus: numbers, labels, dates, links, the rail.
+- `--mono`: **IBM Plex Mono**. Everything that is apparatus: numbers, labels, dates, links.
 - Never a third family, never an icon font, never an emoji.
 
 **Spacing** — `--s1…--s9` = 4 / 8 / 12 / 16 / 24 / 32 / 48 / 72 / 112.

@@ -12,7 +12,7 @@
 
 ## VISUAL DIRECTION
 
-**The page behaves like the front matter and index plates of a printed reference atlas** — paper ground, hairline rules, a measured left rail, and one annotation colour used only where something is current or clickable. It is a document that has been *compiled*, not a landing page that has been *assembled*.
+**The page behaves like the front matter and index plates of a printed reference atlas** — paper ground, hairline rules, and one annotation colour used only where something is current or clickable. It is a document that has been *compiled*, not a landing page that has been *assembled*.
 
 The subject matter earns it: this person's work is atlases (electoral cartography), hierarchies (module mind maps) and traces (harness engineering). An atlas index is the honest form for that body of work.
 
@@ -124,7 +124,7 @@ in a descendant. Only the Work cards carry the cursor-following radial wash, and
 ## TYPOGRAPHY
 
 - **Newsreader** (variable, optical-size axis) for the positioning sentence, section titles, work titles, paper titles, body prose. Used at genuinely different sizes rather than different weights.
-- **IBM Plex Mono** for *all apparatus*: section numbers, labels, dates, statuses, links, captions, the rail. Nothing decorative is set in it.
+- **IBM Plex Mono** for *all apparatus*: section numbers, labels, dates, statuses, links, captions. Nothing decorative is set in it.
 - Two families with strictly separated jobs. No third family, no icon font.
 - Body measure capped at 64ch. Line height 1.7 for prose, 1.25 for display.
 
@@ -173,7 +173,7 @@ colour. The theme values themselves are owned by site-themes, not by this table.
 | `--paper-2` | `#EAEEF6` | raised ground: journal marks, IF chips |
 | `--paper-3` | `#DEE4F0` | row hover |
 | `--ink` | `#0F1220` | text |
-| `--rule` / `--rule-2` | `#D3D9E6` / `#BCC4D6` | hairlines, ticks, the rail |
+| `--rule` / `--rule-2` | `#D3D9E6` / `#BCC4D6` | hairlines |
 | `--muted` | `#5A6273` | secondary text, descriptions |
 | `--annot` | `#3A4BD8` | **annotation only** — current state, links, the impact-factor chip |
 
@@ -194,14 +194,13 @@ with their own usage terms, and a portfolio does not need to redistribute them t
 ## DENSITY / INTERACTION / RESPONSIVE
 
 - **Density:** fact-dense but rule-light — many lines, few boxes. Nothing floats.
-- **Interaction:** rows are links. Hover darkens the row's ground and turns its number vermilion; the rail's active tick fills. Focus is a 2px outline in the theme's focus colour, never removed.
-- **Responsive:** below 900px the rail becomes a horizontal sticky bar with a 2px progress rule beneath it — navigation survives the collapse, and the active item scrolls itself into view. The index and chronology become single-column stacks; the apparatus type floor rises to 11–12px. Nothing is hidden that carries meaning.
+- **Interaction:** rows are links. Hover darkens the row's ground and turns its number vermilion. Focus is a 2px outline in the theme's focus colour, never removed.
+- **Responsive:** navigation is the site path and the contents line (see LAYOUT); neither is sticky. The index and chronology become single-column stacks; the apparatus type floor rises to 11–12px. Nothing is hidden that carries meaning.
 
 ## MOTION
 
 Editorial and quiet. 240ms, `cubic-bezier(.2,.7,.3,1)`.
 - Blocks rise 8px and fade in, once, as each enters the viewport.
-- The rail's measurement line tracks scroll continuously.
 - No parallax, no springs, no scroll-jacking, no looping motion.
 - `prefers-reduced-motion`: all transforms removed, opacity only.
 
@@ -211,9 +210,9 @@ Editorial and quiet. 240ms, `cubic-bezier(.2,.7,.3,1)`.
 
 ## SIGNATURE
 
-**The rail.** A numbered, labelled section index down the left edge that doubles as the entire
-navigation and reports the current section with a single vertical rule. It is the one thing a
-visitor will remember, and it comes from the subject rather than from a trend.
+**The rail** was the signature: a numbered, labelled section index down the left edge that doubled
+as the entire navigation. It was removed in 2026-11 (see LAYOUT), and no replacement signature has
+been named.
 
 ### Revision log — v5 → v6, from owner feedback
 
