@@ -158,10 +158,9 @@ plate**, which also removed one of five identical opener bands. Work's first row
 
 ## Open items
 
-- **Four routes and `/cv.pdf` do not exist**: `/work/harness-atlas/`, `/work/ml-engineering-atlas/`,
-  `/work/mcp-youtube-extract/`, `/work/`, `/cv.pdf`. The markup is correct
-  for the final site; the pages are the next build. The side column labelling two of them `live`
-  refers to the artifacts existing, not to the routes resolving.
+- **The planned `/work/…` routes and `/cv.pdf` were never built** (`/work/harness-atlas/`,
+  `/work/ml-engineering-atlas/`, `/work/mcp-youtube-extract/`, `/work/`), and the page no longer
+  links to any of them. The MCP YouTube Extract card links to its GitHub repo instead.
 - Root-absolute paths (`/work/…`) are correct **because** the repo is `akshayDev17.github.io`, a user
   site. If it ever becomes a project page, every one of them breaks.
 - Research is honest prose, not a bibliography, until the three paper titles/venues/abstracts arrive.

@@ -84,7 +84,7 @@ Everything else is apparatus and stays small, mono, and grey.
 
 - Two columns: a **fixed left rail** (124px, sticky) and an offset editorial column. Never centred.
 - The rail is the *only* navigation — there is no top nav bar — and its one vertical rule marks the current section. No ticks, no progress meter.
-- **Work is a two-column grid of cards** at ≥1024px, one column below. Each card carries its index number, title, one-line description and a ruled footer of facts.
+- **Apps and Work are two-column grids of cards** at ≥901px, one column below. Apps holds the functional web apps; Work holds things built that are not apps. Each card carries its index number, title, one-line description and a ruled footer of facts; an app behind Cloudflare Access carries a small lock after its title.
 - **Research is a column of cards.** Each paper is a spread at ≥1024px: journal, title, authors, citation count and links on the left; the abstract on the right.
 - **Experience is a column of cards.** Each company is a spread: a 16rem sticky meta rail (company, dates, location, tech chips) beside the roles and bullets, with a dot-and-line ladder when a company has more than one role.
 - Full-bleed hairline section rules reach the layout edges.
