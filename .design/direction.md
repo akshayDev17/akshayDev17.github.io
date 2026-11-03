@@ -211,8 +211,9 @@ Editorial and quiet. 240ms, `cubic-bezier(.2,.7,.3,1)`.
 ## SIGNATURE
 
 **The rail** was the signature: a numbered, labelled section index down the left edge that doubled
-as the entire navigation. It was removed in 2026-11 (see LAYOUT), and no replacement signature has
-been named.
+as the entire navigation. It was removed at the owner's request on 2026-11-03 (see LAYOUT). The
+masthead now carries the owner-approved Portfolio path line and the slim contents line under the
+byline.
 
 ### Revision log — v5 → v6, from owner feedback
 
