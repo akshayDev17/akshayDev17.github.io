@@ -196,7 +196,7 @@ with their own usage terms, and a portfolio does not need to redistribute them t
 
 - **Density:** fact-dense but rule-light — many lines, few boxes. Nothing floats.
 - **Interaction:** rows are links. Hover darkens the row's ground and turns its number vermilion. Focus is a 2px outline in the theme's focus colour, never removed.
-- **Responsive:** navigation is the site row and the contents line (see LAYOUT); neither is sticky. The index and chronology become single-column stacks; the apparatus type floor rises to 11–12px. Nothing is hidden that carries meaning.
+- **Responsive:** navigation is the site row and the contents line (see LAYOUT); neither is sticky. The index and chronology become single-column stacks; on a phone (≤640px) the apparatus type floor rises to 12px, and desktop sizes are untouched. Nothing is hidden that carries meaning.
 
 ## MOTION
 

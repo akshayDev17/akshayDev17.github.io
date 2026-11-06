@@ -396,6 +396,10 @@ site-theme-picker{font-family:var(--mono);font-size:.75rem;letter-spacing:.02em;
 @media (max-width:640px){
   .topline site-theme-picker{display:block}
   .statusbar site-theme-picker{display:none}
+  /* phone-only floor for the mono apparatus: the 11px labels join the 12px
+     tier (byline, dates, authors) so no text on a phone computes below 12px.
+     Desktop declarations above stay as they are. */
+  .shead .num,.shead .note,.record dt,.stats .k,.chip,.cite,.links .lbl{font-size:.75rem}
 }
 
 @media print{
